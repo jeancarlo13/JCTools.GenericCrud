@@ -1,0 +1,45 @@
+@using JCTools.GenericCrud.Helpers
+@model JCTools.GenericCrud.Models.ICrudList
+@{
+    Layout = Model.LayoutPage;
+    ViewData["Title"] = Model.Title;
+}
+
+<h2>@Model.Title</h2>
+<h3>@Model.Subtitle</h2>
+
+<table class="table table-striped table-condensed table-hover">
+    <thead>
+        <tr>
+            @foreach(var title in Model.GetModelColumns())
+            {
+                <th>@title</th>
+            }
+            @if(Model.ActionsColumnIsVisible)
+            {
+                <th class="text-center">
+                    @Html.Partial("_action", Model.NewAction)
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var row in Model.GetModelValues())
+        {
+            <tr>
+                @foreach(var value in row)
+                {
+                    <td>@value</td>
+                }
+                @if(Model.ActionsColumnIsVisible)
+                {
+                    <td class="text-center">
+                        @Html.Partial("_action", Model.DetailsAction)
+                        @Html.Partial("_action", Model.EditAction)
+                        @Html.Partial("_action", Model.DeleteAction)
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

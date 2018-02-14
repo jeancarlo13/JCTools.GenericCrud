@@ -1,0 +1,15 @@
+@using JCTools.GenericCrud.Helpers
+@model JCTools.GenericCrud.Models.CrudAction
+@if(Model.Visible)
+{
+    <a href="#" title="@Model.Caption">
+        @if(string.IsNullOrWhiteSpace(Model.IconClass))
+        {
+            @Model.Text
+        }
+        else 
+        {
+            <i class="@Model.IconClass" aria-hidden="true"></i>
+        }
+    </a>
+}
