@@ -1,0 +1,25 @@
+@using JCTools.GenericCrud.Helpers
+@model JCTools.GenericCrud.Models.ICrudDetails
+@{
+    Layout = Model.LayoutPage;
+    ViewData["Title"] = Model.Title;
+    var values = @Model.GetModelValues();
+}
+
+<h2>@Model.Title</h2>
+<h3>@Model.Subtitle</h2>
+
+<dl>
+    @foreach(var value in values)
+    {
+        if (value.Visible)
+        {
+            <dt>
+                @value.Display
+            </dt>
+            <dd>
+                @value.Value
+            </dd>
+        }
+    }
+</dl>

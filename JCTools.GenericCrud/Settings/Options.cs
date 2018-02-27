@@ -1,4 +1,4 @@
-namespace JCTools.GenericCrud
+namespace JCTools.GenericCrud.Settings
 {
     public class Options
     {

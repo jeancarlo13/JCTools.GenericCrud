@@ -1,8 +1,11 @@
 @using JCTools.GenericCrud.Helpers
 @model JCTools.GenericCrud.Models.CrudAction
+@{
+    var url = ViewData["Url"] ?? "#";
+}
 @if(Model.Visible)
 {
-    <a href="#" title="@Model.Caption">
+    <a href="@url" title="@Model.Caption">
         @if(string.IsNullOrWhiteSpace(Model.IconClass))
         {
             @Model.Text
@@ -13,3 +16,4 @@
         }
     </a>
 }
+    

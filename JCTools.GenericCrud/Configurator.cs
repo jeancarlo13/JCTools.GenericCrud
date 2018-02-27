@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using JCTools.GenericCrud.Settings;
 
 namespace JCTools.GenericCrud
 {

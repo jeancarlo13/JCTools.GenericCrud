@@ -11,7 +11,7 @@
 <table class="table table-striped table-condensed table-hover">
     <thead>
         <tr>
-            @foreach(var title in Model.GetModelColumns())
+            @foreach(var title in Model.Columns)
             {
                 <th>@title</th>
             }
@@ -29,14 +29,32 @@
             <tr>
                 @foreach(var value in row)
                 {
-                    <td>@value</td>
+                    if (value.Visible)
+                    {
+                        <td>@value.Value</td>
+                    }
                 }
                 @if(Model.ActionsColumnIsVisible)
                 {
                     <td class="text-center">
-                        @Html.Partial("_action", Model.DetailsAction)
-                        @Html.Partial("_action", Model.EditAction)
-                        @Html.Partial("_action", Model.DeleteAction)
+                        @{
+                            var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
+                            var data = new ViewDataDictionary(this.ViewData) 
+                            { 
+                                { "Url", Url.Action("Details", new { id = value }) }
+                            };
+                        }
+                        @Html.Partial("_action", Model.DetailsAction, data)
+
+                        @{
+                            data["Url"] = Url.Action("Edit", new { id = value });
+                        }
+                        @Html.Partial("_action", Model.EditAction, data)
+                        
+                        @{
+                            data["Url"] = Url.Action("Delete", new { id = value });
+                        }
+                        @Html.Partial("_action", Model.DeleteAction, data)
                     </td>
                 }
             </tr>

@@ -1,0 +1,79 @@
+[
+    {
+        "Key": "Title",
+        "Values": {
+            "en-US": "Title",
+            "es-MX": "Titulo"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Subtitle",
+        "Values": {
+            "en-US": "All data",
+            "es-MX": "Todos los datos"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Create.Caption",
+        "Values": {
+            "en-US": "Create new {0}",
+            "es-MX": "Crear"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Create.Text",
+        "Values": {
+            "en-US": "Create",
+            "es-MX": "Nuevo"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Details.Caption",
+        "Values": {
+            "en-US": "Details of the {0}",
+            "es-MX": "Ver detalles"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Details.Text",
+        "Values": {
+            "en-US": "Details",
+            "es-MX": "Detalles"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Edit.Caption",
+        "Values": {
+            "en-US": "Edit the {0}",
+            "es-MX": "Editar"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Edit.Text",
+        "Values": {
+            "en-US": "Edit",
+            "es-MX": "Editar"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Delete.Caption",
+        "Values": {
+            "en-US": "Delete the {0}",
+            "es-MX": "Borrar"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Delete.Text",
+        "Values": {
+            "en-US": "Delete",
+            "es-MX": "Borrar"
+        }
+    },
+    {
+        "Key": "GenericCrud.Details.Subtitle",
+        "Values": {
+            "en-US": "Details",
+            "es-MX": "Detalles"
+        }
+    }
+]

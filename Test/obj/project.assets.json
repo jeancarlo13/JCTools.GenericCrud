@@ -2,6 +2,21 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.0": {
+      "Askmethat.Aspnet.JsonLocalizer/1.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Hosting": "2.0.0",
+          "Microsoft.Extensions.Caching.Memory": "2.0.0",
+          "Microsoft.Extensions.Localization": "2.0.0",
+          "Newtonsoft.Json": "10.0.3"
+        },
+        "compile": {
+          "lib/netcoreapp2.0/Askmethat.Aspnet.JsonLocalizer.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/Askmethat.Aspnet.JsonLocalizer.dll": {}
+        }
+      },
       "Libuv/1.10.0": {
         "type": "package",
         "dependencies": {
@@ -2685,34 +2700,14 @@
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
       },
-      "Newtonsoft.Json/10.0.1": {
+      "Newtonsoft.Json/10.0.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.3.0",
-          "System.Collections": "4.3.0",
+          "NETStandard.Library": "1.6.1",
           "System.ComponentModel.TypeConverter": "4.3.0",
-          "System.Diagnostics.Debug": "4.3.0",
-          "System.Dynamic.Runtime": "4.3.0",
-          "System.Globalization": "4.3.0",
-          "System.IO": "4.3.0",
-          "System.Linq": "4.3.0",
-          "System.Linq.Expressions": "4.3.0",
-          "System.ObjectModel": "4.3.0",
-          "System.Reflection": "4.3.0",
-          "System.Reflection.Extensions": "4.3.0",
-          "System.Resources.ResourceManager": "4.3.0",
-          "System.Runtime": "4.3.0",
-          "System.Runtime.Extensions": "4.3.0",
-          "System.Runtime.Numerics": "4.3.0",
           "System.Runtime.Serialization.Formatters": "4.3.0",
           "System.Runtime.Serialization.Primitives": "4.3.0",
-          "System.Text.Encoding": "4.3.0",
-          "System.Text.Encoding.Extensions": "4.3.0",
-          "System.Text.RegularExpressions": "4.3.0",
-          "System.Threading": "4.3.0",
-          "System.Threading.Tasks": "4.3.0",
-          "System.Xml.ReaderWriter": "4.3.0",
-          "System.Xml.XDocument": "4.3.0",
           "System.Xml.XmlDocument": "4.3.0"
         },
         "compile": {
@@ -4749,13 +4744,14 @@
       },
       "JCTools.GenericCrud/1.0.0": {
         "type": "project",
-        "framework": ".NETStandard,Version=v2.0",
+        "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
           "Microsoft.AspNetCore.Mvc": "2.0.2",
           "Microsoft.AspNetCore.Mvc.Razor": "2.0.2",
           "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.0.2",
           "Microsoft.EntityFrameworkCore": "2.0.1",
-          "Microsoft.Extensions.FileProviders.Embedded": "2.0.0"
+          "Microsoft.Extensions.FileProviders.Embedded": "2.0.0",
+          "Microsoft.Extensions.Localization": "2.0.1"
         },
         "compile": {
           "bin/placeholder/JCTools.GenericCrud.dll": {}
@@ -4767,6 +4763,22 @@
     }
   },
   "libraries": {
+    "Askmethat.Aspnet.JsonLocalizer/1.0.3": {
+      "sha512": "swC5hIJPUjK1YMgQSC09tE+3DySic4CaBb+ayeue+UFU4whGKgNwJwS2J5kw3ml48DwZ5UPONMFiUsqBCORJ9g==",
+      "type": "package",
+      "path": "askmethat.aspnet.jsonlocalizer/1.0.3",
+      "files": [
+        "askmethat.aspnet.jsonlocalizer.1.0.3.nupkg.sha512",
+        "askmethat.aspnet.jsonlocalizer.nuspec",
+        "lib/netcoreapp1.1/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netcoreapp2.0/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netstandard1.3/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netstandard1.4/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netstandard1.5/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netstandard1.6/Askmethat.Aspnet.JsonLocalizer.dll",
+        "lib/netstandard2.0/Askmethat.Aspnet.JsonLocalizer.dll"
+      ]
+    },
     "Libuv/1.10.0": {
       "sha512": "GsCf4q+eyaI49rCPlgYxdxa1SQCysXFFdSJWdstrwxytg4+VPYLYrXD4AT2rjHVJ+UF7SSWX9CapWEYaU4ejVQ==",
       "type": "package",
@@ -7539,11 +7551,12 @@
         "netstandard.library.nuspec"
       ]
     },
-    "Newtonsoft.Json/10.0.1": {
-      "sha512": "ebWzW9j2nwxQeBo59As2TYn7nYr9BHicqqCwHOD1Vdo+50HBtLPuqdiCYJcLdTRknpYis/DSEOQz5KmZxwrIAg==",
+    "Newtonsoft.Json/10.0.3": {
+      "sha512": "hSXaFmh7hNCuEoC4XNY5DrRkLDzYHqPx/Ik23R4J86Z7PE/Y6YidhG602dFVdLBRSdG6xp9NabH3dXpcoxWvww==",
       "type": "package",
-      "path": "newtonsoft.json/10.0.1",
+      "path": "newtonsoft.json/10.0.3",
       "files": [
+        "LICENSE.md",
         "lib/net20/Newtonsoft.Json.dll",
         "lib/net20/Newtonsoft.Json.xml",
         "lib/net35/Newtonsoft.Json.dll",
@@ -7556,9 +7569,11 @@
         "lib/netstandard1.0/Newtonsoft.Json.xml",
         "lib/netstandard1.3/Newtonsoft.Json.dll",
         "lib/netstandard1.3/Newtonsoft.Json.xml",
-        "lib/portable-net45+win8+wpa81+wp8/Newtonsoft.Json.dll",
-        "lib/portable-net45+win8+wpa81+wp8/Newtonsoft.Json.xml",
-        "newtonsoft.json.10.0.1.nupkg.sha512",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.xml",
+        "newtonsoft.json.10.0.3.nupkg.sha512",
         "newtonsoft.json.nuspec",
         "tools/install.ps1"
       ]
@@ -12552,6 +12567,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
+      "Askmethat.Aspnet.JsonLocalizer >= 1.0.3",
       "JCTools.GenericCrud >= 1.0.0",
       "Microsoft.AspNetCore.All >= 2.0.5",
       "Microsoft.EntityFrameworkCore.Design >= 2.0.1",
@@ -12602,6 +12618,10 @@
     "frameworks": {
       "netcoreapp2.0": {
         "dependencies": {
+          "Askmethat.Aspnet.JsonLocalizer": {
+            "target": "Package",
+            "version": "[1.0.3, )"
+          },
           "Microsoft.AspNetCore.All": {
             "target": "Package",
             "version": "[2.0.5, )"
