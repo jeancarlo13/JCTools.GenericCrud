@@ -8,18 +8,24 @@
 
 <h2>@Model.Title</h2>
 <h3>@Model.Subtitle</h2>
-
-<dl>
-    @foreach(var value in values)
-    {
-        if (value.Visible)
+<div class="row">
+    <dl class="dl-horizontal">
+        @foreach(var value in values)
         {
-            <dt>
-                @value.Display
-            </dt>
-            <dd>
-                @value.Value
-            </dd>
+            if (value.Visible)
+            {
+                <dt>
+                    @value.Display
+                </dt>
+                <dd>
+                    @value.Value
+                </dd>
+            }
         }
-    }
-</dl>
+    </dl>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-default"  >Go back</button>
+    </div>
+</div>

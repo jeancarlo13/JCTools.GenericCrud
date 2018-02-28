@@ -2,10 +2,11 @@
 @model JCTools.GenericCrud.Models.CrudAction
 @{
     var url = ViewData["Url"] ?? "#";
+    
 }
 @if(Model.Visible)
 {
-    <a href="@url" title="@Model.Caption">
+    <a href="@url" title="@Model.Caption" class="@Model.ButtonClass">
         @if(string.IsNullOrWhiteSpace(Model.IconClass))
         {
             @Model.Text

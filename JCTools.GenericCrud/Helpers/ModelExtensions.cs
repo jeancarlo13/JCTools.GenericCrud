@@ -35,7 +35,8 @@ namespace JCTools.GenericCrud.Helpers
                 Visible = options.AllowCreationAction,
                 Caption = localizer.GetLocalizedString("GenericCrud.List.Create.Caption", "Create new {0}", modelName.ToLower()),
                 Text = localizer.GetLocalizedString("GenericCrud.List.Create.Text", "Create"),
-                IconClass = "fa fa-plus"
+                IconClass = options?.Actions?.New?.IconClass ?? ActionOptions.DefaultNew.IconClass,
+                ButtonClass = options?.Actions?.New?.ButtonClass ?? ActionOptions.DefaultNew.ButtonClass,
             };
         }
         private static CrudAction ConfigureDetailsAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
@@ -46,7 +47,8 @@ namespace JCTools.GenericCrud.Helpers
                 Visible = options.AllowShowDetailsAction,
                 Caption = localizer.GetLocalizedString("GenericCrud.List.Details.Caption", "Details of the {0}", modelName.ToLower()),
                 Text = localizer.GetLocalizedString("GenericCrud.List.Details.Text", "Details"),
-                IconClass = "fa fa-info-circle"
+                IconClass = options?.Actions?.Details?.IconClass ?? ActionOptions.DefaultDetails.IconClass,
+                ButtonClass = options?.Actions?.Details?.ButtonClass ?? ActionOptions.DefaultDetails.ButtonClass,
             };
         }
         private static CrudAction ConfigureEditAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
@@ -57,7 +59,8 @@ namespace JCTools.GenericCrud.Helpers
                 Visible = options.AllowEditionAction,
                 Caption = localizer.GetLocalizedString("GenericCrud.List.Edit.Caption", "Edit the {0}", modelName.ToLower()),
                 Text = localizer.GetLocalizedString("GenericCrud.List.Edit.Text", "Edit"),
-                IconClass = "fa fa-pencil-alt"
+                IconClass = options?.Actions?.Edit?.IconClass ?? ActionOptions.DefaultEdit.IconClass,
+                ButtonClass = options?.Actions?.Edit?.ButtonClass ?? ActionOptions.DefaultEdit.ButtonClass,
             };
         }
         private static CrudAction ConfigureDeleteAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
@@ -68,7 +71,8 @@ namespace JCTools.GenericCrud.Helpers
                 Visible = options.AllowDeletionAction,
                 Caption = localizer.GetLocalizedString("GenericCrud.List.Delete.Caption", "Delete the {0}", modelName.ToLower()),
                 Text = localizer.GetLocalizedString("GenericCrud.List.Delete.Text", "Delete"),
-                IconClass = "fa fa-trash"
+                IconClass = options?.Actions?.Delete?.IconClass ?? ActionOptions.DefaultDelete.IconClass,
+                ButtonClass = options?.Actions?.Delete?.ButtonClass ?? ActionOptions.DefaultDelete.ButtonClass,
             };
         }
         public static CrudList<TModel> CreateListModel<TModel>(this ControllerOptions<TModel> options, IStringLocalizer localizer)
