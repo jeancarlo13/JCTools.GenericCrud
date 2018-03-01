@@ -1,5 +1,9 @@
 @using JCTools.GenericCrud.Helpers
+
+@inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
+
 @model JCTools.GenericCrud.Models.ICrudDetails
+
 @{
     Layout = Model.LayoutPage;
     ViewData["Title"] = Model.Title;
@@ -9,20 +13,24 @@
 <h2>@Model.Title</h2>
 <h3>@Model.Subtitle</h2>
 <div class="row">
-    <dl class="dl-horizontal">
+    <form asp-action="Edit" method="POST" asp-anti-forgery="true">
         @foreach(var value in values)
         {
             if (value.Visible)
             {
-                <dt>
-                    @value.Display
-                </dt>
-                <dd>
-                    @value.Value
-                </dd>
+                <div class="form-group row">
+                    <label class="col-md-2 text-right" for="@value.Name">@value.Display</label>
+                    <div class="col-md-10">
+                        @await RenderingServices.CreateEditorForAsync(Model, Html, value.Name)
+                    </div>
+                </div>
+            }
+            else 
+            {
+                @await RenderingServices.CreateEditorForAsync(Model, Html, value.Name, "HiddenFor")
             }
         }
-    </dl>
+    </form>
 </div>
 <div class="row">
     <div class="col-md-12">

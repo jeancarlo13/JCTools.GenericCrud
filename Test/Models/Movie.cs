@@ -6,6 +6,7 @@ namespace Test.Models
 {
     public class Movie
     {
+        [Key]
         [CrudList(Visible = false)]
         public int Id
         {
@@ -13,6 +14,7 @@ namespace Test.Models
             set;
         }
 
+        [Required]
         [Display(Name = "Title", Order = 1)]
         public string Title
         {

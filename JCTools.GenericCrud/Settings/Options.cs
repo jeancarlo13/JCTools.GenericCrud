@@ -7,6 +7,6 @@ namespace JCTools.GenericCrud.Settings
         public bool AllowShowDetailsAction { get; set; } = true;
         public bool AllowEditionAction { get; set; } = true;
         public bool AllowDeletionAction { get; set; } = true;
-        public ActionOptions Actions { get; set; }
+        public ActionOptions Actions { get; set; } = new ActionOptions();
     }
 }

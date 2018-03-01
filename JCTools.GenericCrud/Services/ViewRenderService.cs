@@ -1,15 +1,18 @@
 using System;
+using System.IO;
+using System.Threading.Tasks;
+using JCTools.GenericCrud.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace JCTools.GenericCrud.Services
 {
@@ -21,12 +24,14 @@ namespace JCTools.GenericCrud.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IModelMetadataProvider _metadataProvider;
         private readonly IActionContextAccessor _actionContextAccessor;
+        private readonly IHostingEnvironment _enviroment;
 
         public ViewRenderService(IRazorViewEngine viewEngine, IHttpContextAccessor httpContextAccessor,
             ITempDataProvider tempDataProvider,
             IServiceProvider serviceProvider,
             IModelMetadataProvider metadataProvider,
-            IActionContextAccessor actionContextAccessor)
+            IActionContextAccessor actionContextAccessor,
+            IHostingEnvironment env)
         {
             _viewEngine = viewEngine;
             _httpContextAccessor = httpContextAccessor;
@@ -34,6 +39,7 @@ namespace JCTools.GenericCrud.Services
             _serviceProvider = serviceProvider;
             _metadataProvider = metadataProvider;
             _actionContextAccessor = actionContextAccessor;
+            _enviroment = env;
 
         }
 
@@ -80,20 +86,21 @@ namespace JCTools.GenericCrud.Services
             {
                 RequestServices = _serviceProvider
             };
-            
+
             using(var sw = new StringWriter())
             {
                 var viewResult = _viewEngine.FindView(_actionContextAccessor.ActionContext, viewName, false);
-                // Fallback - the above seems to consistently return null when using the EmbeddedFileProvider
-                if (viewResult.View == null)
-                {
-                    viewResult = _viewEngine.GetView("~/", viewName, false);
-                }
 
                 if (viewResult.View == null)
                 {
-                    throw new ArgumentNullException($"{viewName} does not match any available view");
+                    viewResult = _viewEngine.GetView("~/", viewName, false);
+
+                    if (viewResult.View == null)
+                        viewResult = _viewEngine.GetView(Path.GetDirectoryName(viewName), Path.GetFileNameWithoutExtension(viewName), false);
                 }
+
+                if (viewResult.View == null)
+                    throw new ArgumentNullException($"{viewName} does not match any available view");
 
                 var viewDictionary = new ViewDataDictionary(_metadataProvider, new ModelStateDictionary())
                 {
@@ -122,6 +129,52 @@ namespace JCTools.GenericCrud.Services
         public Task<string> RenderToStringAsync(string viewName)
         {
             return RenderToStringAsync<string>(viewName, string.Empty);
+        }
+
+        public async System.Threading.Tasks.Task<IHtmlContent> CreateEditorForAsync(
+            ICrudDetails model, 
+            IHtmlHelper htmlHelper, 
+            string propertyName,
+            string helperNametoUse = "EditorFor")
+        {
+
+            var content = $@"
+            @model {model.GetGenericType().FullName};
+            @Html.{helperNametoUse}(m => Model.{propertyName}, new {{ htmlAttributes = new {{ @class = ""form-control"" }}}})
+            <span asp-validation-for=""{propertyName}"" class=""text-danger""></span>
+            ";
+            string path = CreateTemporalView(content);
+
+            IHtmlContent result;
+            try
+            {
+                var file = Path.GetFileName(path);
+                result = htmlHelper.Raw(await RenderToStringAsync($"~/Views/Generic/{file}", model.GetData()));
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+
+            return result;
+        }
+
+        private string CreateTemporalView(string content)
+        {
+            var path = Path.Combine(
+                            _enviroment.WebRootPath,
+                            "..",
+                            "Views",
+                            "Generic",
+                            $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.cshtml"
+                        );
+
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            File.WriteAllText(path, content);
+            return path;
         }
     }
 }

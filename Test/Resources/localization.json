@@ -63,6 +63,20 @@
         }
     },
     {
+        "Key": "GenericCrud.List.Index.Text",
+        "Values": {
+            "en-US": "Go back",
+            "es-MX": "Regresar"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Delete.Caption",
+        "Values": {
+            "en-US": "Go back",
+            "es-MX": "Regresar"
+        }
+    },
+    {
         "Key": "GenericCrud.List.Delete.Text",
         "Values": {
             "en-US": "Delete",

@@ -1,21 +1,22 @@
+using System;
+using System.Reflection;
 using JCTools.GenericCrud.Services;
+using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
-using System.Reflection;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using JCTools.GenericCrud.Settings;
 
 namespace JCTools.GenericCrud
 {
     public static class Configurator
     {
         internal static Options Options;
-        public static IServiceCollection ConfigureGenericCrud(this IServiceCollection services, Options options = null)
+        public static IServiceCollection ConfigureGenericCrud(this IServiceCollection services, Action<Options> options = null)
         {
             var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -40,7 +41,8 @@ namespace JCTools.GenericCrud
                     o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
                 });
 
-            Options = options ?? new Options();
+            Options = new Options();
+            options?.Invoke(Options);
 
             return services;
         }

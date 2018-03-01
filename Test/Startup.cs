@@ -50,7 +50,13 @@ namespace Test
                 options.SupportedUICultures = supportedCultures;
             });
 
-            services.ConfigureGenericCrud();
+            services.ConfigureGenericCrud(o => {
+                o.Actions.New.ButtonClass = string.Empty;
+                o.Actions.Details.ButtonClass = string.Empty;
+                o.Actions.Edit.ButtonClass = string.Empty;
+                o.Actions.Delete.ButtonClass = string.Empty;
+                o.Actions.Delete.IconClass += " text-danger";
+            });
             services.AddMvc()
                 .AddViewLocalization(
                     LanguageViewLocationExpanderFormat.Suffix,

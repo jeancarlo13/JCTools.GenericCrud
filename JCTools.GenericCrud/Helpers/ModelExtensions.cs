@@ -75,6 +75,18 @@ namespace JCTools.GenericCrud.Helpers
                 ButtonClass = options?.Actions?.Delete?.ButtonClass ?? ActionOptions.DefaultDelete.ButtonClass,
             };
         }
+        private static CrudAction ConfigureIndexAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
+            where TModel : class, new()
+        {
+            return new CrudAction()
+            {
+                Visible = options.AllowDeletionAction,
+                Caption = localizer.GetLocalizedString("GenericCrud.List.Index.Caption", "Go back", modelName.ToLower()),
+                Text = localizer.GetLocalizedString("GenericCrud.List.Index.Text", "Go back"),
+                IconClass = options?.Actions?.Index?.IconClass ?? ActionOptions.DefaultIndex.IconClass,
+                ButtonClass = options?.Actions?.Index?.ButtonClass ?? ActionOptions.DefaultIndex.ButtonClass,
+            };
+        }
         public static CrudList<TModel> CreateListModel<TModel>(this ControllerOptions<TModel> options, IStringLocalizer localizer)
             where TModel : class, new()
         {
@@ -103,6 +115,7 @@ namespace JCTools.GenericCrud.Helpers
                 Title = modelName,
                 Subtitle = localizer.GetLocalizedString("GenericCrud.Details.Subtitle", "Details"),
                 Data = default(TModel),
+                IndexAction = options.ConfigureIndexAction(modelName, localizer),
                 EditAction = options.ConfigureEditAction(modelName, localizer),
                 DeleteAction = options.ConfigureDeleteAction(modelName, localizer),
                 KeyPropertyName = options.KeyPropertyName,

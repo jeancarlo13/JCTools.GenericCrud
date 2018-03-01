@@ -70,5 +70,42 @@ namespace JCTools.GenericCrud.Controllers
                 "text/html"
             );
         }
+
+        [Route("{id}/edit")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(TKey id)
+        {
+            
+            var entity = await DbContext.Set<TModel>().FindAsync(id);
+
+            if (entity == null)
+                return NotFound();
+
+            var model = Settings.DetailsOptions;
+            model.Data = entity;
+
+            return Content(
+                await _renderingService.RenderToStringAsync(
+                    nameof(Edit),
+                    model
+                ),
+                "text/html"
+            );
+        }
+        [Route("{id}/edit")]
+        [HttpPost]
+        public async Task<IActionResult> Edit(TKey id, TModel model)
+        {
+            var realModel = Settings.DetailsOptions;
+            realModel.Data = model;
+
+            return Content(
+                await _renderingService.RenderToStringAsync(
+                    nameof(Edit),
+                    realModel
+                ),
+                "text/html"
+            );
+        }
     }
 }
