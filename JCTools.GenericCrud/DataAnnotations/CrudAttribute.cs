@@ -1,18 +1,14 @@
-using System;
+﻿using System;
 
-namespace JCTools.GenericCrud.Attibutes
+namespace JCTools.GenericCrud.DataAnnotations
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class CrudListAttribute: Attribute
+    public class CrudAttribute: Attribute
     {
         /// <summary>
         /// True if the property is visible in the crud list; False another case
         /// </summary>
         public bool Visible { get; set; } = true;
-        // /// <summary>
-        // /// The index of appearance into the crud list
-        // /// </summary>
-        // public int Order { get; set; }
 
     }
 }

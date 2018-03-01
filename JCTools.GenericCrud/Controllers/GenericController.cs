@@ -157,7 +157,8 @@ namespace JCTools.GenericCrud.Controllers
             return Content(
                 await _renderingService.RenderToStringAsync(
                     nameof(Edit),
-                    realModel
+                    realModel,
+                    ViewData
                 ),
                 "text/html"
             );

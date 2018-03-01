@@ -1,26 +1,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using JCTools.GenericCrud.Attibutes;
+using JCTools.GenericCrud.DataAnnotations;
 
 namespace Test.Models
 {
     public class Movie
     {
         [Key]
-        [CrudList(Visible = false)]
+        [Crud(Visible = false)]
         public int Id
         {
             get;
             set;
         }
 
-        [Required]
+        [Required(ErrorMessage="RequiredField")]
         [Display(Name = "Title", Order = 1)]
         public string Title
         {
             get;
             set;
         }
+        [Display(Order = 2)]        
         public string Director
         {
             get;
@@ -33,6 +34,7 @@ namespace Test.Models
             get;
             set;
         }
+        [Display(Order = 3)]        
         public string Country
         {
             get;

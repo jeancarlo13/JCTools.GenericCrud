@@ -42,49 +42,14 @@ namespace JCTools.GenericCrud.Services
             _enviroment = env;
 
         }
-
-        public string RenderToString<TModel>(string viewPath, TModel model)
-        {
-            try
-            {
-                var viewEngineResult = _viewEngine.GetView("~/", viewPath, false);
-
-                if (!viewEngineResult.Success)
-                {
-                    throw new InvalidOperationException($"Couldn't find view {viewPath}");
-                }
-
-                var view = viewEngineResult.View;
-
-                using(var sw = new StringWriter())
-                {
-                    var viewContext = new ViewContext()
-                    {
-                    HttpContext = _httpContextAccessor.HttpContext ?? new DefaultHttpContext
-                    {
-                    RequestServices = _serviceProvider
-                    },
-                    ViewData = new ViewDataDictionary<TModel>(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                    {
-                    Model = model
-                    },
-                    Writer = sw
-                    };
-                    view.RenderAsync(viewContext).GetAwaiter().GetResult();
-                    return sw.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error ending email.", ex);
-            }
-        }
-
-        public async Task<string> RenderToStringAsync<TModel>(string viewName, TModel model)
+        public async Task<string> RenderToStringAsync<TModel>(
+            string viewName,
+            TModel model,
+            ViewDataDictionary viewData = null)
         {
             var httpContext = _httpContextAccessor.HttpContext ?? new DefaultHttpContext
             {
-                RequestServices = _serviceProvider
+            RequestServices = _serviceProvider
             };
 
             using(var sw = new StringWriter())
@@ -102,10 +67,8 @@ namespace JCTools.GenericCrud.Services
                 if (viewResult.View == null)
                     throw new ArgumentNullException($"{viewName} does not match any available view");
 
-                var viewDictionary = new ViewDataDictionary(_metadataProvider, new ModelStateDictionary())
-                {
-                    Model = model
-                };
+                var viewDictionary = viewData ?? new ViewDataDictionary(_metadataProvider, new ModelStateDictionary());
+                viewDictionary.Model = model;
 
                 var viewContext = new ViewContext(
                     _actionContextAccessor.ActionContext,
@@ -120,20 +83,10 @@ namespace JCTools.GenericCrud.Services
                 return sw.ToString();
             }
         }
-
-        public string RenderToString(string viewPath)
-        {
-            return RenderToString(viewPath, string.Empty);
-        }
-
-        public Task<string> RenderToStringAsync(string viewName)
-        {
-            return RenderToStringAsync<string>(viewName, string.Empty);
-        }
-
-        public async System.Threading.Tasks.Task<IHtmlContent> CreateEditorForAsync(
-            IBaseDetails model, 
-            IHtmlHelper htmlHelper, 
+        public async System.Threading.Tasks.Task<IHtmlContent> CreateEditorFor(
+            IBaseDetails model,
+            IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
             string propertyName,
             string helperNametoUse = "EditorFor")
         {
@@ -149,7 +102,12 @@ namespace JCTools.GenericCrud.Services
             try
             {
                 var file = Path.GetFileName(path);
-                result = htmlHelper.Raw(await RenderToStringAsync($"~/Views/Generic/{file}", model.GetData()));
+                var viewDictionary = new ViewDataDictionary(_metadataProvider, viewData?.ModelState ?? new ModelStateDictionary())
+                {
+                    Model = model
+                };
+
+                result = htmlHelper.Raw(await RenderToStringAsync($"~/Views/Generic/{file}", model.GetData(), viewDictionary));
             }
             finally
             {
@@ -162,12 +120,12 @@ namespace JCTools.GenericCrud.Services
         private string CreateTemporalView(string content)
         {
             var path = Path.Combine(
-                            _enviroment.WebRootPath,
-                            "..",
-                            "Views",
-                            "Generic",
-                            $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.cshtml"
-                        );
+                _enviroment.WebRootPath,
+                "..",
+                "Views",
+                "Generic",
+                $"{Path.GetFileNameWithoutExtension(Path.GetTempFileName())}.cshtml"
+            );
 
             var directory = Path.GetDirectoryName(path);
             if (!Directory.Exists(directory))

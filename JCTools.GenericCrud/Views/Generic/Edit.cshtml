@@ -22,13 +22,13 @@
                 <div class="form-group row">
                     <label class="col-md-2 text-right" for="@value.Name">@value.Display</label>
                     <div class="col-md-10">
-                        @await RenderingServices.CreateEditorForAsync(Model, Html, value.Name)
+                        @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name)
                     </div>
                 </div>
             }
             else 
             {
-                @await RenderingServices.CreateEditorForAsync(Model, Html, value.Name, "HiddenFor")
+                @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name, "HiddenFor")
             }
         }
         <div class="row">

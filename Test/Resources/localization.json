@@ -104,5 +104,19 @@
             "en-US": "Details",
             "es-MX": "Detalles"
         }
+    },
+    {
+        "Key": "GenericCrud.Edit.Subtitle",
+        "Values": {
+            "en-US": "Edit",
+            "es-MX": "Edición"
+        }
+    },
+    {
+        "Key": "RequiredField",
+        "Values": {
+            "en-US": "The {0}} field is required.",
+            "es-MX": "El campo {0} es obligatorio."
+        }
     }
 ]

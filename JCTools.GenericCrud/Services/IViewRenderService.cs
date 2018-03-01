@@ -2,18 +2,17 @@ using System.Threading.Tasks;
 using JCTools.GenericCrud.Models;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace JCTools.GenericCrud.Services
 {
     public interface IViewRenderService
     {
-        Task<string> RenderToStringAsync(string viewName);
-        Task<string> RenderToStringAsync<TModel>(string viewName, TModel model);
-        string RenderToString<TModel>(string viewPath, TModel model);
-        string RenderToString(string viewPath);
-        System.Threading.Tasks.Task<IHtmlContent> CreateEditorForAsync(
+        Task<string> RenderToStringAsync<TModel>(string viewName, TModel model, ViewDataDictionary viewData = null);
+        System.Threading.Tasks.Task<IHtmlContent> CreateEditorFor(
             IBaseDetails model,
             IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
             string propertyName,
             string helperNametoUse = "EditorFor"
         );
