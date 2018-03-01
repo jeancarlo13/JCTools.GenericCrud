@@ -132,7 +132,7 @@ namespace JCTools.GenericCrud.Services
         }
 
         public async System.Threading.Tasks.Task<IHtmlContent> CreateEditorForAsync(
-            ICrudDetails model, 
+            IBaseDetails model, 
             IHtmlHelper htmlHelper, 
             string propertyName,
             string helperNametoUse = "EditorFor")

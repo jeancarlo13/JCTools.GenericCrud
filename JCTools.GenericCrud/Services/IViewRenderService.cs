@@ -12,7 +12,7 @@ namespace JCTools.GenericCrud.Services
         string RenderToString<TModel>(string viewPath, TModel model);
         string RenderToString(string viewPath);
         System.Threading.Tasks.Task<IHtmlContent> CreateEditorForAsync(
-            ICrudDetails model,
+            IBaseDetails model,
             IHtmlHelper htmlHelper,
             string propertyName,
             string helperNametoUse = "EditorFor"

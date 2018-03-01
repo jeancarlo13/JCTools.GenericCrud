@@ -39,6 +39,18 @@ namespace JCTools.GenericCrud.Helpers
                 ButtonClass = options?.Actions?.New?.ButtonClass ?? ActionOptions.DefaultNew.ButtonClass,
             };
         }
+        private static CrudAction ConfigureSaveAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
+            where TModel : class, new()
+        {
+            return new CrudAction()
+            {
+                Visible = options.AllowCreationAction,
+                Caption = localizer.GetLocalizedString("GenericCrud.List.Save.Caption", "Save changes", modelName.ToLower()),
+                Text = localizer.GetLocalizedString("GenericCrud.List.Save.Text", "Save"),
+                IconClass = options?.Actions?.Save?.IconClass ?? ActionOptions.DefaultSave.IconClass,
+                ButtonClass = options?.Actions?.Save?.ButtonClass ?? ActionOptions.DefaultSave.ButtonClass,
+            };
+        }
         private static CrudAction ConfigureDetailsAction<TModel>(this ControllerOptions<TModel> options,string modelName, IStringLocalizer localizer)
             where TModel : class, new()
         {
@@ -124,6 +136,23 @@ namespace JCTools.GenericCrud.Helpers
             result.Columns = GetModelColumns(result, localizer);
             return result;
         }
+        public static CrudEdit<TModel> CreateEditModel<TModel>(this ControllerOptions<TModel> options, IStringLocalizer localizer)
+            where TModel : class, new()
+        {
+            var modelName = typeof(TModel).Name;
+            var result = new CrudEdit<TModel>()
+            {
+                Title = modelName,
+                Subtitle = localizer.GetLocalizedString("GenericCrud.Details.Subtitle", "Details"),
+                Data = default(TModel),
+                IndexAction = options.ConfigureIndexAction(modelName, localizer),
+                SaveAction = options.ConfigureSaveAction(modelName, localizer),
+                KeyPropertyName = options.KeyPropertyName,
+                Localizer = localizer
+            };
+            result.Columns = GetModelColumns(result, localizer);
+            return result;
+        }
         /// <summary>
         /// Allows get all properties to show into the Crud list
         /// </summary>
@@ -154,7 +183,7 @@ namespace JCTools.GenericCrud.Helpers
                     })
                 );
         }
-        public static IEnumerable<Data> GetModelValues(this ICrudDetails details)
+        public static IEnumerable<Data> GetModelValues(this IBaseDetails details)
         {
             var model =  details.GetData();
             var properties = InvokeListProperties(details);

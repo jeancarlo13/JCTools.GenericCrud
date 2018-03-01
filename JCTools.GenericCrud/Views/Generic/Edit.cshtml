@@ -1,8 +1,9 @@
 @using JCTools.GenericCrud.Helpers
+@using JCTools.GenericCrud.Controllers
 
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
-@model JCTools.GenericCrud.Models.ICrudDetails
+@model JCTools.GenericCrud.Models.ICrudEdit
 
 @{
     Layout = Model.LayoutPage;
@@ -13,7 +14,7 @@
 <h2>@Model.Title</h2>
 <h3>@Model.Subtitle</h2>
 <div class="row">
-    <form asp-action="Edit" method="POST" asp-anti-forgery="true">
+    <form asp-action="SaveChangesAsync" method="POST" asp-anti-forgery="true">
         @foreach(var value in values)
         {
             if (value.Visible)
@@ -30,17 +31,25 @@
                 @await RenderingServices.CreateEditorForAsync(Model, Html, value.Name, "HiddenFor")
             }
         }
+        <div class="row">
+            <div class="col-md-12">
+                @{
+                    var data = new ViewDataDictionary(this.ViewData) 
+                    { 
+                        { "Url", Url.Action("Index") }
+                    };
+                }
+                @Html.Partial("_action", Model.IndexAction, data)
+                @{
+                    Model.SaveAction.UseSubmit = true;
+                    data = new ViewDataDictionary(this.ViewData) 
+                    { 
+                        { "Url", Url.Action("SaveChanges") }
+                    };
+                }
+                @Html.Partial("_action", Model.SaveAction, data)
+                
+            </div>
+        </div>
     </form>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        @{
-            var data = new ViewDataDictionary(this.ViewData) 
-            { 
-                { "Url", Url.Action("Index") }
-            };
-        }
-        @Html.Partial("_action", Model.IndexAction, data)
-
-    </div>
 </div>

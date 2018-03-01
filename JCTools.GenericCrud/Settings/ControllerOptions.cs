@@ -20,6 +20,7 @@ namespace JCTools.GenericCrud.Settings
 
         public CrudList<TModel> ListOptions { get; set; }
         public CrudDetails<TModel> DetailsOptions { get; set; }
+        public CrudEdit<TModel> EditOptions { get; set; }
         public string KeyPropertyName { get; set; }
         
     }

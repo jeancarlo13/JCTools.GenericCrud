@@ -1,11 +1,8 @@
 namespace JCTools.GenericCrud.Models
 {
-    public interface ICrudDetails:IBase
+    public interface ICrudDetails : IBaseDetails
     {
-        CrudAction IndexAction { get; set; }
         CrudAction EditAction { get; set; }
         CrudAction DeleteAction { get; set; }
-        object GetData();
-
     }
 }

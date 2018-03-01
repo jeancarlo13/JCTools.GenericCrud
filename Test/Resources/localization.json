@@ -70,6 +70,21 @@
         }
     },
     {
+        "Key": "GenericCrud.List.Save.Caption",
+        "Values": {
+            "en-US": "Save changes",
+            "es-MX": "Guardar cambios"
+        }
+    },
+    {
+        "Key": "GenericCrud.List.Save.Text",
+        "Values": {
+            "en-US": "Save",
+            "es-MX": "Guardar"
+        }
+    },
+    
+    {
         "Key": "GenericCrud.List.Delete.Caption",
         "Values": {
             "en-US": "Go back",
