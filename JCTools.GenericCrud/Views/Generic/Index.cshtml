@@ -7,7 +7,13 @@
 
 <h2>@Model.Title</h2>
 <h3>@Model.Subtitle</h2>
-
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <div class="alert @(Model.MessageClass) alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+        @Model.Message
+    </div>
+}
 <table class="table table-striped table-condensed table-hover">
     <thead>
         <tr>
@@ -26,7 +32,9 @@
     <tbody>
         @foreach(var row in Model.GetModelValues())
         {
-            <tr>
+            var isSelected = row.FirstOrDefault(v => v.Name == Model.KeyPropertyName)?.Value.Equals( Model.GetId());
+            var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
+            <tr @Html.Raw(classAttribute) >
                 @foreach(var value in row)
                 {
                     if (value.Visible)

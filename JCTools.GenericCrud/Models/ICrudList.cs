@@ -3,13 +3,36 @@ using System.Collections.Generic;
 
 namespace JCTools.GenericCrud.Models
 {
-    public interface ICrudList: IBase
+    public interface ICrudList : IBase
     {
-        CrudAction NewAction { get; set; }
-        CrudAction DetailsAction { get; set; }
-        CrudAction EditAction { get; set; }
-        CrudAction DeleteAction { get; set; }
-        bool ActionsColumnIsVisible { get; }
+        CrudAction NewAction
+        {
+            get;
+        }
+        CrudAction DetailsAction
+        {
+            get;
+        }
+        CrudAction EditAction
+        {
+            get;
+        }
+        CrudAction DeleteAction
+        {
+            get;
+        }
+        bool ActionsColumnIsVisible
+        {
+            get;
+        }
         IEnumerable<Object> GetData();
+        string Message
+        {
+            get;
+        }
+        string MessageClass
+        {
+            get;
+        }
     }
 }

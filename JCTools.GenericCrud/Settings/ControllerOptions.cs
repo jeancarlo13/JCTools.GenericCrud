@@ -2,8 +2,8 @@ using JCTools.GenericCrud.Models;
 
 namespace JCTools.GenericCrud.Settings
 {
-    public class ControllerOptions<TModel> : Options
-        where TModel : class, new () 
+    public class ControllerOptions<TModel, TKey> : Options
+    where TModel : class, new()
     {
         public ControllerOptions(string keyPropertyName) : base()
         {
@@ -18,10 +18,26 @@ namespace JCTools.GenericCrud.Settings
             AllowDeletionAction = options.AllowDeletionAction;
         }
 
-        public CrudList<TModel> ListOptions { get; set; }
-        public CrudDetails<TModel> DetailsOptions { get; set; }
-        public CrudEdit<TModel> EditOptions { get; set; }
-        public string KeyPropertyName { get; set; }
-        
+        public CrudList<TModel, TKey> ListOptions
+        {
+            get;
+            set;
+        }
+        public CrudDetails<TModel, TKey> DetailsOptions
+        {
+            get;
+            set;
+        }
+        public CrudEdit<TModel, TKey> EditOptions
+        {
+            get;
+            set;
+        }
+        public string KeyPropertyName
+        {
+            get;
+            set;
+        }
+
     }
 }

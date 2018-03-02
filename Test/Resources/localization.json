@@ -17,7 +17,7 @@
         "Key": "GenericCrud.List.Create.Caption",
         "Values": {
             "en-US": "Create new {0}",
-            "es-MX": "Crear"
+            "es-MX": "Crear {0}"
         }
     },
     {
@@ -45,7 +45,7 @@
         "Key": "GenericCrud.List.Edit.Caption",
         "Values": {
             "en-US": "Edit the {0}",
-            "es-MX": "Editar"
+            "es-MX": "Editar {0}"
         }
     },
     {
@@ -59,7 +59,7 @@
         "Key": "GenericCrud.List.Delete.Caption",
         "Values": {
             "en-US": "Delete the {0}",
-            "es-MX": "Borrar"
+            "es-MX": "Borrar {0}"
         }
     },
     {
@@ -110,6 +110,20 @@
         "Values": {
             "en-US": "Edit",
             "es-MX": "Edición"
+        }
+    },
+    {
+        "Key": "GenericCrud.Index.EditSuccessMessage",
+        "Values": {
+            "en-US": "Changes stored successful.",
+            "es-MX": "Cambios almacenado correctamente."
+        }
+    },
+    {
+        "Key": "Movie",
+        "Values": {
+            "en-US": "Movie",
+            "es-MX": "Pelicula"
         }
     },
     {

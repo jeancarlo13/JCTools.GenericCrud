@@ -92,10 +92,13 @@ namespace JCTools.GenericCrud.Services
         {
 
             var content = $@"
-            @model {model.GetGenericType().FullName};
-            @Html.{helperNametoUse}(m => Model.{propertyName}, new {{ htmlAttributes = new {{ @class = ""form-control"" }}}})
-            <span asp-validation-for=""{propertyName}"" class=""text-danger""></span>
-            ";
+            @model {model.GetModelGenericType().FullName};
+            " +
+                ((helperNametoUse.ToLower().StartsWith("hidden")) ?
+                    $@"<input asp-for=""{propertyName}"" type=""hidden"" />" :
+                    $@"@Html.{helperNametoUse}(m => Model.{propertyName}, new {{ htmlAttributes = new {{ @class = ""form-control"" }}}})"
+                ) +
+                $@"<span asp-validation-for=""{propertyName}"" class=""text-danger""></span>";
             string path = CreateTemporalView(content);
 
             IHtmlContent result;

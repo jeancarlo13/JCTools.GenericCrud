@@ -11,7 +11,10 @@ namespace JCTools.GenericCrud.Models
         string Subtitle { get; set; }
         IEnumerable<string> Columns { get; set; }
         string KeyPropertyName { get; set; }
-        Type GetGenericType();
+        Type GetModelGenericType();
+        Type GetKeyGenericType();
         IStringLocalizer Localizer { get; set; }
+
+        object GetId();
     }
 }
