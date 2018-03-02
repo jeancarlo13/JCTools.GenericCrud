@@ -99,13 +99,28 @@ namespace JCTools.GenericCrud.Helpers
             return result;
         }
         public static CrudDetails<TModel, TKey> CreateDetailsModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
+        where TModel : class, new() => CreateDetailsModel(options, localizer, "GenericCrud.Details.Subtitle", "Details");
+        public static CrudDetails<TModel, TKey> CreateDeleteModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
+        where TModel : class, new()
+        {
+            var result = CreateDetailsModel(options, localizer, "GenericCrud.Delete.Subtitle", "Are you sure you want to delete this?");
+            if (result.DeleteAction.IconClass == ActionOptions.DefaultDelete.IconClass)
+                result.DeleteAction.IconClass = string.Empty;
+            return result;
+        }
+
+        private static CrudDetails<TModel, TKey> CreateDetailsModel<TModel, TKey>(
+            this ControllerOptions<TModel, TKey> options,
+            IStringLocalizer localizer,
+            string subtitleKey,
+            string defaultSubtitle)
         where TModel : class, new()
         {
             var modelName = localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
             var result = new CrudDetails<TModel, TKey>()
                 {
                     Title = modelName,
-                    Subtitle = localizer.GetLocalizedString("GenericCrud.Details.Subtitle", "Details"),
+                    Subtitle = localizer.GetLocalizedString(subtitleKey, defaultSubtitle),
                     Data = default(TModel),
                     IndexAction = options.ConfigureIndexAction(modelName, localizer),
                     EditAction = options.ConfigureEditAction(modelName, localizer),
@@ -116,11 +131,11 @@ namespace JCTools.GenericCrud.Helpers
             result.Columns = result.GetModelColumns(localizer);
             return result;
         }
+
         public static CrudEdit<TModel, TKey> CreateEditModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
-        where TModel : class, new()
-            => CreateEditModel(options, localizer, "GenericCrud.Edit.Subtitle", "Edit");
+        where TModel : class, new() => CreateEditModel(options, localizer, "GenericCrud.Edit.Subtitle", "Edit");
         private static CrudEdit<TModel, TKey> CreateEditModel<TModel, TKey>(
-            this ControllerOptions<TModel, TKey> options, 
+            this ControllerOptions<TModel, TKey> options,
             IStringLocalizer localizer,
             string subtitleKey,
             string defaultSubtitle)
@@ -141,7 +156,6 @@ namespace JCTools.GenericCrud.Helpers
             return result;
         }
         public static CrudEdit<TModel, TKey> CreateCreateModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
-        where TModel : class, new()
-            => CreateEditModel(options, localizer, "GenericCrud.Create.Subtitle", "Create");
+        where TModel : class, new() => CreateEditModel(options, localizer, "GenericCrud.Create.Subtitle", "Create");
     }
 }

@@ -127,10 +127,24 @@
         }
     },
     {
+        "Key": "GenericCrud.Index.DeleteSuccessMessage",
+        "Values": {
+            "en-US": "Information deleted successful.",
+            "es-MX": "Información borrada correctamente."
+        }
+    },
+    {
         "Key": "GenericCrud.UnableSaveChangesMessage",
         "Values": {
             "en-US": "Unable to save changes. Try again, and if the problem persists, see your system administrator.",
             "es-MX": "No se pueden guardar los cambios. Inténtelo de nuevo, y si el problema persiste, consulte a su administrador del sistema."
+        }
+    },
+    {
+        "Key": "GenericCrud.UnableDeleteMessage",
+        "Values": {
+            "en-US": "Unable to delete the data. Try again, and if the problem persists, see your system administrator.",
+            "es-MX": "No se pueden borrar los datos. Inténtelo de nuevo, y si el problema persiste, consulte a su administrador del sistema."
         }
     },
     {

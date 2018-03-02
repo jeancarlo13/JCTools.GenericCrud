@@ -33,6 +33,13 @@
             };
         }
         @Html.Partial("_action", Model.IndexAction, data)
-
+        @if (ViewBag.IsDelete == true)
+        {
+            data = new ViewDataDictionary(this.ViewData) 
+            { 
+                { "Url", Url.Action("DeleteConfirm", new { id = Model.GetId() } ) }
+            };
+            @Html.Partial("_action", Model.DeleteAction, data)
+        }
     </div>
 </div>

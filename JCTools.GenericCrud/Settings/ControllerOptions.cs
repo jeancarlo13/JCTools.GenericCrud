@@ -43,6 +43,10 @@ namespace JCTools.GenericCrud.Settings
             get;
             set;
         }
-
+        public CrudDetails<TModel, TKey> DeleteOptions
+        {
+            get;
+            internal set;
+        }
     }
 }

@@ -102,6 +102,7 @@ namespace JCTools.GenericCrud.Controllers
             Settings.DetailsOptions = Settings.CreateDetailsModel(_localizer);
             Settings.EditOptions = Settings.CreateEditModel<TModel, TKey>(_localizer);
             Settings.CreateOptions = Settings.CreateCreateModel<TModel, TKey>(_localizer);
+            Settings.DeleteOptions = Settings.CreateDeleteModel(_localizer);
         }
         /// <summary>
         /// Allows render the index view
@@ -120,6 +121,7 @@ namespace JCTools.GenericCrud.Controllers
             model.MessageClass =
                 message == IndexMessages.EditSuccess ? "alert-success" :
                 message == IndexMessages.CreateSuccess ? "alert-success" :
+                message == IndexMessages.DeleteSuccess ? "alert-success" :
                 "alert-info";
             if (id.HasValue)
                 model.Id = id.Value;
@@ -137,6 +139,7 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The id of the entity to show into the view</param>
         [Route("{id}/details")]
+        [HttpGet]
         public virtual async Task<IActionResult> Details(TKey id)
         {
             var entity = await DbContext.Set<TModel>().FindAsync(id);
@@ -154,6 +157,75 @@ namespace JCTools.GenericCrud.Controllers
                 ),
                 "text/html"
             );
+        }
+        /// <summary>
+        /// Allows render the delete view
+        /// </summary>
+        /// <param name="id">The id of the entity to show into the view</param>
+        [Route("{id}/delete")]
+        [HttpGet]
+        public virtual async Task<IActionResult> Delete(TKey id)
+        {
+            var entity = await DbContext.Set<TModel>().FindAsync(id);
+
+            if (entity == null)
+                return NotFound();
+
+            var model = Settings.DeleteOptions;
+            model.Data = entity;
+            model.Id = id;
+
+            ViewBag.IsDelete = true;
+
+            return Content(
+                await _renderingService.RenderToStringAsync(
+                    nameof(Details),
+                    model,
+                    ViewData
+                ),
+                "text/html"
+            );
+        }
+        /// <summary>
+        /// Allows render the delete view
+        /// </summary>
+        /// <param name="id">The id of the entity to show into the view</param>
+        [Route("{id}/deleteconfirm")]
+        [HttpGet]
+        public virtual async Task<IActionResult> DeleteConfirm(TKey id)
+        {
+            var entity = await DbContext.Set<TModel>().FindAsync(id);
+
+            if (entity == null)
+                return NotFound();
+
+            var saved = await DbContext.Set<TModel>().FindAsync(id);
+
+            if (saved == null)
+                return NotFound();
+
+            DbContext.Remove(saved);
+
+            try
+            {
+                await DbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogWarning(ex, "Failure deleting entity.");
+                var message = _localizer["GenericCrud.UnableDeleteMessage"];
+                ModelState.AddModelError("",
+                    string.IsNullOrWhiteSpace(message) ?
+                    "Unable to delete the data. Try again, and if the problem persists, see your system administrator." :
+                    message
+                );
+            }
+
+            return RedirectToAction(nameof(Index), new
+            {
+                message = IndexMessages.DeleteSuccess
+            });
+
         }
         /// <summary>
         /// Allows render the create view
