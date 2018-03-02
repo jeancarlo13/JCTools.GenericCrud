@@ -120,6 +120,20 @@
         }
     },
     {
+        "Key": "GenericCrud.Index.CreateSuccessMessage",
+        "Values": {
+            "en-US": "Information stored successful.",
+            "es-MX": "Información almacenada correctamente."
+        }
+    },
+    {
+        "Key": "GenericCrud.UnableSaveChangesMessage",
+        "Values": {
+            "en-US": "Unable to save changes. Try again, and if the problem persists, see your system administrator.",
+            "es-MX": "No se pueden guardar los cambios. Inténtelo de nuevo, y si el problema persiste, consulte a su administrador del sistema."
+        }
+    },
+    {
         "Key": "Movie",
         "Values": {
             "en-US": "Movie",

@@ -24,7 +24,13 @@
             @if(Model.ActionsColumnIsVisible)
             {
                 <th class="text-center">
-                    @Html.Partial("_action", Model.NewAction)
+                    @{
+                        var data = new ViewDataDictionary(this.ViewData) 
+                        { 
+                            { "Url", Url.Action("Create") }
+                        };
+                    }
+                    @Html.Partial("_action", Model.NewAction, data)
                 </th>
             }
         </tr>

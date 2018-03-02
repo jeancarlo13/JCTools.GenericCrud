@@ -33,6 +33,11 @@ namespace JCTools.GenericCrud.Settings
             get;
             set;
         }
+        public CrudEdit<TModel, TKey> CreateOptions
+        {
+            get;
+            set;
+        }
         public string KeyPropertyName
         {
             get;

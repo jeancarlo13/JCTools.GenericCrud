@@ -6,6 +6,7 @@ using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -100,6 +101,7 @@ namespace JCTools.GenericCrud.Controllers
             Settings.ListOptions = Settings.CreateListModel(_localizer);
             Settings.DetailsOptions = Settings.CreateDetailsModel(_localizer);
             Settings.EditOptions = Settings.CreateEditModel<TModel, TKey>(_localizer);
+            Settings.CreateOptions = Settings.CreateCreateModel<TModel, TKey>(_localizer);
         }
         /// <summary>
         /// Allows render the index view
@@ -115,7 +117,10 @@ namespace JCTools.GenericCrud.Controllers
             var model = Settings.ListOptions;
             model.Data = all;
             model.Message = _localizer[$"GenericCrud.Index.{message.ToString()}Message"];
-            model.MessageClass = message == IndexMessages.EditSuccess ? "alert-success" : "alert-info";
+            model.MessageClass =
+                message == IndexMessages.EditSuccess ? "alert-success" :
+                message == IndexMessages.CreateSuccess ? "alert-success" :
+                "alert-info";
             if (id.HasValue)
                 model.Id = id.Value;
 
@@ -132,7 +137,7 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The id of the entity to show into the view</param>
         [Route("{id}/details")]
-        public async Task<IActionResult> Details(TKey id)
+        public virtual async Task<IActionResult> Details(TKey id)
         {
             var entity = await DbContext.Set<TModel>().FindAsync(id);
 
@@ -151,30 +156,111 @@ namespace JCTools.GenericCrud.Controllers
             );
         }
         /// <summary>
+        /// Allows render the create view
+        /// </summary>
+        /// <param name="id">The id of the entity to edit into the view</param>
+        [Route("create")]
+        [HttpGet]
+        public virtual async Task<IActionResult> Create()
+        {
+            var model = Settings.CreateOptions;
+
+            ViewBag.Action = Url.Action(nameof(Create));
+            return Content(
+                await _renderingService.RenderToStringAsync(
+                    nameof(Edit),
+                    model,
+                    ViewData
+                ),
+                "text/html"
+            );
+        }
+        /// <summary>
+        /// Allows save new entities
+        /// </summary>
+        /// <param name="model">The entity to save</param>
+        [Route("create")]
+        [HttpPost]
+        public virtual async Task<IActionResult> Create(TModel model)
+        {
+            ModelState.Remove(Settings.CreateOptions.KeyPropertyName);
+            if (ModelState.IsValid)
+            {
+
+                await DbContext.AddAsync(model);
+
+                try
+                {
+                    await DbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogWarning(ex, "Failure saving changes.");
+                    AddSaveChangesErrorMessage();
+                }
+                return RedirectToAction(nameof(Index), new
+                {
+                    message = IndexMessages.CreateSuccess,
+                        id = typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model)
+                });
+            }
+
+            return await Create();
+        }
+        /// <summary>
+        /// Add a the current <see cref="Controller.ModelState"/> a message with the save changes error
+        /// </summary>
+        private void AddSaveChangesErrorMessage()
+        {
+            var message = _localizer["GenericCrud.UnableSaveChangesMessage"];
+            ModelState.AddModelError("",
+                string.IsNullOrWhiteSpace(message) ?
+                "Unable to save changes. Try again, and if the problem persists, see your system administrator." :
+                message
+            );
+        }
+
+        /// <summary>
         /// Allows render the Edit view
         /// </summary>
         /// <param name="id">The id of the entity to edit into the view</param>
         [Route("{id}/edit")]
         [HttpGet]
-        public async Task<IActionResult> Edit(TKey id)
+        public virtual async Task<IActionResult> Edit(TKey id)
         {
             var entity = await DbContext.Set<TModel>().FindAsync(id);
 
             if (entity == null)
                 return NotFound();
 
+            return await Edit(id, entity);
+        }
+        // <summary>
+        /// Allows render the Edit view
+        /// </summary>
+        /// <param name="id">The id of the entity to edit into the view</param>
+        /// <param name="entity">The entity to edit</param>
+        private async Task<IActionResult> Edit(TKey id, TModel entity)
+        {
             var model = Settings.EditOptions;
             model.Data = entity;
             model.Id = id;
 
+            ViewBag.Action = Url.Action(nameof(SaveChangesAsync), new
+            {
+                id = id
+            });
+
             return Content(
                 await _renderingService.RenderToStringAsync(
                     nameof(Edit),
-                    model
+                    model,
+                    ViewData
                 ),
                 "text/html"
             );
         }
+
         /// <summary>
         /// Allows valid and save the changes into the specified entity
         /// </summary>
@@ -182,7 +268,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to change</param>
         [Route("{id}/edit")]
         [HttpPost]
-        public async Task<IActionResult> SaveChangesAsync(TKey id, TModel model)
+        public virtual async Task<IActionResult> SaveChangesAsync(TKey id, TModel model)
         {
             var key = (TKey) Convert.ChangeType(model.GetType().GetProperty(Settings.KeyPropertyName)?.GetValue(model), typeof(TKey));
             if (!id.Equals(key))
@@ -204,9 +290,7 @@ namespace JCTools.GenericCrud.Controllers
                 catch (DbUpdateException ex)
                 {
                     _logger.LogWarning(ex, "Failure saving changes.");
-                    ModelState.AddModelError("", "Unable to save changes. " +
-                        "Try again, and if the problem persists, " +
-                        "see your system administrator.");
+                    AddSaveChangesErrorMessage();
                 }
                 return RedirectToAction(nameof(Index), new
                 {
@@ -215,18 +299,7 @@ namespace JCTools.GenericCrud.Controllers
                 });
             }
 
-            var realModel = Settings.EditOptions;
-            realModel.Data = model;
-
-            return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Edit),
-                    realModel,
-                    ViewData
-                ),
-                "text/html"
-            );
-
+            return await Edit(id, model);
         }
     }
 }

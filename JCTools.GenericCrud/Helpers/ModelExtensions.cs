@@ -64,7 +64,7 @@ namespace JCTools.GenericCrud.Helpers
             {
                 Name = p.Info.Name,
                 Display = GetPropertyDisplay(p, details.Localizer),
-                Value = p.Info.GetValue(model),
+                Value = model != null ? p.Info.GetValue(model) :null,
                 Visible = p.List?.Visible ?? true
             });
         }
