@@ -1,5 +1,8 @@
 @using JCTools.GenericCrud.Helpers
+@using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.ICrudDetails
+@inject IViewLocalizer Localizer
+
 @{
     Layout = Model.LayoutPage;
     ViewData["Title"] = Model.Title;

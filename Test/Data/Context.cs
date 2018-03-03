@@ -11,6 +11,12 @@ namespace Test.Data
             set;
         }
 
+        public DbSet<Country> Country
+        {
+            get;
+            set;
+        }
+
         protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite ("Data Source=Data/MoviesGallery.db");

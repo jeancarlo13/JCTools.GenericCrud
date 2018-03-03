@@ -2,8 +2,9 @@
 @using JCTools.GenericCrud.Controllers
 
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
-
+@using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.ICrudEdit
+@inject IViewLocalizer Localizer
 
 @{
     Layout = Model.LayoutPage;
