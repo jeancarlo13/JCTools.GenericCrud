@@ -10,14 +10,27 @@ using Test.Data;
 namespace Test.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20180214052259_Moviecountry")]
-    partial class Moviecountry
+    [Migration("20180303004127_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.1-rtm-125");
+
+            modelBuilder.Entity("Test.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
 
             modelBuilder.Entity("Test.Models.Movie", b =>
                 {
@@ -28,7 +41,8 @@ namespace Test.Migrations
 
                     b.Property<string>("Director");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .IsRequired();
 
                     b.Property<int>("Year");
 

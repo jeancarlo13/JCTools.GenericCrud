@@ -11,7 +11,7 @@ namespace Test.Data
             set;
         }
 
-        public DbSet<Country> Country
+        public DbSet<Country> Countries
         {
             get;
             set;
