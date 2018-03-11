@@ -1,18 +1,12 @@
 @using JCTools.GenericCrud.Helpers
 @model JCTools.GenericCrud.Models.CrudAction
-@{
-    var usePopups = (bool)(ViewData["UsePopups"]  ?? false);
-    var url =  ViewData["Url"] ?? "#";
-    var onClick = ViewData["OnClick"] ?? "genericCrud.showModal.call(this)";
-    var useText = (bool)(ViewData["UseText"] ?? false);
-}
 
 @if(Model.Visible)
 {
-    @if (Model.UseSubmit || usePopups)
+    @if (Model.UseSubmit || Model.UsePopups)
     {
-        <button type="@(Model.UseSubmit ? "submit": "button")" onclick="@onClick" data-url="@url" title="@Model.Caption" class="@Model.ButtonClass">
-            @if(string.IsNullOrWhiteSpace(Model.IconClass) || useText)
+        <button type="@(Model.UseSubmit ? "submit": "button")" onclick="@Model.OnClientClick" data-url="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
+            @if(string.IsNullOrWhiteSpace(Model.IconClass) || Model.UseText)
             {
                 @Model.Text
             }
@@ -24,7 +18,7 @@
     }
     else 
     {
-        <a href="@url" title="@Model.Caption" class="@Model.ButtonClass">
+        <a href="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
             @if(string.IsNullOrWhiteSpace(Model.IconClass))
             {
                 @Model.Text

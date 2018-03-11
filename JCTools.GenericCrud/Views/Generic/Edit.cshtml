@@ -10,6 +10,10 @@
     Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
+
+    Model.IndexAction.Url = Url.Action("Index");
+    Model.SaveAction.UseSubmit = true;
+    Model.SaveAction.Url = Url.Action("SaveChanges");
 }
 @if (!Model.UsePopups)
 {
@@ -38,22 +42,8 @@
         {
             <div class="row">
                 <div class="col-md-12">
-                    @{
-                        var data = new ViewDataDictionary(this.ViewData) 
-                        { 
-                            { "Url", Url.Action("Index") }
-                        };
-                    }
-                    @Html.Partial("_action", Model.IndexAction, data)
-                    @{
-                        Model.SaveAction.UseSubmit = true;
-                        data = new ViewDataDictionary(this.ViewData) 
-                        { 
-                            { "Url", Url.Action("SaveChanges") }
-                        };
-                    }
-                    @Html.Partial("_action", Model.SaveAction, data)
-                    
+                    @Html.Partial("_action", Model.IndexAction)
+                    @Html.Partial("_action", Model.SaveAction)
                 </div>
             </div>
         }

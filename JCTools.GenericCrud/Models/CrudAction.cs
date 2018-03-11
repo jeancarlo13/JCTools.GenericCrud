@@ -24,5 +24,28 @@ namespace JCTools.GenericCrud.Models
             get;
             set;
         } = false;
+
+        public bool UsePopups
+        {
+            get;
+            set;
+        } = false;
+
+        public bool UseText
+        {
+            get;
+            set;
+        } = false;
+
+        public string Url
+        {
+            get;
+            set;
+        }
+        public string OnClientClick
+        {
+            get;
+            set;
+        }
     }
 }

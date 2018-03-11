@@ -7,6 +7,9 @@
     Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
+    
+    Model.IndexAction.Url = Url.Action("Index");
+    Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() } );
 }
 @if (!Model.UsePopups)
 {
@@ -33,20 +36,10 @@
 {
     <div class="row">
         <div class="col-md-12">
-            @{
-                var data = new ViewDataDictionary(this.ViewData) 
-                { 
-                    { "Url", Url.Action("Index") }
-                };
-            }
-            @Html.Partial("_action", Model.IndexAction, data)
+            @Html.Partial("_action", Model.IndexAction)
             @if (ViewBag.IsDelete == true)
             {
-                data = new ViewDataDictionary(this.ViewData) 
-                { 
-                    { "Url", Url.Action("DeleteConfirm", new { id = Model.GetId() } ) }
-                };
-                @Html.Partial("_action", Model.DeleteAction, data)
+                @Html.Partial("_action", Model.DeleteAction)
             }
         </div>
     </div>

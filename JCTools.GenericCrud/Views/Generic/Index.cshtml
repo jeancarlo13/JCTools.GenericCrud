@@ -6,6 +6,19 @@
 @{
     Layout = Model.LayoutPage;
     ViewData["Title"] = Model.Title;
+
+    Model.NewAction.Url = Url.Action("Create");
+    Model.NewAction.UsePopups = Model.UsePopups;
+    Model.DetailsAction.UsePopups = Model.UsePopups;
+    Model.EditAction.UsePopups = Model.UsePopups;
+    Model.DeleteAction.UsePopups = Model.UsePopups;
+    if (Model.UsePopups)
+    {
+        Model.NewAction.OnClientClick = "genericCrud.showModal.call(this)";
+        Model.DetailsAction.OnClientClick = Model.NewAction.OnClientClick;
+        Model.EditAction.OnClientClick = Model.NewAction.OnClientClick;
+        Model.DeleteAction.OnClientClick = Model.NewAction.OnClientClick;        
+    }
 }
 
 <h2>@Model.Title</h2>
@@ -27,14 +40,7 @@
             @if(Model.ActionsColumnIsVisible)
             {
                 <th class="text-center">
-                    @{
-                        var data = new ViewDataDictionary(this.ViewData) 
-                        { 
-                            { "Url", Url.Action("Create") },
-                            { "UsePopups", Model.UsePopups }
-                        };
-                    }
-                    @Html.Partial("_action", Model.NewAction, data)
+                    @Html.Partial("_action", Model.NewAction)
                 </th>
             }
         </tr>
@@ -57,23 +63,13 @@
                     <td class="text-center">
                         @{
                             var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
-                            var data = new ViewDataDictionary(this.ViewData) 
-                            { 
-                                { "Url", Url.Action("Details", new { id = value }) },
-                                { "UsePopups", Model.UsePopups }
-                            };
+                            Model.DetailsAction.Url = Url.Action("Details", new { id = value });
+                            Model.EditAction.Url = Url.Action("Edit", new { id = value });
+                            Model.DeleteAction.Url = Url.Action("Delete", new { id = value });
                         }
-                        @Html.Partial("_action", Model.DetailsAction, data)
-
-                        @{
-                            data["Url"] = Url.Action("Edit", new { id = value });
-                        }
-                        @Html.Partial("_action", Model.EditAction, data)
-                        
-                        @{
-                            data["Url"] = Url.Action("Delete", new { id = value });
-                        }
-                        @Html.Partial("_action", Model.DeleteAction, data)
+                        @Html.Partial("_action", Model.DetailsAction)
+                        @Html.Partial("_action", Model.EditAction)
+                        @Html.Partial("_action", Model.DeleteAction)
                     </td>
                 }
             </tr>
