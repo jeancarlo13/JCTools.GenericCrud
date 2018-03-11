@@ -1,9 +1,11 @@
 @using JCTools.GenericCrud.Helpers
 @model JCTools.GenericCrud.Models.CrudAction
 @{
+    var usePopups = (bool)(ViewData["UsePopups"]  ?? false);
     var url = ViewData["Url"] ?? "#";
-    
+    var onClick = ViewData["OnClick"] ?? "genericCrud.showModal.call(this)";
 }
+
 @if(Model.Visible)
 {
     @if (Model.UseSubmit){
@@ -17,6 +19,11 @@
                 <i class="@Model.IconClass" aria-hidden="true"></i>
             }
         </button>
+    }
+    else if(usePopups){
+        <a onclick="@onClick" data-url="@url" title="@Model.Caption" class="@Model.ButtonClass">
+            @Model.Text            
+        </a>
     }
     else 
     {

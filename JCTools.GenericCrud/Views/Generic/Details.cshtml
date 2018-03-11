@@ -4,13 +4,15 @@
 @inject IViewLocalizer Localizer
 
 @{
-    Layout = Model.LayoutPage;
+    Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
 }
-
-<h2>@Model.Title</h2>
-<h3>@Model.Subtitle</h2>
+@if (!Model.UsePopups)
+{
+    <h2>@Model.Title</h2>
+    <h3>@Model.Subtitle</h3>
+}
 <div class="row">
     <dl class="dl-horizontal">
         @foreach(var value in values)
@@ -27,22 +29,25 @@
         }
     </dl>
 </div>
-<div class="row">
-    <div class="col-md-12">
-        @{
-            var data = new ViewDataDictionary(this.ViewData) 
-            { 
-                { "Url", Url.Action("Index") }
-            };
-        }
-        @Html.Partial("_action", Model.IndexAction, data)
-        @if (ViewBag.IsDelete == true)
-        {
-            data = new ViewDataDictionary(this.ViewData) 
-            { 
-                { "Url", Url.Action("DeleteConfirm", new { id = Model.GetId() } ) }
-            };
-            @Html.Partial("_action", Model.DeleteAction, data)
-        }
+@if (!Model.UsePopups)
+{
+    <div class="row">
+        <div class="col-md-12">
+            @{
+                var data = new ViewDataDictionary(this.ViewData) 
+                { 
+                    { "Url", Url.Action("Index") }
+                };
+            }
+            @Html.Partial("_action", Model.IndexAction, data)
+            @if (ViewBag.IsDelete == true)
+            {
+                data = new ViewDataDictionary(this.ViewData) 
+                { 
+                    { "Url", Url.Action("DeleteConfirm", new { id = Model.GetId() } ) }
+                };
+                @Html.Partial("_action", Model.DeleteAction, data)
+            }
+        </div>
     </div>
-</div>
+}

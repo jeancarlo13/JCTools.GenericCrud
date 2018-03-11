@@ -1,0 +1,27 @@
+@using JCTools.GenericCrud.Helpers
+@using Microsoft.AspNetCore.Mvc.Localization
+@model JCTools.GenericCrud.Models.Popup
+@inject IViewLocalizer Localizer
+
+<div class="modal fade" tabindex="-1" role="dialog" id="genericCrudModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="@Localizer["GenericCrud.ClosePopup"]" title="@Localizer["GenericCrud.ClosePopup"]">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">@Model.Title</h4>
+        </div>
+        <div class="modal-body">
+            @Html.Partial(Model.InnerView, Model.Model)
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
+            @if (Model.CommitAction != null)
+            {
+                @Html.Partial("_action", Model.CommitAction, new ViewDataDictionary(this.ViewData) { { "UsePopups", true } } )
+            }
+        </div>
+    </div>
+  </div>
+</div>

@@ -55,7 +55,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Edit?.ButtonClass ?? ActionOptions.DefaultEdit.ButtonClass,
             };
         }
-        private static CrudAction ConfigureDeleteAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
+        public static CrudAction ConfigureDeleteAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
         where TModel : class, new()
         {
             return new CrudAction()
@@ -79,10 +79,13 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Index?.ButtonClass ?? ActionOptions.DefaultIndex.ButtonClass,
             };
         }
+        public static string GetModelName<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
+        where TModel : class, new() 
+        => localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
         public static CrudList<TModel, TKey> CreateListModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
         where TModel : class, new()
         {
-            var modelName = localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
+            var modelName = options.GetModelName(localizer);
             var result = new CrudList<TModel, TKey>()
                 {
                     Title = modelName,
@@ -93,7 +96,8 @@ namespace JCTools.GenericCrud.Helpers
                     EditAction = options.ConfigureEditAction(modelName, localizer),
                     DeleteAction = options.ConfigureDeleteAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
-                    Localizer = localizer
+                    Localizer = localizer,
+                    UsePopups = options.UsePopups
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;
@@ -116,7 +120,7 @@ namespace JCTools.GenericCrud.Helpers
             string defaultSubtitle)
         where TModel : class, new()
         {
-            var modelName = localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
+            var modelName = options.GetModelName(localizer);
             var result = new CrudDetails<TModel, TKey>()
                 {
                     Title = modelName,
@@ -126,7 +130,8 @@ namespace JCTools.GenericCrud.Helpers
                     EditAction = options.ConfigureEditAction(modelName, localizer),
                     DeleteAction = options.ConfigureDeleteAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
-                    Localizer = localizer
+                    Localizer = localizer,
+                    UsePopups = options.UsePopups,
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;
@@ -141,7 +146,7 @@ namespace JCTools.GenericCrud.Helpers
             string defaultSubtitle)
         where TModel : class, new()
         {
-            var modelName = localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
+            var modelName = options.GetModelName(localizer);
             var result = new CrudEdit<TModel, TKey>()
                 {
                     Title = modelName,
@@ -150,7 +155,8 @@ namespace JCTools.GenericCrud.Helpers
                     IndexAction = options.ConfigureIndexAction(modelName, localizer),
                     SaveAction = options.ConfigureSaveAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
-                    Localizer = localizer
+                    Localizer = localizer,
+                    UsePopups = options.UsePopups
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;

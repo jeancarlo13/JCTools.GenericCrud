@@ -7,6 +7,7 @@ namespace JCTools.GenericCrud.Models
     public interface IBase
     {        
         string LayoutPage { get; set; }
+        bool UsePopups { get; set; }
         string Title { get; set; }
         string Subtitle { get; set; }
         IEnumerable<string> Columns { get; set; }

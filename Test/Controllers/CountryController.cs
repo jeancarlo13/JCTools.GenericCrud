@@ -14,6 +14,7 @@ namespace Test.Controllers
         : base(serviceProvider, new Data.Context())
         { 
             // Settings.ListOptions.Subtitle = "Lista";
+            Settings.UsePopups = true;
         }
     }
 }

@@ -113,6 +113,13 @@
         }
     },
     {
+        "Key": "GenericCrud.Delete.Subtitle",
+        "Values": {
+            "en-US": "Are you sure you want to delete this?",
+            "es-MX": "¿Estas seguro de desear borrar esto?"
+        }
+    },
+    {
         "Key": "GenericCrud.Index.EditSuccessMessage",
         "Values": {
             "en-US": "Changes stored successful.",
@@ -148,6 +155,13 @@
         }
     },
     {
+        "Key": "GenericCrud.ClosePopup",
+        "Values": {
+            "en-US": "Close",
+            "es-MX": "Cerrar"
+        }
+    },
+    {
         "Key": "Movie",
         "Values": {
             "en-US": "Movie",
@@ -164,7 +178,7 @@
     {
         "Key": "RequiredField",
         "Values": {
-            "en-US": "The {0}} field is required.",
+            "en-US": "The {0} field is required.",
             "es-MX": "El campo {0} es obligatorio."
         }
     },

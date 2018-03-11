@@ -21,7 +21,7 @@ namespace JCTools.GenericCrud.Helpers
             internal static string GetLocalizedString(this IStringLocalizer localizer, string key, string @default, params string[] parameters){
             var localized = localizer[key].Value;
 
-            if (!string.IsNullOrWhiteSpace(@default) && localized == key)
+            if (string.IsNullOrWhiteSpace(localized) || localized == key)
                 localized = @default;
 
             return string.Format(localized, parameters);

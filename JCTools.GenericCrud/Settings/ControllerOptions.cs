@@ -38,15 +38,47 @@ namespace JCTools.GenericCrud.Settings
             get;
             set;
         }
-        public string KeyPropertyName
-        {
-            get;
-            set;
-        }
         public CrudDetails<TModel, TKey> DeleteOptions
         {
             get;
             internal set;
         }
+        private string _keyPropertyName;
+        public string KeyPropertyName
+        {
+            get => _keyPropertyName;
+            set
+            {
+                _keyPropertyName = value;
+                SetProperty(nameof(KeyPropertyName), value);
+            }
+        }
+        public override string LayoutPath
+        {
+            get => base.LayoutPath;
+            set
+            {
+                base.LayoutPath = value;
+                SetProperty(nameof(LayoutPath), value);
+            }
+        }
+        public override bool UsePopups
+        {
+            get => base.UsePopups;
+            set
+            {
+                base.UsePopups = value;
+                SetProperty(nameof(UsePopups), value);
+            }
+        }
+        private void SetProperty<TValue>(string property, TValue value)
+        {
+            SetProperty(ListOptions, property, value);
+            SetProperty(DetailsOptions, property, value);
+            SetProperty(CreateOptions, property, value);
+            SetProperty(EditOptions, property, value);
+            SetProperty(DeleteOptions, property, value);
+        }
+        private void SetProperty<TValue>(IBase options, string property, TValue value) => options?.GetType().GetProperty(property)?.SetValue(options, value);
     }
 }

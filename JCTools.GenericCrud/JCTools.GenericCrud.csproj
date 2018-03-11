@@ -15,7 +15,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Views\Generic\Index.cshtml" />
     <EmbeddedResource Include="Views\Generic\_action.cshtml" />
+    <EmbeddedResource Include="Views\Generic\_popup.cshtml" />
     <EmbeddedResource Include="Views\Generic\Details.cshtml" />
     <EmbeddedResource Include="Views\Generic\Edit.cshtml" />
+    <EmbeddedResource Include="js\genericCrud.js" />
   </ItemGroup>
 </Project>

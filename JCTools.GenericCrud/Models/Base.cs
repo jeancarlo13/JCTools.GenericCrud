@@ -12,6 +12,7 @@ namespace JCTools.GenericCrud.Models
             get;
             set;
         } = Configurator.Options.LayoutPath;
+        public bool UsePopups { get; set; } = Configurator.Options.UsePopups;
         public virtual string Title
         {
             get;

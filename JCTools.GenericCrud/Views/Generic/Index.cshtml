@@ -30,7 +30,8 @@
                     @{
                         var data = new ViewDataDictionary(this.ViewData) 
                         { 
-                            { "Url", Url.Action("Create") }
+                            { "Url", Url.Action("Create") },
+                            { "UsePopups", Model.UsePopups }
                         };
                     }
                     @Html.Partial("_action", Model.NewAction, data)
@@ -58,7 +59,8 @@
                             var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
                             var data = new ViewDataDictionary(this.ViewData) 
                             { 
-                                { "Url", Url.Action("Details", new { id = value }) }
+                                { "Url", Url.Action("Details", new { id = value }) },
+                                { "UsePopups", Model.UsePopups }
                             };
                         }
                         @Html.Partial("_action", Model.DetailsAction, data)
@@ -78,3 +80,5 @@
         }
     </tbody>
 </table>
+
+<script src="@(Url.Action("GetScript", new { fileName = "genericCrud"}))"></script>

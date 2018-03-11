@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
@@ -150,14 +153,33 @@ namespace JCTools.GenericCrud.Controllers
             var model = Settings.DetailsOptions;
             model.Data = entity;
 
+            return await RenderView(nameof(Details), model);
+        }
+
+        private async Task<IActionResult> RenderView(
+            string view,
+            IBase model,
+            CrudAction commitAction = null)
+        {
+            object popupModel = model;
+            if (Settings.UsePopups)
+            {
+                popupModel = new Popup()
+                {
+                    Model = model,
+                    InnerView = view,
+                    CommitAction = commitAction
+                };
+
+                view = "_popup";
+            }
+
             return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Details),
-                    model
-                ),
+                await _renderingService.RenderToStringAsync(view, popupModel, ViewData),
                 "text/html"
             );
         }
+
         /// <summary>
         /// Allows render the delete view
         /// </summary>
@@ -177,14 +199,8 @@ namespace JCTools.GenericCrud.Controllers
 
             ViewBag.IsDelete = true;
 
-            return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Details),
-                    model,
-                    ViewData
-                ),
-                "text/html"
-            );
+            var action = Settings.ConfigureDeleteAction(Settings.GetModelName(_localizer), _localizer);
+            return await RenderView(nameof(Details), model, action);
         }
         /// <summary>
         /// Allows render the delete view
@@ -372,6 +388,23 @@ namespace JCTools.GenericCrud.Controllers
             }
 
             return await Edit(id, model);
+        }
+
+        [Route("{filename}.js")]
+        public FileResult GetScript(string fileName)
+        {
+            var assembly = Settings.GetType().GetTypeInfo().Assembly;
+
+            // This shows the available items.
+            string[] resources = assembly.GetManifestResourceNames();
+
+            var stream = assembly.GetManifestResourceStream($"JCTools.GenericCrud.js.{fileName}.js");
+
+            using(var reader = new StreamReader(stream))
+            {
+                var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+                return File(bytes, "application/javascript");
+            }
         }
     }
 }
