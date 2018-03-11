@@ -254,14 +254,9 @@ namespace JCTools.GenericCrud.Controllers
             var model = Settings.CreateOptions;
 
             ViewBag.Action = Url.Action(nameof(Create));
-            return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Edit),
-                    model,
-                    ViewData
-                ),
-                "text/html"
-            );
+
+            var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
+            return await RenderView(nameof(Edit), model, action);
         }
         /// <summary>
         /// Allows save new entities
@@ -339,14 +334,8 @@ namespace JCTools.GenericCrud.Controllers
                 id = id
             });
 
-            return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Edit),
-                    model,
-                    ViewData
-                ),
-                "text/html"
-            );
+            var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
+            return await RenderView(nameof(Edit), model, action);
         }
 
         /// <summary>

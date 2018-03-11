@@ -13,13 +13,16 @@
             <h4 class="modal-title">@Model.Title</h4>
         </div>
         <div class="modal-body">
-            @Html.Partial(Model.InnerView, Model.Model)
+            <div class="container-fluid">
+                @Html.Partial(Model.InnerView, Model.Model)
+                
+            </div>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
             @if (Model.CommitAction != null)
             {
-                @Html.Partial("_action", Model.CommitAction, new ViewDataDictionary(this.ViewData) { { "UsePopups", true } } )
+                @Html.Partial("_action", Model.CommitAction, new ViewDataDictionary(this.ViewData) { { "UsePopups", true }, { "UseText", true } } )
             }
         </div>
     </div>

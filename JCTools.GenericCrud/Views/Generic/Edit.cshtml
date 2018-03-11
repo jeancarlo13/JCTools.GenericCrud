@@ -7,13 +7,15 @@
 @inject IViewLocalizer Localizer
 
 @{
-    Layout = Model.LayoutPage;
+    Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
 }
-
-<h2>@Model.Title</h2>
-<h3>@Model.Subtitle</h2>
+@if (!Model.UsePopups)
+{
+    <h2>@Model.Title</h2>
+    <h3>@Model.Subtitle</h3>
+}
 <div class="row">
     <form action="@ViewBag.Action"  method="POST" asp-anti-forgery="true">
         @foreach(var value in values)
@@ -32,25 +34,28 @@
                 @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name, "HiddenFor")
             }
         }
-        <div class="row">
-            <div class="col-md-12">
-                @{
-                    var data = new ViewDataDictionary(this.ViewData) 
-                    { 
-                        { "Url", Url.Action("Index") }
-                    };
-                }
-                @Html.Partial("_action", Model.IndexAction, data)
-                @{
-                    Model.SaveAction.UseSubmit = true;
-                    data = new ViewDataDictionary(this.ViewData) 
-                    { 
-                        { "Url", Url.Action("SaveChanges") }
-                    };
-                }
-                @Html.Partial("_action", Model.SaveAction, data)
-                
+        @if (!Model.UsePopups)
+        {
+            <div class="row">
+                <div class="col-md-12">
+                    @{
+                        var data = new ViewDataDictionary(this.ViewData) 
+                        { 
+                            { "Url", Url.Action("Index") }
+                        };
+                    }
+                    @Html.Partial("_action", Model.IndexAction, data)
+                    @{
+                        Model.SaveAction.UseSubmit = true;
+                        data = new ViewDataDictionary(this.ViewData) 
+                        { 
+                            { "Url", Url.Action("SaveChanges") }
+                        };
+                    }
+                    @Html.Partial("_action", Model.SaveAction, data)
+                    
+                </div>
             </div>
-        </div>
+        }
     </form>
 </div>

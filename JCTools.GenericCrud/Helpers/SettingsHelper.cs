@@ -19,7 +19,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.New?.ButtonClass ?? ActionOptions.DefaultNew.ButtonClass,
             };
         }
-        private static CrudAction ConfigureSaveAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
+        internal static CrudAction ConfigureSaveAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
         where TModel : class, new()
         {
             return new CrudAction()
@@ -55,7 +55,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Edit?.ButtonClass ?? ActionOptions.DefaultEdit.ButtonClass,
             };
         }
-        public static CrudAction ConfigureDeleteAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
+        internal static CrudAction ConfigureDeleteAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
         where TModel : class, new()
         {
             return new CrudAction()
