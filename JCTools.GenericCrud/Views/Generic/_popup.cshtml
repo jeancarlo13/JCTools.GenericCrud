@@ -24,6 +24,7 @@
             {
                 Model.CommitAction.UsePopups = true;
                 Model.CommitAction.UseText = true;
+                Model.CommitAction.OnClientClick = "genericCrud.executeCommitAction.call(this)";
                 @Html.Partial("_action", Model.CommitAction)
             }
         </div>

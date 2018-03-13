@@ -200,6 +200,11 @@ namespace JCTools.GenericCrud.Controllers
             ViewBag.IsDelete = true;
 
             var action = Settings.ConfigureDeleteAction(Settings.GetModelName(_localizer), _localizer);
+            action.Url = Url.Action(nameof(DeleteConfirm), new
+            {
+                id
+            });
+
             return await RenderView(nameof(Details), model, action);
         }
         /// <summary>
@@ -237,11 +242,10 @@ namespace JCTools.GenericCrud.Controllers
                 );
             }
 
-            return RedirectToAction(nameof(Index), new
+            return SendSuccessResponse(nameof(Index), new
             {
                 message = IndexMessages.DeleteSuccess
             });
-
         }
         /// <summary>
         /// Allows render the create view
@@ -256,6 +260,8 @@ namespace JCTools.GenericCrud.Controllers
             ViewBag.Action = Url.Action(nameof(Create));
 
             var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
+            action.Url = ViewBag.Action;
+
             return await RenderView(nameof(Edit), model, action);
         }
         /// <summary>
@@ -281,7 +287,8 @@ namespace JCTools.GenericCrud.Controllers
                     _logger.LogWarning(ex, "Failure saving changes.");
                     AddSaveChangesErrorMessage();
                 }
-                return RedirectToAction(nameof(Index), new
+
+                return SendSuccessResponse(nameof(Index), new
                 {
                     message = IndexMessages.CreateSuccess,
                         id = typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model)
@@ -335,6 +342,8 @@ namespace JCTools.GenericCrud.Controllers
             });
 
             var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
+            action.Url = ViewBag.Action;
+
             return await RenderView(nameof(Edit), model, action);
         }
 
@@ -369,7 +378,8 @@ namespace JCTools.GenericCrud.Controllers
                     _logger.LogWarning(ex, "Failure saving changes.");
                     AddSaveChangesErrorMessage();
                 }
-                return RedirectToAction(nameof(Index), new
+
+                return SendSuccessResponse(nameof(Index), new
                 {
                     message = IndexMessages.EditSuccess,
                         id = id
@@ -377,6 +387,18 @@ namespace JCTools.GenericCrud.Controllers
             }
 
             return await Edit(id, model);
+        }
+
+        private IActionResult SendSuccessResponse(string action, object args)
+        {
+            if (Settings.UsePopups)
+                return Json(new JsonResponse
+                {
+                    Success = true,
+                        RedirectUrl = Url.Action(action, args)
+                });
+            else
+                return RedirectToAction(action, args);
         }
 
         [Route("{filename}.js")]
