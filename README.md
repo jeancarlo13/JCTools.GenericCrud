@@ -50,7 +50,6 @@ dotnet add package JCTools.GenericCrud --version 1.0.0
 ### Custom controllers
 If your desired personalize your controllers, add additional actions or override the default actions, then
 
-<<<<<<< HEAD
 1. Not add the model to manage in the step 3 of the last section
 2. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController<TDbContext, TModel, TKey>**. sample
 ```cs
@@ -78,9 +77,3 @@ namespace Test.Controllers
 
  ### License
 [MIT License](/LICENSE)
-
-=======
-
- ### License
-[MIT License](/LICENSE)
->>>>>>> e9f2534f4572a90043e70e83b718f27737826b63
