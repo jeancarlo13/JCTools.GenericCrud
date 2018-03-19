@@ -4,6 +4,7 @@ namespace JCTools.GenericCrud.Models
     {
         CrudAction IndexAction { get; set; }
         object GetData();
+        void SetData(object model);
         
     }
 }

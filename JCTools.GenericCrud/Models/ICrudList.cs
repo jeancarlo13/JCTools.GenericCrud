@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JCTools.GenericCrud.Models
 {
@@ -26,13 +27,14 @@ namespace JCTools.GenericCrud.Models
             get;
         }
         IEnumerable<Object> GetData();
+        void SetData(IQueryable model);
         string Message
         {
-            get;
+            get; set;
         }
         string MessageClass
         {
-            get;
+            get; set;
         }
     }
 }

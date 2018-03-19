@@ -1,47 +1,61 @@
+using System;
+using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
+using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Settings
 {
-    public class ControllerOptions<TModel, TKey> : Options
+    public class ControllerOptions<TModel, TKey> : Options, IControllerOptions
     where TModel : class, new()
     {
         public ControllerOptions(string keyPropertyName) : base()
         {
             KeyPropertyName = keyPropertyName;
         }
-        public ControllerOptions(Options options, string keyPropertyName) : this(keyPropertyName)
+        public ControllerOptions(
+            Options options,
+            string keyPropertyName,
+            IStringLocalizer _localizer
+        ) : this(keyPropertyName)
         {
             LayoutPath = options.LayoutPath;
             AllowCreationAction = options.AllowCreationAction;
             AllowShowDetailsAction = options.AllowShowDetailsAction;
             AllowEditionAction = options.AllowEditionAction;
             AllowDeletionAction = options.AllowDeletionAction;
+            UseModals = options.UseModals;
+
+            ListOptions = this.CreateListModel(_localizer);
+            DetailsOptions = this.CreateDetailsModel(_localizer);
+            EditOptions = this.CreateEditModel<TModel, TKey>(_localizer);
+            CreateOptions = this.CreateCreateModel<TModel, TKey>(_localizer);
+            DeleteOptions = this.CreateDeleteModel(_localizer);
         }
 
-        public CrudList<TModel, TKey> ListOptions
+        public ICrudList ListOptions
         {
             get;
             set;
         }
-        public CrudDetails<TModel, TKey> DetailsOptions
+        public ICrudDetails DetailsOptions
         {
             get;
             set;
         }
-        public CrudEdit<TModel, TKey> EditOptions
+        public ICrudEdit EditOptions
         {
             get;
             set;
         }
-        public CrudEdit<TModel, TKey> CreateOptions
+        public ICrudEdit CreateOptions
         {
             get;
             set;
         }
-        public CrudDetails<TModel, TKey> DeleteOptions
+        public ICrudDetails DeleteOptions
         {
             get;
-            internal set;
+            set;
         }
         private string _keyPropertyName;
         public string KeyPropertyName
@@ -62,13 +76,13 @@ namespace JCTools.GenericCrud.Settings
                 SetProperty(nameof(LayoutPath), value);
             }
         }
-        public override bool UsePopups
+        public override bool UseModals
         {
-            get => base.UsePopups;
+            get => base.UseModals;
             set
             {
-                base.UsePopups = value;
-                SetProperty(nameof(UsePopups), value);
+                base.UseModals = value;
+                SetProperty(nameof(UseModals), value);
             }
         }
         private void SetProperty<TValue>(string property, TValue value)
@@ -80,5 +94,7 @@ namespace JCTools.GenericCrud.Settings
             SetProperty(DeleteOptions, property, value);
         }
         private void SetProperty<TValue>(IBase options, string property, TValue value) => options?.GetType().GetProperty(property)?.SetValue(options, value);
+
+        public Type GetModelType() => typeof(TModel);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JCTools.GenericCrud.Models
 {
@@ -36,6 +37,7 @@ namespace JCTools.GenericCrud.Models
             get => NewAction.Visible || DetailsAction.Visible || EditAction.Visible || DeleteAction.Visible;
         }
         public IEnumerable<object> GetData() => Data;
+        public void SetData(IQueryable model) => Data = model as IEnumerable<TModel>;
         public string Message
         {
             get;

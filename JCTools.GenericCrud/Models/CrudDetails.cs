@@ -24,6 +24,7 @@ namespace JCTools.GenericCrud.Models
             set;
         }
         public object GetData() => Data;
+        public void SetData(object model) => Data = model as TModel;
 
     }
 }

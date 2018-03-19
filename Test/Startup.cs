@@ -7,8 +7,10 @@ using Askmethat.Aspnet.JsonLocalizer.Extensions;
 using JCTools.GenericCrud;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -50,13 +52,13 @@ namespace Test
                 options.SupportedUICultures = supportedCultures;
             });
 
-            services.ConfigureGenericCrud(o => {
-                // o.Actions.New.ButtonClass = string.Empty;
-                // o.Actions.Details.ButtonClass = string.Empty;
-                // o.Actions.Edit.ButtonClass = string.Empty;
-                // o.Actions.Delete.ButtonClass = string.Empty;
-                // o.Actions.Delete.IconClass += " text-danger";
+            services.ConfigureGenericCrud(o =>
+            {
+                o.UseModals = true;
+                o.ContextCreator = () => new Test.Data.Context();
+                o.Models.Add(typeof(Models.Country));
             });
+
             services.AddMvc()
                 .AddViewLocalization(
                     LanguageViewLocationExpanderFormat.Suffix,
@@ -83,11 +85,14 @@ namespace Test
             app.UseStaticFiles();
 
             app.UseRequestLocalization();
+
             app.UseMvc(routes =>
             {
+                routes.MapCrudRoutes();
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
             });
         }
     }

@@ -22,7 +22,7 @@
             <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
             @if (Model.CommitAction != null)
             {
-                Model.CommitAction.UsePopups = true;
+                Model.CommitAction.UseModals = true;
                 Model.CommitAction.UseText = true;
                 Model.CommitAction.OnClientClick = "genericCrud.executeCommitAction.call(this)";
                 @Html.Partial("_action", Model.CommitAction)

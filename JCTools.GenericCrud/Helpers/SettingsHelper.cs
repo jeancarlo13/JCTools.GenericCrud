@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Settings;
@@ -19,8 +20,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.New?.ButtonClass ?? ActionOptions.DefaultNew.ButtonClass,
             };
         }
-        internal static CrudAction ConfigureSaveAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
-        where TModel : class, new()
+        internal static CrudAction ConfigureSaveAction(this IControllerOptions options, string modelName, IStringLocalizer localizer)
         {
             return new CrudAction()
             {
@@ -31,8 +31,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Save?.ButtonClass ?? ActionOptions.DefaultSave.ButtonClass,
             };
         }
-        private static CrudAction ConfigureDetailsAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
-        where TModel : class, new()
+        private static CrudAction ConfigureDetailsAction(this IControllerOptions options, string modelName, IStringLocalizer localizer)
         {
             return new CrudAction()
             {
@@ -55,8 +54,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Edit?.ButtonClass ?? ActionOptions.DefaultEdit.ButtonClass,
             };
         }
-        internal static CrudAction ConfigureDeleteAction<TModel, TKey>(this ControllerOptions<TModel, TKey> options, string modelName, IStringLocalizer localizer)
-        where TModel : class, new()
+        internal static CrudAction ConfigureDeleteAction(this IControllerOptions options, string modelName, IStringLocalizer localizer)
         {
             return new CrudAction()
             {
@@ -79,9 +77,7 @@ namespace JCTools.GenericCrud.Helpers
                     ButtonClass = options?.Actions?.Index?.ButtonClass ?? ActionOptions.DefaultIndex.ButtonClass,
             };
         }
-        public static string GetModelName<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
-        where TModel : class, new() 
-        => localizer.GetLocalizedString(typeof(TModel).Name, typeof(TModel).Name);
+        public static string GetModelName(this IControllerOptions options, IStringLocalizer localizer) => localizer.GetLocalizedString(options.GetModelType().Name, options.GetModelType().Name);
         public static CrudList<TModel, TKey> CreateListModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
         where TModel : class, new()
         {
@@ -97,7 +93,7 @@ namespace JCTools.GenericCrud.Helpers
                     DeleteAction = options.ConfigureDeleteAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
                     Localizer = localizer,
-                    UsePopups = options.UsePopups
+                    UseModals = options.UseModals
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;
@@ -131,7 +127,7 @@ namespace JCTools.GenericCrud.Helpers
                     DeleteAction = options.ConfigureDeleteAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
                     Localizer = localizer,
-                    UsePopups = options.UsePopups,
+                    UseModals = options.UseModals,
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;
@@ -156,12 +152,50 @@ namespace JCTools.GenericCrud.Helpers
                     SaveAction = options.ConfigureSaveAction(modelName, localizer),
                     KeyPropertyName = options.KeyPropertyName,
                     Localizer = localizer,
-                    UsePopups = options.UsePopups
+                    UseModals = options.UseModals
                 };
             result.Columns = result.GetModelColumns(localizer);
             return result;
         }
         public static CrudEdit<TModel, TKey> CreateCreateModel<TModel, TKey>(this ControllerOptions<TModel, TKey> options, IStringLocalizer localizer)
         where TModel : class, new() => CreateEditModel(options, localizer, "GenericCrud.Create.Subtitle", "Create");
+        /// <summary>
+        /// Create dinamically the type of the CenericController with the specific model type 
+        /// </summary>
+        /// <param name="model">The model type to use</param>
+        /// <param name="key">the key property name of the model</param>
+        /// <returns>The created type</returns>
+        public static Type CreateGenericControllerType(Type model, string key)
+        {
+            var keyType = model.GetProperty(key)?.PropertyType ??
+                throw new ArgumentOutOfRangeException(nameof(key));
+
+            var dbContext = Configurator.Options.ContextCreator?.Invoke() ??
+                throw new InvalidOperationException($"The {nameof(Options.ContextCreator)} is missing.");
+
+            var dbContextType = dbContext.GetType();
+
+            var genericType = Type.GetType("JCTools.GenericCrud.Controllers.GenericController`3");
+            var genericControllerType = genericType.MakeGenericType(dbContextType, model, keyType);
+            return genericControllerType;
+        }
+        /// <summary>
+        /// Create the instance of the GenericController according the specific arguments
+        /// </summary>
+        /// <param name="provider">The applicaction service provider to use</param>
+        /// <param name="model">The model type to use</param>
+        /// <param name="key">the key property name of the model</param>
+        /// <returns>The created instance </returns>
+        public static object CreateGenericController(this IServiceProvider provider, Type model, string key)
+        {
+            var genericControllerType = CreateGenericControllerType(model, key);
+
+            var controller = Activator.CreateInstance(genericControllerType, new object[]
+            {
+                provider,
+                key
+            });
+            return controller;
+        }
     }
 }

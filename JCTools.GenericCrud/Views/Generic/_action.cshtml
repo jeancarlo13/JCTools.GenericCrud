@@ -3,7 +3,7 @@
 
 @if(Model.Visible)
 {
-    @if (Model.UseSubmit || Model.UsePopups)
+    @if (Model.UseSubmit || Model.UseModals)
     {
         <button type="@(Model.UseSubmit ? "submit": "button")" onclick="@Model.OnClientClick" data-url="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
             @if(string.IsNullOrWhiteSpace(Model.IconClass) || Model.UseText)

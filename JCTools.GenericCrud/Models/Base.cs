@@ -12,7 +12,7 @@ namespace JCTools.GenericCrud.Models
             get;
             set;
         } = Configurator.Options.LayoutPath;
-        public bool UsePopups { get; set; } = Configurator.Options.UsePopups;
+        public bool UseModals { get; set; } = Configurator.Options.UseModals;
         public virtual string Title
         {
             get;
@@ -47,5 +47,7 @@ namespace JCTools.GenericCrud.Models
             set;
         }
         public object GetId() => Id;
+        public void SetId(object id) => Id = (TKey)id;
+        
     }
 }

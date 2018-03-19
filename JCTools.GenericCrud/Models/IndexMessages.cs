@@ -5,6 +5,7 @@ namespace JCTools.GenericCrud.Models
     /// </summary>
     public enum IndexMessages
     {
+        None = 0,
         EditSuccess = 1,
         CreateSuccess = 2,
         DeleteSuccess = 3

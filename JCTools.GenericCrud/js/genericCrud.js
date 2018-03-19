@@ -1,16 +1,25 @@
+/*jshint esversion: 6 */
+
 var genericCrud =
   genericCrud ||
   (function() {
     "use strict";
 
     function addResponse(response) {
-      var div = document.createElement("div"),
-        modal = undefined;
-
+      var div = document.createElement("div");
       div.innerHTML = response;
-      modal = div.querySelector(":first-child");
 
+      let modal = div.querySelector(":first-child");
       document.body.appendChild(modal);
+
+      let form = modal.querySelector("form");
+      if (form) {
+        form.onsubmit = evt => {
+          evt.preventDefault();
+          modal.querySelector(".modal-footer button:last-child").click();
+          return false;
+        };
+      }
 
       $(modal).modal();
     }

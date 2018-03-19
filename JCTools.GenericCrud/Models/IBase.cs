@@ -7,7 +7,7 @@ namespace JCTools.GenericCrud.Models
     public interface IBase
     {        
         string LayoutPage { get; set; }
-        bool UsePopups { get; set; }
+        bool UseModals { get; set; }
         string Title { get; set; }
         string Subtitle { get; set; }
         IEnumerable<string> Columns { get; set; }
@@ -17,5 +17,7 @@ namespace JCTools.GenericCrud.Models
         IStringLocalizer Localizer { get; set; }
 
         object GetId();
+        void SetId(object id);
+
     }
 }

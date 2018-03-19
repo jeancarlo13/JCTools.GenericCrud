@@ -7,7 +7,7 @@
 @inject IViewLocalizer Localizer
 
 @{
-    Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
+    Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
 
@@ -15,13 +15,13 @@
     Model.SaveAction.UseSubmit = true;
     Model.SaveAction.Url = Url.Action("SaveChanges");
 }
-@if (!Model.UsePopups)
+@if (!Model.UseModals)
 {
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
 }
 <div class="row">
-    <form action="@ViewBag.Action"  method="POST" asp-anti-forgery="true">
+    <form action="@(Model.UseModals ? "" : ViewBag.Action)"  method="POST" asp-anti-forgery="true">
         @foreach(var value in values)
         {
             if (value.Visible)
@@ -38,7 +38,7 @@
                 @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name, "HiddenFor")
             }
         }
-        @if (!Model.UsePopups)
+        @if (!Model.UseModals)
         {
             <div class="row">
                 <div class="col-md-12">

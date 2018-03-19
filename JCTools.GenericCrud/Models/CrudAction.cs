@@ -25,7 +25,7 @@ namespace JCTools.GenericCrud.Models
             set;
         } = false;
 
-        public bool UsePopups
+        public bool UseModals
         {
             get;
             set;

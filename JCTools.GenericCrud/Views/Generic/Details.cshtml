@@ -4,14 +4,14 @@
 @inject IViewLocalizer Localizer
 
 @{
-    Layout = Model.UsePopups ? string.Empty : Model.LayoutPage;
+    Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var values = @Model.GetModelValues();
     
     Model.IndexAction.Url = Url.Action("Index");
     Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() } );
 }
-@if (!Model.UsePopups)
+@if (!Model.UseModals)
 {
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
@@ -32,7 +32,7 @@
         }
     </dl>
 </div>
-@if (!Model.UsePopups)
+@if (!Model.UseModals)
 {
     <div class="row">
         <div class="col-md-12">
