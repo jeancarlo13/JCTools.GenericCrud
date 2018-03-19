@@ -58,11 +58,7 @@ var genericCrud =
     }
 
     return {
-      showModal: function() {
-        showModal.call(this);
-      },
-      executeCommitAction: function() {
-        executeCommitAction.call(this);
-      }
+      showModal: () => showModal.call(this),
+      executeCommitAction: () => executeCommitAction.call(this)
     };
   })();
