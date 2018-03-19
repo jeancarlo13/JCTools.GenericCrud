@@ -1,5 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>JCTools.GenericCrud</AssemblyName>
+    <PackageId>JCTools.GenericCrud</PackageId>
+    <Authors>JeanCarlo13</Authors>
+    <Company>http://jctools.mx/</Company>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
+    <Description>Simplification of the Create, Read, Update and Delete pages of the application models.</Description>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>

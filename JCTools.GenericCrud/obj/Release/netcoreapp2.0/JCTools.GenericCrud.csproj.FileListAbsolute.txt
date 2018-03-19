@@ -1,0 +1,8 @@
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/bin/Release/netcoreapp2.0/JCTools.GenericCrud.deps.json
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/bin/Release/netcoreapp2.0/JCTools.GenericCrud.dll
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/bin/Release/netcoreapp2.0/JCTools.GenericCrud.pdb
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Release/netcoreapp2.0/JCTools.GenericCrud.csproj.CoreCompileInputs.cache
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Release/netcoreapp2.0/JCTools.GenericCrud.AssemblyInfoInputs.cache
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Release/netcoreapp2.0/JCTools.GenericCrud.AssemblyInfo.cs
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Release/netcoreapp2.0/JCTools.GenericCrud.dll
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Release/netcoreapp2.0/JCTools.GenericCrud.pdb
