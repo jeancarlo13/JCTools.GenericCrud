@@ -22,3 +22,4 @@
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/Test/obj/Debug/netcoreapp2.0/Test.AssemblyInfo.cs
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/Test/obj/Debug/netcoreapp2.0/Test.dll
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/Test/obj/Debug/netcoreapp2.0/Test.pdb
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/Test/obj/Debug/netcoreapp2.0/Test.csproj.CopyComplete

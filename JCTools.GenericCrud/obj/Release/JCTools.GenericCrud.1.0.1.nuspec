@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>JCTools.GenericCrud</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>JeanCarlo13</authors>
     <owners>JeanCarlo13</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -20,6 +20,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/bin/Debug/netcoreapp2.0/JCTools.GenericCrud.dll" target="lib/netcoreapp2.0/JCTools.GenericCrud.dll" />
+    <file src="/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/bin/Release/netcoreapp2.0/JCTools.GenericCrud.dll" target="lib/netcoreapp2.0/JCTools.GenericCrud.dll" />
   </files>
 </package>

@@ -9,11 +9,11 @@ namespace JCTools.GenericCrud.Settings
         private string _modelType;
         public CrudRouteConstraint(Type modelType)
         {
-            _modelType = modelType.Name;
+            _modelType = modelType.Name.ToLowerInvariant();
         }
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
-            return values[routeKey].Equals(_modelType);
+            return values[routeKey].ToString().ToLowerInvariant().Equals(_modelType);
         }
     }
 }
