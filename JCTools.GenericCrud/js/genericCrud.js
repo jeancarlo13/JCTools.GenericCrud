@@ -6,6 +6,8 @@ var genericCrud =
     "use strict";
 
     function addResponse(response) {
+      $("#genericCrudModal").remove();
+      
       var div = document.createElement("div");
       div.innerHTML = response;
 
@@ -59,6 +61,7 @@ var genericCrud =
 
     return {
       showModal: function() {
+        $("#genericCrudModal").remove();
         showModal.call(this);
       },
       executeCommitAction: function() {

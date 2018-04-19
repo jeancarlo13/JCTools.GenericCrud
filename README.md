@@ -14,11 +14,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
 ```bash
-Install-Package JCTools.GenericCrud -Version 1.0.0
+Install-Package JCTools.GenericCrud -Version 1.0.2
 
 Or
 
-dotnet add package JCTools.GenericCrud --version 1.0.0
+dotnet add package JCTools.GenericCrud --version 1.0.2
 ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
 ```cs
