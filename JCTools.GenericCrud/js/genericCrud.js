@@ -2,12 +2,16 @@
 
 var genericCrud =
   genericCrud ||
-  (function() {
+  (function () {
     "use strict";
 
-    function addResponse(response) {
+    var global = {
+      loadingClass: 'fa fa-spinner fa-spin'
+    };
+
+    function addResponse(response, btnIcon, lastClasses) {
       $("#genericCrudModal").remove();
-      
+
       var div = document.createElement("div");
       div.innerHTML = response;
 
@@ -24,20 +28,33 @@ var genericCrud =
       }
 
       $(modal).modal();
+      btnIcon.className = lastClasses;
     }
 
     function showModal() {
+      var i = this.querySelector('i'),
+        classes = i.className;
+
+      i.className = global.loadingClass;
+
       $.ajax({
         url: this.dataset.url,
         method: "GET",
-        success: addResponse
+        success: function (response) {
+          addResponse(response, i, classes);
+        }
       });
     }
 
     function executeCommitAction() {
       var modal = $("#genericCrudModal"),
         form = modal[0].querySelector("form"),
-        data = form ? $(form).serialize() : undefined;
+        data = form ? $(form).serialize() : undefined,
+        i = document.createElement('i');
+        
+      i.className = global.loadingClass;
+      this.insertBefore(i, this.childNodes[0]);
+
       $.ajax({
         method: form && data ? "POST" : "GET",
         data: data,
@@ -50,6 +67,7 @@ var genericCrud =
           modal.modal("hide");
           document.body.removeChild(modal[0]);
 
+          i.parentElement.removeChild(i);
           if (isJson && r.success === true) {
             window.location.replace(r.redirectUrl);
           } else if (isHtml) {
@@ -60,11 +78,11 @@ var genericCrud =
     }
 
     return {
-      showModal: function() {
+      showModal: function () {
         $("#genericCrudModal").remove();
         showModal.call(this);
       },
-      executeCommitAction: function() {
+      executeCommitAction: function () {
         executeCommitAction.call(this);
       }
     };

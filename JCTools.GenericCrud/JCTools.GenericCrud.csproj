@@ -9,7 +9,8 @@
     <Description>Simplification of the Create, Read, Update and Delete pages of the application models.</Description>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
+    
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
