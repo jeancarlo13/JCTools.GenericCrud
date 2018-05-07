@@ -98,7 +98,8 @@ namespace JCTools.GenericCrud.Controllers
             return Content(
                 await _renderingService.RenderToStringAsync(
                     nameof(Index),
-                    model
+                    model,
+                    ViewData
                 ),
                 "text/html"
             );

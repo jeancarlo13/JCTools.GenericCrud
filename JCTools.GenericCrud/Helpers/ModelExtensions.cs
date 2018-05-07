@@ -10,15 +10,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Helpers
+{
+    /// <summary>
+    /// Extensors used for get the model properties
+    /// </summary>
+    public static class ModelExtensions
     {
-        /// <summary>
-        /// Extensors used for get the model properties
-        /// </summary>
-        public static class ModelExtensions
-        {
-            internal static string GetLocalizedString(this IStringLocalizer localizer, string key, params string[] parameters) => GetLocalizedString(localizer, key, null, parameters);
+        internal static string GetLocalizedString(this IStringLocalizer localizer, string key, params string[] parameters) => GetLocalizedString(localizer, key, null, parameters);
 
-            internal static string GetLocalizedString(this IStringLocalizer localizer, string key, string @default, params string[] parameters){
+        internal static string GetLocalizedString(this IStringLocalizer localizer, string key, string @default, params string[] parameters)
+        {
             var localized = localizer[key].Value;
 
             if (string.IsNullOrWhiteSpace(localized) || localized == key)
@@ -33,50 +34,53 @@ namespace JCTools.GenericCrud.Helpers
         public static IEnumerable<string> GetModelColumns<TModel, TKey>(this Base<TModel, TKey> list, IStringLocalizer localizer)
             where TModel : class, new()
             => GetListProperties<TModel, TKey>(list).Select(p => GetPropertyDisplay(p, localizer));
-            
+
         private static string GetPropertyDisplay(Property p, IStringLocalizer localizer)
         {
             if (p.Display == null)
                 return p.Info.Name;
-            else {
+            else
+            {
                 var name = p.Display.GetName();
-                return string.IsNullOrWhiteSpace(name)? p.Info.Name : localizer[name];
+                return string.IsNullOrWhiteSpace(name) ? p.Info.Name : localizer[name];
             }
         }
         public static IEnumerable<IEnumerable<Data>> GetModelValues(this ICrudList list)
         {
             var properties = InvokeListProperties(list);
             return list.GetData()
-                .Select(d => 
-                    properties.Select(p => new  Data
+                .Select(d =>
+                    properties.Select(p => new Data
                     {
                         Name = p.Info.Name,
                         Value = p.Info.GetValue(d),
-                        Visible = p.List?.Visible ?? true
+                        Visible = p.List?.Visible ?? true,
+                        UseCustomView = p.List?.UseCustomView ?? false
                     })
                 );
         }
         public static IEnumerable<Data> GetModelValues(this IBaseDetails details)
         {
-            var model =  details.GetData();
+            var model = details.GetData();
             var properties = InvokeListProperties(details);
-            return properties.Select(p => new  Data
+            return properties.Select(p => new Data
             {
                 Name = p.Info.Name,
                 Display = GetPropertyDisplay(p, details.Localizer),
-                Value = model != null ? p.Info.GetValue(model) :null,
-                Visible = p.List?.Visible ?? true
+                Value = model != null ? p.Info.GetValue(model) : null,
+                Visible = p.List?.Visible ?? true,
+                UseCustomView = p.List?.UseCustomView ?? false
             });
         }
         private static IEnumerable<Property> InvokeListProperties(IBase config)
         {
             MethodInfo method = typeof(ModelExtensions)
                 .GetMethod(
-                    nameof(GetListProperties), 
+                    nameof(GetListProperties),
                     BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy
                 );
             MethodInfo generic = method.MakeGenericMethod(config.GetModelGenericType(), config.GetKeyGenericType());
-           return generic.Invoke(null, new object[]{config, true}) as IEnumerable<Property>;            
+            return generic.Invoke(null, new object[] { config, true }) as IEnumerable<Property>;
         }
         /// <summary>
         /// Allows get the properties that shuld appear into the crud list    

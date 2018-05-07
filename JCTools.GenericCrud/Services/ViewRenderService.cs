@@ -49,10 +49,10 @@ namespace JCTools.GenericCrud.Services
         {
             var httpContext = _httpContextAccessor.HttpContext ?? new DefaultHttpContext
             {
-            RequestServices = _serviceProvider
+                RequestServices = _serviceProvider
             };
 
-            using(var sw = new StringWriter())
+            using (var sw = new StringWriter())
             {
                 var viewResult = _viewEngine.FindView(_actionContextAccessor.ActionContext, viewName, false);
 
@@ -69,7 +69,7 @@ namespace JCTools.GenericCrud.Services
 
                 var viewDictionary = viewData ?? new ViewDataDictionary(_metadataProvider, new ModelStateDictionary());
                 viewDictionary.Model = model;
-
+                
                 var viewContext = new ViewContext(
                     _actionContextAccessor.ActionContext,
                     viewResult.View,
@@ -83,6 +83,46 @@ namespace JCTools.GenericCrud.Services
                 return sw.ToString();
             }
         }
+        public async System.Threading.Tasks.Task<IHtmlContent> RenderViewFor(
+            IBase model,
+            IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
+            string propertyName,
+            object data)
+        {
+            var viewDictionary = new ViewDataDictionary(_metadataProvider, viewData?.ModelState ?? new ModelStateDictionary())
+            {
+                Model = data
+            };
+
+            foreach (var key in viewData.Keys)
+            {
+                viewDictionary.Add(key, viewData[key]);
+            }
+            var file = $"~/Views/{model.GetModelGenericType().Name}/_Details{propertyName}.cshtml";
+            var result = htmlHelper.Raw(await RenderToStringAsync(file, data, viewDictionary));
+            return result;
+        }
+        public async System.Threading.Tasks.Task<IHtmlContent> RenderViewFor(
+            IBaseDetails model,
+            IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
+            string propertyName)
+        {
+            var viewDictionary = new ViewDataDictionary(_metadataProvider, viewData?.ModelState ?? new ModelStateDictionary())
+            {
+                Model = model
+            };
+
+            foreach (var key in viewData.Keys)
+            {
+                viewDictionary.Add(key, viewData[key]);
+            }
+
+            var file = $"~/Views/{model.GetModelGenericType().Name}/_Edit{propertyName}.cshtml";
+            var result = htmlHelper.Raw(await RenderToStringAsync(file, model.GetData(), viewDictionary));
+            return result;
+        }
         public async System.Threading.Tasks.Task<IHtmlContent> CreateEditorFor(
             IBaseDetails model,
             IHtmlHelper htmlHelper,
@@ -90,7 +130,6 @@ namespace JCTools.GenericCrud.Services
             string propertyName,
             string helperNametoUse = "EditorFor")
         {
-
             var content = $@"
             @model {model.GetModelGenericType().FullName};
             " +

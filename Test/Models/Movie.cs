@@ -34,8 +34,9 @@ namespace Test.Models
             get;
             set;
         }
-        [Display(Order = 3)]        
-        public string Country
+        [Display(Order = 3)]  
+        [Crud(UseCustomView = true)]      
+        public int Country
         {
             get;
             set;

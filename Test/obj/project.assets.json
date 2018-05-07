@@ -4787,7 +4787,7 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "JCTools.GenericCrud/1.0.2": {
+      "JCTools.GenericCrud/1.0.3": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
@@ -12732,7 +12732,7 @@
         "windowsazure.storage.nuspec"
       ]
     },
-    "JCTools.GenericCrud/1.0.2": {
+    "JCTools.GenericCrud/1.0.3": {
       "type": "project",
       "path": "../JCTools.GenericCrud/JCTools.GenericCrud.csproj",
       "msbuildProject": "../JCTools.GenericCrud/JCTools.GenericCrud.csproj"
@@ -12741,7 +12741,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "Askmethat.Aspnet.JsonLocalizer >= 1.0.3",
-      "JCTools.GenericCrud >= 1.0.2",
+      "JCTools.GenericCrud >= 1.0.3",
       "Microsoft.AspNetCore.All >= 2.0.5",
       "Microsoft.EntityFrameworkCore.Design >= 2.0.1",
       "Microsoft.EntityFrameworkCore.Sqlite >= 2.0.1",

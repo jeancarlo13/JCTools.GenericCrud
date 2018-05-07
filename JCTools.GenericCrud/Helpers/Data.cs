@@ -22,6 +22,7 @@ namespace JCTools.GenericCrud.Helpers
             get;
             set;
         }
+        public bool UseCustomView { get; set; }
 
         public override string ToString() => Name;
     }

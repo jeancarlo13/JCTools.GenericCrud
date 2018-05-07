@@ -16,5 +16,17 @@ namespace JCTools.GenericCrud.Services
             string propertyName,
             string helperNametoUse = "EditorFor"
         );
+        System.Threading.Tasks.Task<IHtmlContent> RenderViewFor(
+            IBaseDetails model,
+            IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
+            string propertyName
+        );
+        System.Threading.Tasks.Task<IHtmlContent> RenderViewFor(
+            IBase model,
+            IHtmlHelper htmlHelper,
+            ViewDataDictionary viewData,
+            string propertyName,
+            object data);
     }
 }

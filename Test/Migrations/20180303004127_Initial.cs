@@ -27,7 +27,7 @@ namespace Test.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Country = table.Column<string>(nullable: true),
+                    Country = table.Column<int>(nullable: true),
                     Director = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: false),
                     Year = table.Column<int>(nullable: false)

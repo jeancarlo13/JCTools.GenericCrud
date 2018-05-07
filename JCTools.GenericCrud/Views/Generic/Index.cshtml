@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.ICrudList
 @inject IViewLocalizer Localizer
+@inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
 @{
     Layout = Model.LayoutPage;
@@ -46,33 +47,44 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var row in Model.GetModelValues())
-        {
-            var isSelected = row.FirstOrDefault(v => v.Name == Model.KeyPropertyName)?.Value.Equals( Model.GetId());
-            var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
-            <tr @Html.Raw(classAttribute) >
-                @foreach(var value in row)
-                {
-                    if (value.Visible)
+        @{
+            var data = Model.GetData().ToList();
+            var rows = Model.GetModelValues().ToList();
+            for(var i = 0; i < rows.Count(); i++)
+            {
+                var row = rows[i];            
+                var isSelected = row.FirstOrDefault(v => v.Name == Model.KeyPropertyName)?.Value.Equals( Model.GetId());
+                var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
+                <tr @Html.Raw(classAttribute) >
+                    @foreach(var value in row)
                     {
-                        <td>@value.Value</td>
-                    }
-                }
-                @if(Model.ActionsColumnIsVisible)
-                {
-                    <td class="text-center">
-                        @{
-                            var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
-                            Model.DetailsAction.Url = Url.Action("Details", new { id = value });
-                            Model.EditAction.Url = Url.Action("Edit", new { id = value });
-                            Model.DeleteAction.Url = Url.Action("Delete", new { id = value });
+                        if (value.Visible)
+                        {
+                            if (value.UseCustomView){
+                                <td>
+                                    @await RenderingServices.RenderViewFor(Model, Html, ViewData, value.Name, data[i])
+                                </td>
+                            }else {
+                                <td>@value.Value</td>
+                            }
                         }
-                        @Html.Partial("_action", Model.DetailsAction)
-                        @Html.Partial("_action", Model.EditAction)
-                        @Html.Partial("_action", Model.DeleteAction)
-                    </td>
-                }
-            </tr>
+                    }
+                    @if(Model.ActionsColumnIsVisible)
+                    {
+                        <td class="text-center">
+                            @{
+                                var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
+                                Model.DetailsAction.Url = Url.Action("Details", new { id = value });
+                                Model.EditAction.Url = Url.Action("Edit", new { id = value });
+                                Model.DeleteAction.Url = Url.Action("Delete", new { id = value });
+                            }
+                            @Html.Partial("_action", Model.DetailsAction)
+                            @Html.Partial("_action", Model.EditAction)
+                            @Html.Partial("_action", Model.DeleteAction)
+                        </td>
+                    }
+                </tr>
+            }
         }
     </tbody>
 </table>

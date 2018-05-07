@@ -36,7 +36,7 @@ namespace Test.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Country");
+                    b.Property<int>("Country");
 
                     b.Property<string>("Director");
 

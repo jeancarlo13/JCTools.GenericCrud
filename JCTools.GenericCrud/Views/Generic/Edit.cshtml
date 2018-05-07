@@ -27,10 +27,14 @@
             if (value.Visible)
             {
                 <div class="form-group row">
-                    <label class="col-md-2 text-right" for="@value.Name">@value.Display</label>
-                    <div class="col-md-10">
-                        @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name)
-                    </div>
+                    @if (value.UseCustomView){
+                        @await RenderingServices.RenderViewFor(Model, Html, ViewData, value.Name)
+                    } else {
+                        <label class="col-md-2 text-right" for="@value.Name">@value.Display</label>
+                        <div class="col-md-10">
+                            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name)
+                        </div>
+                    }
                 </div>
             }
             else 

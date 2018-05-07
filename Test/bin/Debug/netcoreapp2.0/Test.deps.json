@@ -24,7 +24,7 @@
       "Test/1.0.0": {
         "dependencies": {
           "Askmethat.Aspnet.JsonLocalizer": "1.0.3",
-          "JCTools.GenericCrud": "1.0.2",
+          "JCTools.GenericCrud": "1.0.3",
           "Microsoft.AspNetCore.All": "2.0.5",
           "Microsoft.EntityFrameworkCore.Design": "2.0.1",
           "Microsoft.EntityFrameworkCore.Sqlite": "2.0.1",
@@ -3832,7 +3832,7 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "JCTools.GenericCrud/1.0.2": {
+      "JCTools.GenericCrud/1.0.3": {
         "dependencies": {
           "Microsoft.AspNetCore.Mvc": "2.0.2",
           "Microsoft.AspNetCore.Mvc.Razor": "2.0.2",
@@ -6056,7 +6056,7 @@
       "path": "windowsazure.storage/8.1.4",
       "hashPath": "windowsazure.storage.8.1.4.nupkg.sha512"
     },
-    "JCTools.GenericCrud/1.0.2": {
+    "JCTools.GenericCrud/1.0.3": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
