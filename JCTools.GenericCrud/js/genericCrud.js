@@ -9,8 +9,8 @@ var genericCrud =
       loadingClass: 'fa fa-spinner fa-spin'
     };
 
-    function addResponse(response, btnIcon, lastClasses) {
-      $("#genericCrudModal").remove();
+    function addResponse(response) {
+      $("#genericCrudModal").modal("hide");
 
       var div = document.createElement("div");
       div.innerHTML = response;
@@ -28,7 +28,6 @@ var genericCrud =
       }
 
       $(modal).modal();
-      btnIcon.className = lastClasses;
     }
 
     function showModal() {
@@ -41,7 +40,8 @@ var genericCrud =
         url: this.dataset.url,
         method: "GET",
         success: function (response) {
-          addResponse(response, i, classes);
+          addResponse(response);
+          i.className = classes;
         }
       });
     }
@@ -51,7 +51,7 @@ var genericCrud =
         form = modal[0].querySelector("form"),
         data = form ? $(form).serialize() : undefined,
         i = document.createElement('i');
-        
+
       i.className = global.loadingClass;
       this.insertBefore(i, this.childNodes[0]);
 
@@ -72,6 +72,10 @@ var genericCrud =
             window.location.replace(r.redirectUrl);
           } else if (isHtml) {
             addResponse(r);
+            let parent = i.parentElement;
+            if (parent) {
+              parent.removeChild(i);
+            }
           }
         }
       });
