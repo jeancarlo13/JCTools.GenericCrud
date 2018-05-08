@@ -11,6 +11,7 @@ var genericCrud =
 
     function addResponse(response) {
       $("#genericCrudModal").modal("hide");
+      $('.modal-backdrop.fade.show').remove();
 
       var div = document.createElement("div");
       div.innerHTML = response;

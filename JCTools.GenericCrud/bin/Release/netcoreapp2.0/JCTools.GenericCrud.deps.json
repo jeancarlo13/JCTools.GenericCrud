@@ -21,7 +21,7 @@
   },
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "JCTools.GenericCrud/1.0.4": {
+      "JCTools.GenericCrud/1.0.4.1": {
         "dependencies": {
           "Microsoft.AspNetCore.Mvc": "2.0.2",
           "Microsoft.AspNetCore.Mvc.Razor": "2.0.2",
@@ -2186,7 +2186,7 @@
     }
   },
   "libraries": {
-    "JCTools.GenericCrud/1.0.4": {
+    "JCTools.GenericCrud/1.0.4.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
