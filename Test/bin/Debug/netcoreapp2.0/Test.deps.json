@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "7812cd7e429dfe2d0f917d121f793117ec6851f7"
+    "signature": "09f5ff3e5944ab9f4dc96b34e7a1504313eaf10e"
   },
   "compilationOptions": {
     "defines": [
@@ -24,7 +24,7 @@
       "Test/1.0.0": {
         "dependencies": {
           "Askmethat.Aspnet.JsonLocalizer": "1.0.3",
-          "JCTools.GenericCrud": "1.0.4.2",
+          "JCTools.GenericCrud": "1.0.5",
           "Microsoft.AspNetCore.All": "2.0.5",
           "Microsoft.EntityFrameworkCore.Design": "2.0.1",
           "Microsoft.EntityFrameworkCore.Sqlite": "2.0.1",
@@ -1571,7 +1571,7 @@
           "lib/netstandard2.0/Microsoft.Data.Sqlite.dll": {}
         }
       },
-      "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
+      "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
         "dependencies": {
           "System.AppContext": "4.3.0",
           "System.Collections": "4.3.0",
@@ -1878,7 +1878,7 @@
       },
       "Microsoft.Extensions.DependencyModel/2.0.3": {
         "dependencies": {
-          "Microsoft.DotNet.PlatformAbstractions": "2.1.0-rc1",
+          "Microsoft.DotNet.PlatformAbstractions": "2.0.4",
           "Newtonsoft.Json": "10.0.3",
           "System.Diagnostics.Debug": "4.3.0",
           "System.Dynamic.Runtime": "4.3.0",
@@ -3832,12 +3832,12 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "JCTools.GenericCrud/1.0.4.2": {
+      "JCTools.GenericCrud/1.0.5": {
         "dependencies": {
           "Microsoft.AspNetCore.Mvc": "2.0.2",
           "Microsoft.AspNetCore.Mvc.Razor": "2.0.2",
           "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.0.2",
-          "Microsoft.DotNet.PlatformAbstractions": "2.1.0-rc1",
+          "Microsoft.DotNet.PlatformAbstractions": "2.0.4",
           "Microsoft.EntityFrameworkCore": "2.0.1",
           "Microsoft.Extensions.FileProviders.Embedded": "2.0.0",
           "Microsoft.Extensions.Localization": "2.0.1",
@@ -4727,12 +4727,12 @@
       "path": "microsoft.data.sqlite.core/2.0.0",
       "hashPath": "microsoft.data.sqlite.core.2.0.0.nupkg.sha512"
     },
-    "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
+    "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-0DlJXmOj8zdAO8UmS7rNn7mxfeY2OuglvJHOw+MCoHvtoKe72BfTsqycZq4jko0qKskE6vUnoRJnZbFiXce95g==",
-      "path": "microsoft.dotnet.platformabstractions/2.1.0-rc1",
-      "hashPath": "microsoft.dotnet.platformabstractions.2.1.0-rc1.nupkg.sha512"
+      "sha512": "sha512-2HjSGp63VCLQaeGadrLYR868g25mJHr+TFF81yWCaClzjUbU2vNDx6km7SUgPnoLVksE/1e7in88eh+oPtc4aQ==",
+      "path": "microsoft.dotnet.platformabstractions/2.0.4",
+      "hashPath": "microsoft.dotnet.platformabstractions.2.0.4.nupkg.sha512"
     },
     "Microsoft.EntityFrameworkCore/2.0.1": {
       "type": "package",
@@ -6057,7 +6057,7 @@
       "path": "windowsazure.storage/8.1.4",
       "hashPath": "windowsazure.storage.8.1.4.nupkg.sha512"
     },
-    "JCTools.GenericCrud/1.0.4.2": {
+    "JCTools.GenericCrud/1.0.5": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

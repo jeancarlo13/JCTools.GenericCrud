@@ -635,7 +635,7 @@
           "lib/netcoreapp2.0/_._": {}
         }
       },
-      "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
+      "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
         "type": "package",
         "dependencies": {
           "System.AppContext": "4.1.0",
@@ -3265,17 +3265,16 @@
         "version.txt"
       ]
     },
-    "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
-      "sha512": "0DlJXmOj8zdAO8UmS7rNn7mxfeY2OuglvJHOw+MCoHvtoKe72BfTsqycZq4jko0qKskE6vUnoRJnZbFiXce95g==",
+    "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
+      "sha512": "2HjSGp63VCLQaeGadrLYR868g25mJHr+TFF81yWCaClzjUbU2vNDx6km7SUgPnoLVksE/1e7in88eh+oPtc4aQ==",
       "type": "package",
-      "path": "microsoft.dotnet.platformabstractions/2.1.0-rc1",
+      "path": "microsoft.dotnet.platformabstractions/2.0.4",
       "files": [
-        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net45/Microsoft.DotNet.PlatformAbstractions.dll",
         "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll",
-        "microsoft.dotnet.platformabstractions.2.1.0-rc1.nupkg.sha512",
+        "microsoft.dotnet.platformabstractions.2.0.4.nupkg.sha512",
         "microsoft.dotnet.platformabstractions.nuspec"
       ]
     },
@@ -8040,7 +8039,7 @@
       "Microsoft.AspNetCore.Mvc >= 2.0.2",
       "Microsoft.AspNetCore.Mvc.Razor >= 2.0.2",
       "Microsoft.AspNetCore.Mvc.ViewFeatures >= 2.0.2",
-      "Microsoft.DotNet.PlatformAbstractions >= 2.1.0-rc1",
+      "Microsoft.DotNet.PlatformAbstractions >= 2.0.4",
       "Microsoft.EntityFrameworkCore >= 2.0.1",
       "Microsoft.Extensions.FileProviders.Embedded >= 2.0.0",
       "Microsoft.Extensions.Localization >= 2.0.1",
@@ -8053,7 +8052,7 @@
     "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.4.2",
+    "version": "1.0.5",
     "restore": {
       "projectUniqueName": "/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/JCTools.GenericCrud.csproj",
       "projectName": "JCTools.GenericCrud",
@@ -8101,7 +8100,7 @@
           },
           "Microsoft.DotNet.PlatformAbstractions": {
             "target": "Package",
-            "version": "[2.1.0-rc1, )"
+            "version": "[2.0.4, )"
           },
           "Microsoft.EntityFrameworkCore": {
             "target": "Package",

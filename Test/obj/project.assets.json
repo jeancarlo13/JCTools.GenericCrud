@@ -1655,7 +1655,7 @@
           "lib/netstandard2.0/Microsoft.Data.Sqlite.dll": {}
         }
       },
-      "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
+      "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
         "type": "package",
         "dependencies": {
           "System.AppContext": "4.1.0",
@@ -4787,14 +4787,14 @@
           "lib/netstandard1.3/Microsoft.WindowsAzure.Storage.dll": {}
         }
       },
-      "JCTools.GenericCrud/1.0.4.2": {
+      "JCTools.GenericCrud/1.0.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v2.0",
         "dependencies": {
           "Microsoft.AspNetCore.Mvc": "2.0.2",
           "Microsoft.AspNetCore.Mvc.Razor": "2.0.2",
           "Microsoft.AspNetCore.Mvc.ViewFeatures": "2.0.2",
-          "Microsoft.DotNet.PlatformAbstractions": "2.1.0-rc1",
+          "Microsoft.DotNet.PlatformAbstractions": "2.0.4",
           "Microsoft.EntityFrameworkCore": "2.0.1",
           "Microsoft.Extensions.FileProviders.Embedded": "2.0.0",
           "Microsoft.Extensions.Localization": "2.0.1",
@@ -6122,17 +6122,16 @@
         "microsoft.data.sqlite.core.nuspec"
       ]
     },
-    "Microsoft.DotNet.PlatformAbstractions/2.1.0-rc1": {
-      "sha512": "0DlJXmOj8zdAO8UmS7rNn7mxfeY2OuglvJHOw+MCoHvtoKe72BfTsqycZq4jko0qKskE6vUnoRJnZbFiXce95g==",
+    "Microsoft.DotNet.PlatformAbstractions/2.0.4": {
+      "sha512": "2HjSGp63VCLQaeGadrLYR868g25mJHr+TFF81yWCaClzjUbU2vNDx6km7SUgPnoLVksE/1e7in88eh+oPtc4aQ==",
       "type": "package",
-      "path": "microsoft.dotnet.platformabstractions/2.1.0-rc1",
+      "path": "microsoft.dotnet.platformabstractions/2.0.4",
       "files": [
-        ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net45/Microsoft.DotNet.PlatformAbstractions.dll",
         "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll",
-        "microsoft.dotnet.platformabstractions.2.1.0-rc1.nupkg.sha512",
+        "microsoft.dotnet.platformabstractions.2.0.4.nupkg.sha512",
         "microsoft.dotnet.platformabstractions.nuspec"
       ]
     },
@@ -12734,7 +12733,7 @@
         "windowsazure.storage.nuspec"
       ]
     },
-    "JCTools.GenericCrud/1.0.4.2": {
+    "JCTools.GenericCrud/1.0.5": {
       "type": "project",
       "path": "../JCTools.GenericCrud/JCTools.GenericCrud.csproj",
       "msbuildProject": "../JCTools.GenericCrud/JCTools.GenericCrud.csproj"
@@ -12743,7 +12742,7 @@
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
       "Askmethat.Aspnet.JsonLocalizer >= 1.0.3",
-      "JCTools.GenericCrud >= 1.0.4.2",
+      "JCTools.GenericCrud >= 1.0.5",
       "Microsoft.AspNetCore.All >= 2.0.5",
       "Microsoft.EntityFrameworkCore.Design >= 2.0.1",
       "Microsoft.EntityFrameworkCore.Sqlite >= 2.0.1",
