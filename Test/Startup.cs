@@ -57,6 +57,7 @@ namespace Test
                 o.UseModals = true;
                 o.ContextCreator = () => new Test.Data.Context();
                 o.Models.Add(typeof(Models.Country));
+                o.Models.Add(typeof(Models.Genre), nameof(Models.Genre.Name));
             });
 
             services.AddMvc()

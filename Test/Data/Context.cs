@@ -17,9 +17,14 @@ namespace Test.Data
             set;
         }
 
-        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder)
+        public DbSet<Genre> Genres
         {
-            optionsBuilder.UseSqlite ("Data Source=Data/MoviesGallery.db");
+            get;
+            set;
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data Source=Data/MoviesGallery.db");
         }
     }
 }

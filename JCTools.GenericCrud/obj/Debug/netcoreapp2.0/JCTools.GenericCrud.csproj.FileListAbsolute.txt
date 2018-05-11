@@ -6,3 +6,4 @@
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Debug/netcoreapp2.0/JCTools.GenericCrud.AssemblyInfo.cs
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Debug/netcoreapp2.0/JCTools.GenericCrud.dll
 /home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Debug/netcoreapp2.0/JCTools.GenericCrud.pdb
+/home/jeancarlo/Documents/projects/JCTools.GenericCrud/JCTools.GenericCrud/obj/Debug/netcoreapp2.0/JCTools.GenericCrud.csprojAssemblyReference.cache

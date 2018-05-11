@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Localization;
 using Test.Models;
@@ -51,5 +52,28 @@ namespace Test.Controllers
             });
         }
 
+        [HttpGet("routes")]
+        public IActionResult GetRoutes()
+        {
+            var routes = _actionDescriptorCollectionProvider.ActionDescriptors.Items
+            .Cast<ControllerActionDescriptor>()
+            .Select(x => new
+            {
+                Action = x.ActionName,
+                Controller = x.ControllerName,
+                Name = x.AttributeRouteInfo?.Name,
+                DisplayName = x.DisplayName,
+                Template = x.AttributeRouteInfo?.Template,
+                Method = x.MethodInfo.ToString(),
+                RouteValues = x.RouteValues,
+                Properties = x.Properties,
+                ActionConstraints = x.ActionConstraints,
+                Parameters = x.Parameters.Select(p => p.Name),
+                BoundProperties = x.BoundProperties.Select(p => p.Name),
+                FilterDescriptors = x.FilterDescriptors
+            })
+            .ToList();
+            return Ok(routes);
+        }
     }
 }

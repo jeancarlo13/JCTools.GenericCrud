@@ -188,6 +188,13 @@
             "en-US": "Name",
             "es-MX": "Nombre"
         }
+    },
+    {
+        "Key": "Genre",
+        "Values": {
+            "en-US": "Genre",
+            "es-MX": "Genero"
+        }
     }
     
 ]

@@ -27,7 +27,6 @@ namespace JCTools.GenericCrud.Controllers
     public class GenericController<TDbContext, TModel, TKey> : Controller
     where TDbContext : DbContext
     where TModel : class, new()
-    where TKey : struct
     {
         /// <summary>
         /// The instance of the <see cref="TDbContext" />. You use in the database operations 
@@ -81,7 +80,14 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
-        public virtual async Task<IActionResult> Index(IndexMessages message = IndexMessages.None, TKey? id = null)
+        public virtual Task<IActionResult> Index(IndexMessages message = IndexMessages.None)
+            => Index2(default(TKey), message);
+        /// <summary>
+        /// Allows render the index view
+        /// </summary>
+        /// <param name="id">The last id affect for the crud</param>
+        /// <param name="message">The identifier of the message to show at the user</param>
+        public virtual async Task<IActionResult> Index2(TKey id, IndexMessages message = IndexMessages.None)
         {
             var all = DbContext.Set<TModel>();
             var model = Settings.ListOptions;
@@ -92,8 +98,8 @@ namespace JCTools.GenericCrud.Controllers
                 message == IndexMessages.CreateSuccess ? "alert-success" :
                 message == IndexMessages.DeleteSuccess ? "alert-success" :
                 "alert-info";
-            if (id.HasValue)
-                model.SetId(id.Value);
+            if (id != null)
+                model.SetId(id);
 
             return Content(
                 await _renderingService.RenderToStringAsync(
@@ -250,7 +256,7 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(nameof(Index), new
+                return SendSuccessResponse(nameof(Index2), new
                 {
                     message = IndexMessages.CreateSuccess,
                         id = typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model)
@@ -339,7 +345,7 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(nameof(Index), new
+                return SendSuccessResponse(nameof(Index2), new
                 {
                     message = IndexMessages.EditSuccess,
                         id = id

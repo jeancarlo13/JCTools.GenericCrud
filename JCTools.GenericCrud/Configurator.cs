@@ -28,6 +28,7 @@ namespace JCTools.GenericCrud
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddSingleton<IActionSelector, CrudActionSelector>();
 
             services.Configure<RazorViewEngineOptions>(o =>
             {
@@ -87,7 +88,8 @@ namespace JCTools.GenericCrud
                 routes.MapRoute(item.Type, "Edit", "{model}/{id}/edit", dataTokens);
                 routes.MapRoute(item.Type, "SaveChangesAsync", "{model}/SaveChanges/{id}", dataTokens);
                 routes.MapRoute(item.Type, "GetScript", "{model}/{filename}.js", dataTokens);
-                routes.MapRoute(item.Type, "Index", "{model}/{action}/{id?}", dataTokens);
+                routes.MapRoute(item.Type, "Index", "{model}", dataTokens);
+                routes.MapRoute(item.Type, $"{item.Type.Name}_FullIndex", "Index2", "{model}/{id}/index", dataTokens);
 
             }
         }
@@ -104,11 +106,27 @@ namespace JCTools.GenericCrud
             Type type,
             string action,
             string template,
+            RouteValueDictionary tokens)
+            => MapRoute(routes, type, $"{type.Name}_{action}", action, template, tokens);
+        /// <summary>
+        /// Add a new route into the routes collections
+        /// </summary>
+        /// <param name="routes">Collection of routes of the app</param>
+        /// <param name="type">The model type to map</param>
+        /// <param name="action">the action name to map </param>
+        /// <param name="tokens">The tokes to add at the route</param>
+        /// <param name="template">The string with the template of the route</param>
+        private static void MapRoute(
+            this IRouteBuilder routes,
+            Type type,
+            string routeName,
+            string action,
+            string template,
             RouteValueDictionary tokens
         )
         {
             routes.MapRoute(
-                name: $"{type.Name}_{action}",
+                name: routeName,
                 template : template,
                 defaults : new
                 {
@@ -117,7 +135,7 @@ namespace JCTools.GenericCrud
                 },
                 constraints : new
                 {
-                    model = new Settings.CrudRouteConstraint(type)
+                    model = new Settings.CrudRouteConstraint(type, template)
                 },
                 dataTokens : tokens
             );

@@ -7,9 +7,11 @@ namespace JCTools.GenericCrud.Settings
     public class CrudRouteConstraint : IRouteConstraint
     {
         private string _modelType;
-        public CrudRouteConstraint(Type modelType)
+        private string _template;
+        public CrudRouteConstraint(Type modelType, string template)
         {
             _modelType = modelType.Name.ToLowerInvariant();
+            _template = template;
         }
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
