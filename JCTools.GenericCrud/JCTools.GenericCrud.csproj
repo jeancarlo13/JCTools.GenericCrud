@@ -9,7 +9,7 @@
     <Description>Simplification of the Create, Read, Update and Delete pages of the application models.</Description>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Version>1.0.4.2</Version>
+    <Version>1.0.5</Version>
     
   </PropertyGroup>
   <ItemGroup>
