@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Controllers;
 
 namespace Test
 {
@@ -41,7 +42,7 @@ namespace Test
             });
             services.Configure<RequestLocalizationOptions>(options =>
             {
-                var supportedCultures = new []
+                var supportedCultures = new[]
                 {
                 new CultureInfo("en-US"),
                 new CultureInfo("es-MX")
@@ -58,6 +59,7 @@ namespace Test
                 o.ContextCreator = () => new Test.Data.Context();
                 o.Models.Add(typeof(Models.Country));
                 o.Models.Add(typeof(Models.Genre), nameof(Models.Genre.Name));
+                o.Models.Add(typeof(Models.Movie), nameof(Models.Movie.Id), nameof(MovieController));
             });
 
             services.AddMvc()

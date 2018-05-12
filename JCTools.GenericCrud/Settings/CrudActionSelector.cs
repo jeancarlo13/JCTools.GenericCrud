@@ -132,7 +132,7 @@ namespace JCTools.GenericCrud.Settings
 
                     var actionNames = string.Join(
                         Environment.NewLine,
-                        finalMatches.Select(a => a.DisplayName));
+                        crudMatches.Select(a => a.DisplayName));
 
                     _logger.LogError($"Request matched multiple actions resulting in ambiguity. Matching actions: {actionNames}");
 
@@ -148,6 +148,7 @@ namespace JCTools.GenericCrud.Settings
         private IReadOnlyList<ActionDescriptor> MatchCrudActions(RouteContext context, IReadOnlyList<ActionDescriptor> candidates)
         {
             var requestedModelType = context.RouteData.DataTokens[Configurator.ModelTypeTokenName] as Type;
+
             var castedCandidates = candidates
                 .Select(c => c as ControllerActionDescriptor)
                 .Where(c => c != null);
@@ -157,11 +158,13 @@ namespace JCTools.GenericCrud.Settings
             foreach (var candidate in castedCandidates)
             {
                 var genericTypes = candidate.ControllerTypeInfo.GetGenericArguments();
-                if (genericTypes.Contains(requestedModelType))
+                if (requestedModelType != null && genericTypes.Contains(requestedModelType))
+                    results.Add(candidate);
+                else if (requestedModelType == null && candidate.ControllerName != "GenericController`3")
                     results.Add(candidate);
             }
-
             return results.Any() ? results : candidates;
+
         }
 
         /// <summary>

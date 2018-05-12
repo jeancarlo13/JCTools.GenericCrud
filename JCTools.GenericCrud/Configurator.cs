@@ -80,16 +80,18 @@ namespace JCTools.GenericCrud
                     }
                 };
 
-                routes.MapRoute(item.Type, "Details", "{model}/{id}/details", dataTokens);
-                routes.MapRoute(item.Type, "Delete", "{model}/{id}/delete", dataTokens);
-                routes.MapRoute(item.Type, "DeleteConfirm", "{model}/{id}/deleteconfirm", dataTokens);
-                routes.MapRoute(item.Type, "Create", "{model}/create", dataTokens);
-                routes.MapRoute(item.Type, "Save", "{model}/Save", dataTokens);
-                routes.MapRoute(item.Type, "Edit", "{model}/{id}/edit", dataTokens);
-                routes.MapRoute(item.Type, "SaveChangesAsync", "{model}/SaveChanges/{id}", dataTokens);
-                routes.MapRoute(item.Type, "GetScript", "{model}/{filename}.js", dataTokens);
-                routes.MapRoute(item.Type, "Index", "{model}", dataTokens);
-                routes.MapRoute(item.Type, $"{item.Type.Name}_FullIndex", "Index2", "{model}/{id}/index", dataTokens);
+                var controller = string.IsNullOrWhiteSpace(item.Controller) ? "GenericController`3" : item.Controller;
+
+                routes.MapRoute(item.Type, "Details", controller, "{model}/{id}/details", dataTokens);
+                routes.MapRoute(item.Type, "Delete", controller, "{model}/{id}/delete", dataTokens);
+                routes.MapRoute(item.Type, "DeleteConfirm", controller, "{model}/{id}/deleteconfirm", dataTokens);
+                routes.MapRoute(item.Type, "Create", controller, "{model}/create", dataTokens);
+                routes.MapRoute(item.Type, "Save", controller, "{model}/Save", dataTokens);
+                routes.MapRoute(item.Type, "Edit", controller, "{model}/{id}/edit", dataTokens);
+                routes.MapRoute(item.Type, "SaveChangesAsync", controller, "{model}/SaveChanges/{id}", dataTokens);
+                routes.MapRoute(item.Type, "GetScript", controller, "{model}/{filename}.js", dataTokens);
+                routes.MapRoute(item.Type, "Index", controller, "{model}", dataTokens);
+                routes.MapRoute(item.Type, $"{item.Type.Name}_RedirectedIndex", "Index", controller, "{model}/{id}/index", dataTokens);
 
             }
         }
@@ -105,9 +107,10 @@ namespace JCTools.GenericCrud
             this IRouteBuilder routes,
             Type type,
             string action,
+            string controller,
             string template,
             RouteValueDictionary tokens)
-            => MapRoute(routes, type, $"{type.Name}_{action}", action, template, tokens);
+            => MapRoute(routes, type, $"{type.Name}_{action}", action, controller, template, tokens);
         /// <summary>
         /// Add a new route into the routes collections
         /// </summary>
@@ -121,23 +124,24 @@ namespace JCTools.GenericCrud
             Type type,
             string routeName,
             string action,
+            string controller,
             string template,
             RouteValueDictionary tokens
         )
         {
             routes.MapRoute(
                 name: routeName,
-                template : template,
-                defaults : new
+                template: template,
+                defaults: new
                 {
-                    controller = "GenericController`3",
-                        action = action
+                    controller = controller,
+                    action = action
                 },
-                constraints : new
+                constraints: new
                 {
                     model = new Settings.CrudRouteConstraint(type, template)
                 },
-                dataTokens : tokens
+                dataTokens: tokens
             );
         }
     }

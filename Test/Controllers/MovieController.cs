@@ -23,14 +23,7 @@ namespace Test.Controllers
             ViewBag.Countries = DbContext.Countries.ToList();
             base.OnActionExecuting(filterContext);
         }
-        /// <summary>
-        /// Allows render the create view
-        /// </summary>
-        /// <param name="id">The id of the entity to edit into the view</param>
-        [HttpGet]
-        public override async Task<IActionResult> Create()
-        {
-            return await base.Create();
-        }
+        
+
     }
 }

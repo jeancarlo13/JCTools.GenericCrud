@@ -8,9 +8,11 @@ using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -75,19 +77,13 @@ namespace JCTools.GenericCrud.Controllers
             Settings = new ControllerOptions<TModel, TKey>(Configurator.Options, keyPropertyName, _localizer);
 
         }
+
         /// <summary>
         /// Allows render the index view
         /// </summary>
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
-        public virtual Task<IActionResult> Index(IndexMessages message = IndexMessages.None)
-            => Index2(default(TKey), message);
-        /// <summary>
-        /// Allows render the index view
-        /// </summary>
-        /// <param name="id">The last id affect for the crud</param>
-        /// <param name="message">The identifier of the message to show at the user</param>
-        public virtual async Task<IActionResult> Index2(TKey id, IndexMessages message = IndexMessages.None)
+        public virtual async Task<IActionResult> Index(object id = null, IndexMessages message = IndexMessages.None)
         {
             var all = DbContext.Set<TModel>();
             var model = Settings.ListOptions;
@@ -99,7 +95,17 @@ namespace JCTools.GenericCrud.Controllers
                 message == IndexMessages.DeleteSuccess ? "alert-success" :
                 "alert-info";
             if (id != null)
-                model.SetId(id);
+            {
+                try
+                {
+                    var realId = (TKey)Convert.ChangeType(id, typeof(TKey));
+                    model.SetId(realId);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogCritical(e, $"The '{id}' is not a valid value for {typeof(TKey)}.");
+                }
+            }
 
             return Content(
                 await _renderingService.RenderToStringAsync(
@@ -212,10 +218,7 @@ namespace JCTools.GenericCrud.Controllers
                 );
             }
 
-            return SendSuccessResponse(nameof(Index), new
-            {
-                message = IndexMessages.DeleteSuccess
-            });
+            return SendSuccessResponse(nameof(Index), null, IndexMessages.DeleteSuccess);
         }
         /// <summary>
         /// Allows render the create view
@@ -256,11 +259,11 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(nameof(Index2), new
-                {
-                    message = IndexMessages.CreateSuccess,
-                        id = typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model)
-                });
+                return SendSuccessResponse(
+                    nameof(Index),
+                    typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model),
+                    IndexMessages.CreateSuccess
+                );
             }
 
             return await Create();
@@ -322,7 +325,7 @@ namespace JCTools.GenericCrud.Controllers
         [HttpPost]
         public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm]TModel model)
         {
-            var key = (TKey) Convert.ChangeType(model.GetType().GetProperty(Settings.KeyPropertyName)?.GetValue(model), typeof(TKey));
+            var key = (TKey)Convert.ChangeType(model.GetType().GetProperty(Settings.KeyPropertyName)?.GetValue(model), typeof(TKey));
             if (!id.Equals(key))
                 return NotFound();
 
@@ -345,26 +348,33 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(nameof(Index2), new
-                {
-                    message = IndexMessages.EditSuccess,
-                        id = id
-                });
+                return SendSuccessResponse(nameof(Index), id, IndexMessages.EditSuccess);
             }
 
             return await Edit(id, model);
         }
 
-        private IActionResult SendSuccessResponse(string action, object args)
+        private IActionResult SendSuccessResponse(string action, object id, IndexMessages message = IndexMessages.None)
         {
             if (Settings.UseModals)
+            {
+                var strId = id == null ? string.Empty : $"{id}/index";
+                var strMessage = message != IndexMessages.None ? $"?message={message}" : string.Empty;
                 return Json(new JsonResponse
                 {
                     Success = true,
-                        RedirectUrl = Url.Action(action, args)
+                    RedirectUrl = Url.Action(nameof(Index), new {                  
+                        message = message,   
+                        id = id                
+                    })
                 });
+            }
             else
-                return RedirectToAction(action, args);
+                return RedirectToAction(action, new
+                {
+                    message = id,
+                    id = message
+                });
         }
 
         public FileResult GetScript(string fileName)
@@ -376,7 +386,7 @@ namespace JCTools.GenericCrud.Controllers
 
             var stream = assembly.GetManifestResourceStream($"JCTools.GenericCrud.js.{fileName}.js");
 
-            using(var reader = new StreamReader(stream))
+            using (var reader = new StreamReader(stream))
             {
                 var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
                 return File(bytes, "application/javascript");

@@ -15,10 +15,13 @@ namespace JCTools.GenericCrud.Settings
             set;
         }
 
-        public CrudType(Type type, string keyPropertyName = "Id")
+        public string Controller { get; set; }
+
+        public CrudType(Type type, string keyPropertyName = "Id", string controller = "")
         {
             Type = type;
             KeyPropertyName = keyPropertyName;
+            Controller = string.IsNullOrWhiteSpace(controller) ? string.Empty : controller;
         }
     }
 }
