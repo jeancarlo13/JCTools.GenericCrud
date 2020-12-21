@@ -1,8 +1,0 @@
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/obj/Debug/netstandard2.0/GenericCrud.csproj.CoreCompileInputs.cache
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/obj/Debug/netstandard2.0/GenericCrud.AssemblyInfoInputs.cache
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/obj/Debug/netstandard2.0/GenericCrud.AssemblyInfo.cs
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/bin/Debug/netstandard2.0/GenericCrud.deps.json
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/bin/Debug/netstandard2.0/GenericCrud.dll
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/bin/Debug/netstandard2.0/GenericCrud.pdb
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/obj/Debug/netstandard2.0/GenericCrud.dll
-/home/jeancarlo/Documents/projects/GenericCrud/GenericCrud/obj/Debug/netstandard2.0/GenericCrud.pdb
