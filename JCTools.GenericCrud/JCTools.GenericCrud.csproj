@@ -7,20 +7,20 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <Description>Simplification of the Create, Read, Update and Delete pages of the application models.</Description>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Version>1.0.5</Version>
-    
+    <Version>2.0.0-beta1</Version>   
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>     
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.2" />
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="2.0.1" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.14" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="2.1.1" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.6" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\Generic\Index.cshtml" />

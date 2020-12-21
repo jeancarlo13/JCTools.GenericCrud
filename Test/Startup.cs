@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -19,23 +20,20 @@ namespace Test
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _enviroment;
+        private readonly IHostingEnvironment _environment;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment enviroment)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Configuration = configuration;
-            _enviroment = enviroment;
+            _environment = environment;
         }
 
-        public IConfiguration Configuration
-        {
-            get;
-        }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var resourcesPath = "../../../Resources";
+            var resourcesPath = "Resources";
             services.AddJsonLocalization(o =>
             {
                 o.ResourcesPath = resourcesPath;
@@ -53,9 +51,16 @@ namespace Test
                 options.SupportedUICultures = supportedCultures;
             });
 
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
             services.ConfigureGenericCrud(o =>
             {
-                o.UseModals = true;
+                o.UseModals = false;
                 o.ContextCreator = () => new Test.Data.Context();
                 o.Models.Add(typeof(Models.Country));
                 o.Models.Add(typeof(Models.Genre), nameof(Models.Genre.Name));
@@ -69,7 +74,8 @@ namespace Test
                     {
                         opts.ResourcesPath = resourcesPath;
                     })
-                .AddDataAnnotationsLocalization();
+                .AddDataAnnotationsLocalization()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
         }
 
@@ -83,9 +89,12 @@ namespace Test
             else
             {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
 
             app.UseRequestLocalization();
 
