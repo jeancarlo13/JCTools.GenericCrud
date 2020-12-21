@@ -16,8 +16,23 @@ namespace JCTools.GenericCrud.Helpers
     /// </summary>
     public static class ModelExtensions
     {
-        internal static string GetLocalizedString(this IStringLocalizer localizer, string key, params string[] parameters) => GetLocalizedString(localizer, key, null, parameters);
-
+        /// <summary>
+        /// Allows get a localized string from the I18N/L12N resources
+        /// </summary>
+        /// <param name="localizer">The string localizer instance to be used by get the desired string</param>
+        /// <param name="key">The name/key of the desired string</param>
+        /// <param name="parameters">An object array that contains zero or more objects to format using the found localized string</param>
+        /// <returns>The found localized string</returns>
+        internal static string GetLocalizedString(this IStringLocalizer localizer, string key, params string[] parameters)
+            => GetLocalizedString(localizer, key, null, parameters);
+        /// <summary>
+        /// Allows get a localized string from the I18N/L12N resources
+        /// </summary>
+        /// <param name="localizer">The string localizer instance to be used by get the desired string</param>
+        /// <param name="key">The name/key of the desired string</param>
+        /// <param name="default">The default value that will used if the desired string is not found</param>
+        /// <param name="parameters">An object array that contains zero or more objects to format using the found localized string</param>
+        /// <returns>The found localized string</returns>
         internal static string GetLocalizedString(this IStringLocalizer localizer, string key, string @default, params string[] parameters)
         {
             var localized = localizer[key].Value;
@@ -83,12 +98,12 @@ namespace JCTools.GenericCrud.Helpers
             return generic.Invoke(null, new object[] { config, true }) as IEnumerable<Property>;
         }
         /// <summary>
-        /// Allows get the properties that shuld appear into the crud list    
+        /// Allows get the properties that should appear into the crud list    
         /// </summary>
-        /// <param name="includeNoVisibles">True for include the not visible collumns; False for return only the visible columns</param>
+        /// <param name="includeNoVisibleColumns">True for include the not visible columns; False for return only the visible columns</param>
         /// <param name="config">The configuration of the list</param>
         /// <returns>Collection of properties</returns>
-        private static IEnumerable<Property> GetListProperties<TModel, TKey>(IBase config, bool includeNoVisibles = false)
+        private static IEnumerable<Property> GetListProperties<TModel, TKey>(IBase config, bool includeNoVisibleColumns = false)
             where TModel : class, new()
         {
             return config.GetModelGenericType().GetTypeInfo().GetProperties()
@@ -98,7 +113,7 @@ namespace JCTools.GenericCrud.Helpers
                     List = p.GetCustomAttribute<CrudAttribute>(),
                     Display = p.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>()
                 })
-                .Where(p => includeNoVisibles || (p.List?.Visible ?? true))
+                .Where(p => includeNoVisibleColumns || (p.List?.Visible ?? true))
                 .OrderBy(p => p.Display?.Order ?? 0);
         }
 

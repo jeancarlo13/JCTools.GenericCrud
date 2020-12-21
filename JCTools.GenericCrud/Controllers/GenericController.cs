@@ -20,34 +20,31 @@ using Microsoft.Extensions.Logging;
 namespace JCTools.GenericCrud.Controllers
 {
     /// <summary>
-    /// Used for create the controllers that are theentry points for the custom cruds
+    /// Used for create the controllers that are the entry points for the custom cruds
     /// </summary>
-    /// <typeparam name="TDbContext">the type of the database context to use</typeparam>
-    /// <typeparam name="TModel">The type of the model to use related with the <see cref="TDbContext"/> parameter </typeparam>
-    /// <typeparam name="TKey">the type of the property key of the <see cref="TModel" /> parameter</typeparam>
+    /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
+    /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
+    /// <typeparam name="TKey">The property type of the identifier of the entity model</typeparam>
     /// <returns></returns>
-    public class GenericController<TDbContext, TModel, TKey> : Controller
-    where TDbContext : DbContext
-    where TModel : class, new()
+    public class GenericController<TContext, TModel, TKey> : Controller
+        where TContext : DbContext
+        where TModel : class, new()
     {
         /// <summary>
-        /// The instance of the <see cref="TDbContext" />. You use in the database operations 
+        /// The database context instance to be used in the database operations 
         /// </summary>
-        protected readonly TDbContext DbContext;
+        protected readonly TContext DbContext;
         /// <summary>
-        /// Instance of the Settings of the crud. You use for personalize the current crud
+        /// Instance of the Settings of the crud.
         /// </summary>
-        protected ControllerOptions<TModel, TKey> Settings
-        {
-            get;
-            set;
-        }
+        /// <remarks>You can use its for customize the current crud only</remarks>
+        protected ControllerOptions<TModel, TKey> Settings { get; set; }
         /// <summary>
-        /// The instance of <see cref="IViewRenderService"/> used for render the embebed views
+        /// The instance of <see cref="IViewRenderService"/> used for render the embedded views
         /// </summary>
         private IViewRenderService _renderingService;
         /// <summary>
-        /// The instance of <see cref="IStringLocalizer" /> used of the internazionalization and localization of the string
+        /// The instance of <see cref="IStringLocalizer" /> used of the internationalization and localization of the string
         /// </summary>
         private readonly IStringLocalizer _localizer;
         /// <summary>
@@ -58,7 +55,7 @@ namespace JCTools.GenericCrud.Controllers
         /// Create an instace of the controller with the specific parameter
         /// </summary>
         /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used of access to the configured services into the startup class</param>
-        /// <param name="context">Instance of the database context to use for the database operations</param>
+        /// <param name="keyPropertyName">The name of the model property to be used how to identifier of the entities</param>
         public GenericController(
             IServiceProvider serviceProvider,
             string keyPropertyName = "Id"
@@ -67,12 +64,12 @@ namespace JCTools.GenericCrud.Controllers
             if (Configurator.Options.ContextCreator == null)
                 throw new ArgumentNullException(nameof(Configurator.Options.ContextCreator));
             else
-                DbContext = Configurator.Options.ContextCreator.Invoke() as TDbContext;
+                DbContext = Configurator.Options.ContextCreator.Invoke() as TContext;
 
             _renderingService = serviceProvider.GetService(typeof(IViewRenderService)) as IViewRenderService;
             _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer;
             _logger = (serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory)
-                .CreateLogger<GenericController<TDbContext, TModel, TKey>>();
+                .CreateLogger<GenericController<TContext, TModel, TKey>>();
 
             Settings = new ControllerOptions<TModel, TKey>(Configurator.Options, keyPropertyName, _localizer);
 
@@ -116,6 +113,7 @@ namespace JCTools.GenericCrud.Controllers
                 "text/html"
             );
         }
+
         /// <summary>
         /// Allows render the details view
         /// </summary>
@@ -133,7 +131,13 @@ namespace JCTools.GenericCrud.Controllers
 
             return await RenderView(nameof(Details), model);
         }
-
+        /// <summary>
+        /// Generate the view to be display to the user
+        /// </summary>
+        /// <param name="view">The name of the view to render</param>
+        /// <param name="model">The model with the data to display</param>
+        /// <param name="commitAction">The action to be invoked when the user desired save the changes made</param>
+        /// <returns>The task to be invoked</returns>
         private async Task<IActionResult> RenderView(
             string view,
             IBase model,
@@ -184,6 +188,7 @@ namespace JCTools.GenericCrud.Controllers
 
             return await RenderView(nameof(Details), model, action);
         }
+
         /// <summary>
         /// Allows render the delete view
         /// </summary>
@@ -220,10 +225,10 @@ namespace JCTools.GenericCrud.Controllers
 
             return SendSuccessResponse(nameof(Index), null, IndexMessages.DeleteSuccess);
         }
+
         /// <summary>
         /// Allows render the create view
         /// </summary>
-        /// <param name="id">The id of the entity to edit into the view</param>
         [HttpGet]
         public virtual async Task<IActionResult> Create()
         {
@@ -236,12 +241,13 @@ namespace JCTools.GenericCrud.Controllers
 
             return await RenderView(nameof(Edit), model, action);
         }
+
         /// <summary>
         /// Allows save new entities
         /// </summary>
         /// <param name="model">The entity to save</param>
         [HttpPost]
-        public virtual async Task<IActionResult> Save([FromForm]TModel model)
+        public virtual async Task<IActionResult> Save([FromForm] TModel model)
         {
             ModelState.Remove(Settings.CreateOptions.KeyPropertyName);
             if (ModelState.IsValid)
@@ -268,8 +274,9 @@ namespace JCTools.GenericCrud.Controllers
 
             return await Create();
         }
+
         /// <summary>
-        /// Add a the current <see cref="Controller.ModelState"/> a message with the save changes error
+        /// Add a the current Model State a message with the save changes error
         /// </summary>
         private void AddSaveChangesErrorMessage()
         {
@@ -295,7 +302,8 @@ namespace JCTools.GenericCrud.Controllers
 
             return await Edit(id, entity);
         }
-        // <summary>
+
+        /// <summary>
         /// Allows render the Edit view
         /// </summary>
         /// <param name="id">The id of the entity to edit into the view</param>
@@ -323,7 +331,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="model">Instance with the changes of the entity to save</param>
         /// <param name="id">The id of the entity to change</param>
         [HttpPost]
-        public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm]TModel model)
+        public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm] TModel model)
         {
             var key = (TKey)Convert.ChangeType(model.GetType().GetProperty(Settings.KeyPropertyName)?.GetValue(model), typeof(TKey));
             if (!id.Equals(key))
@@ -354,6 +362,13 @@ namespace JCTools.GenericCrud.Controllers
             return await Edit(id, model);
         }
 
+        /// <summary>
+        /// Generate the correctly response using the specified settings and arguments
+        /// </summary>
+        /// <param name="action">The action to be redirect if the modals was not used</param>
+        /// <param name="id">The id of the affected entity</param>
+        /// <param name="message">The message to be sent into the response</param>
+        /// <returns>The generated action result</returns>
         private IActionResult SendSuccessResponse(string action, object id, IndexMessages message = IndexMessages.None)
         {
             if (Settings.UseModals)
@@ -363,9 +378,10 @@ namespace JCTools.GenericCrud.Controllers
                 return Json(new JsonResponse
                 {
                     Success = true,
-                    RedirectUrl = Url.Action(nameof(Index), new {                  
-                        message = message,   
-                        id = id                
+                    RedirectUrl = Url.Action(nameof(Index), new
+                    {
+                        message = message,
+                        id = id
                     })
                 });
             }
@@ -376,8 +392,13 @@ namespace JCTools.GenericCrud.Controllers
                     id = message
                 });
         }
-
-        public FileResult GetScript(string fileName)
+        
+        /// <summary>
+        /// Allows get a javascript embedded file
+        /// </summary>
+        /// <param name="fileName">The name of the desired file</param>
+        /// <returns>A file with the found file content</returns>
+        public IActionResult GetScript(string fileName)
         {
             var assembly = Settings.GetType().GetTypeInfo().Assembly;
 
@@ -385,6 +406,9 @@ namespace JCTools.GenericCrud.Controllers
             string[] resources = assembly.GetManifestResourceNames();
 
             var stream = assembly.GetManifestResourceStream($"JCTools.GenericCrud.js.{fileName}.js");
+
+            if (stream == null)
+                return NotFound();
 
             using (var reader = new StreamReader(stream))
             {

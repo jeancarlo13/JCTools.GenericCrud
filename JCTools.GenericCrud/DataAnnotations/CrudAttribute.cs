@@ -2,6 +2,9 @@
 
 namespace JCTools.GenericCrud.DataAnnotations
 {
+    /// <summary>
+    /// Allows configured the property to be use into the CRUDs
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class CrudAttribute: Attribute
     {
@@ -13,7 +16,6 @@ namespace JCTools.GenericCrud.DataAnnotations
         /// True if desired use a custom view; False another case.
         /// The custom views are find in the controller view folder with the name of the property preceded by "__Details" or "__Edit"
         /// </summary>
-        /// <returns></returns>
         public bool UseCustomView { get; set; }
     }
 }

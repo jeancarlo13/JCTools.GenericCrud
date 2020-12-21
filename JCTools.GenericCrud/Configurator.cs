@@ -61,7 +61,7 @@ namespace JCTools.GenericCrud
             return services;
         }
         /// <summary>
-        /// Add the routes of all models relateed at the cruds
+        /// Add the routes of all models related at the cruds
         /// </summary>
         /// <param name="routes">the application route collection</param>
         public static void MapCrudRoutes(this IRouteBuilder routes)
@@ -70,17 +70,11 @@ namespace JCTools.GenericCrud
             {
                 var dataTokens = new RouteValueDictionary()
                 {
-                    {
-                    ModelTypeTokenName,
-                    item.Type
-                    },
-                    {
-                    KeyTokenName,
-                    item.KeyPropertyName
-                    }
+                    { ModelTypeTokenName, item.Type },
+                    { KeyTokenName, item.KeyPropertyName }
                 };
 
-                var controller = string.IsNullOrWhiteSpace(item.Controller) ? "GenericController`3" : item.Controller;
+                var controller = string.IsNullOrWhiteSpace(item.ControllerName) ? "GenericController`3" : item.ControllerName;
 
                 routes.MapRoute(item.Type, "Details", controller, "{model}/{id}/details", dataTokens);
                 routes.MapRoute(item.Type, "Delete", controller, "{model}/{id}/delete", dataTokens);

@@ -45,7 +45,7 @@ dotnet add package JCTools.GenericCrud --version 1.0.2
     });
  ```
  4. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
- ![Sample index page](/Mockups/sampleIndexPage.png)
+ ![Sample index page](Mockups/sampleIndexPage.png)
 
 ### Custom controllers
 If your desired personalize your controllers, add additional actions or override the default actions, then
@@ -76,4 +76,4 @@ namespace Test.Controllers
 
 
  ### License
-[MIT License](/LICENSE)
+[MIT License](LICENSE)

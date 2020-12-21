@@ -85,7 +85,7 @@
     },
     
     {
-        "Key": "GenericCrud.List.Delete.Caption",
+        "Key": "GenericCrud.List.GoBack.Caption",
         "Values": {
             "en-US": "Go back",
             "es-MX": "Regresar"
