@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace JCTools.GenericCrud.Settings
 {
+    /// <summary>
+    /// Allows configured the required controllers for generate the configured CRUDs 
+    /// </summary>
     public class GenericControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
     {
         /// <summary>
@@ -15,8 +18,10 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="feature">The feature instance to populate.</param>
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            foreach (var item in Configurator.Options.Models)
+            var cruds = Configurator.Options.Models.GetEnumerator();
+            while (cruds.MoveNext())
             {
+                var item = cruds.Current;
                 var genericControllerType = Helpers.SettingsHelper.CreateGenericControllerType(item.Type, item.KeyPropertyName);
                 feature.Controllers.Add(genericControllerType.GetTypeInfo());
             }

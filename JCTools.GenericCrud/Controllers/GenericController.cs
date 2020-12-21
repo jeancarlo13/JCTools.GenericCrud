@@ -24,7 +24,7 @@ namespace JCTools.GenericCrud.Controllers
     /// </summary>
     /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
-    /// <typeparam name="TKey">The property type of the identifier of the entity model</typeparam>
+    /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
     /// <returns></returns>
     public class GenericController<TContext, TModel, TKey> : Controller
         where TContext : DbContext
@@ -392,7 +392,7 @@ namespace JCTools.GenericCrud.Controllers
                     id = message
                 });
         }
-        
+
         /// <summary>
         /// Allows get a javascript embedded file
         /// </summary>

@@ -62,9 +62,9 @@ namespace Test
             {
                 o.UseModals = false;
                 o.ContextCreator = () => new Test.Data.Context();
-                o.Models.Add(typeof(Models.Country));
-                o.Models.Add(typeof(Models.Genre), nameof(Models.Genre.Name));
-                o.Models.Add(typeof(Models.Movie), nameof(Models.Movie.Id), nameof(MovieController));
+                o.Models.Add<Models.Country>();
+                o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+                o.Models.Add<Models.Movie, int, MovieController, Data.Context>();
             });
 
             services.AddMvc()

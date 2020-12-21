@@ -5,7 +5,7 @@ namespace JCTools.GenericCrud.Settings
     /// <summary>
     /// Defines the properties required for generate a CRUD of any model
     /// </summary>
-    public class CrudType
+    internal class CrudType
     {
         /// <summary>
         /// The type of the model to be used into the CRUD
@@ -25,12 +25,12 @@ namespace JCTools.GenericCrud.Settings
         /// </summary>
         /// <param name="type">The type of the model to be used into the CRUD</param>
         /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
-        /// <param name="controller">The custom controller name to be used for the CRUD; string empty for used a generic controller</param>
-        public CrudType(Type type, string keyPropertyName = "Id", string controller = "")
+        /// <param name="controllerName">The custom controller name to be used for the CRUD; string empty for used a generic controller</param>
+        public CrudType(Type type, string keyPropertyName = "Id", string controllerName = "")
         {
             Type = type;
             KeyPropertyName = keyPropertyName;
-            ControllerName = string.IsNullOrWhiteSpace(controller) ? string.Empty : controller;
+            ControllerName = string.IsNullOrWhiteSpace(controllerName) ? string.Empty : controllerName;
         }
     }
 }
