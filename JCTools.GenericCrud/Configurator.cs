@@ -60,14 +60,17 @@ namespace JCTools.GenericCrud
 
             return services;
         }
+        
         /// <summary>
         /// Add the routes of all models related at the cruds
         /// </summary>
         /// <param name="routes">the application route collection</param>
         public static void MapCrudRoutes(this IRouteBuilder routes)
         {
-            foreach (var item in Options.Models)
+            var cruds = Options.Models.GetEnumerator();
+            while (cruds.MoveNext())
             {
+                var item = cruds.Current;
                 var dataTokens = new RouteValueDictionary()
                 {
                     { ModelTypeTokenName, item.Type },
@@ -95,30 +98,33 @@ namespace JCTools.GenericCrud
         /// <param name="routes">Collection of routes of the app</param>
         /// <param name="type">The model type to map</param>
         /// <param name="action">the action name to map </param>
-        /// <param name="tokens">The tokes to add at the route</param>
+        /// <param name="controllerName">The name of the controller to be received the requests</param>
         /// <param name="template">The string with the template of the route</param>
+        /// <param name="tokens">The tokes to add at the route</param>
         private static void MapRoute(
             this IRouteBuilder routes,
             Type type,
             string action,
-            string controller,
+            string controllerName,
             string template,
             RouteValueDictionary tokens)
-            => MapRoute(routes, type, $"{type.Name}_{action}", action, controller, template, tokens);
+            => MapRoute(routes, type, $"{type.Name}_{action}", action, controllerName, template, tokens);
         /// <summary>
         /// Add a new route into the routes collections
         /// </summary>
         /// <param name="routes">Collection of routes of the app</param>
         /// <param name="type">The model type to map</param>
+        /// <param name="routeName">The name of the route to be generated</param>
         /// <param name="action">the action name to map </param>
-        /// <param name="tokens">The tokes to add at the route</param>
+        /// <param name="controllerName">The name of the controller to be received the requests</param>
         /// <param name="template">The string with the template of the route</param>
+        /// <param name="tokens">The tokes to add at the route</param>
         private static void MapRoute(
             this IRouteBuilder routes,
             Type type,
             string routeName,
             string action,
-            string controller,
+            string controllerName,
             string template,
             RouteValueDictionary tokens
         )
@@ -128,7 +134,7 @@ namespace JCTools.GenericCrud
                 template: template,
                 defaults: new
                 {
-                    controller = controller,
+                    controller = controllerName,
                     action = action
                 },
                 constraints: new

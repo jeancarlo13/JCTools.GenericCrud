@@ -24,11 +24,19 @@ dotnet add package JCTools.GenericCrud --version 1.0.2
 ```cs
     services.ConfigureGenericCrud(o =>
     {
+        // Indicate if desired use Modals 
         o.UseModals = true;
-        o.ContextCreator = () => new Test.Data.Context(); // method that will create an database context instance 
-        o.Models.Add(typeof(Models.Country)); // add the model type to manage with the package
+        // method that will create an database context instance 
+        o.ContextCreator = () => new Test.Data.Context(); 
+        // add the models type to manage with the package
+        o.Models.Add<Models.Country>(); 
+        o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+        o.Models.Add<Models.Movie, int, MovieController, Data.Context>();
     });
 ```
+
+**Note:** From the version 2.0.0 the method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")* was marked how to obsolete and will be removed in future versions.
+
 3. Add the next line in the **UseMvc** middleware call, this in the method **Configure** of your **Startup** class
  ```cs
  routes.MapCrudRoutes();
