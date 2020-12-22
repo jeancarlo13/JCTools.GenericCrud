@@ -19,17 +19,26 @@ namespace JCTools.GenericCrud
 {
     public static class Configurator
     {
+        /// <summary>
+        /// The name of the token with the model type of a CRUD
+        /// </summary>
         internal const string ModelTypeTokenName = "ModelType";
+        /// <summary>
+        /// The name of the token with the Id/Key property name to be use into a CRUD 
+        /// </summary>
         internal const string KeyTokenName = "ModelKey";
+        /// <summary>
+        /// The configured settins for all CRUDs
+        /// </summary>
         internal static Options Options;
-        public static IServiceCollection ConfigureGenericCrud(this IServiceCollection services, Action<Options> options = null)
+        public static IServiceCollection ConfigureGenericCrud(this IServiceCollection services, Action<Options> optionsFactory = null)
         {
-            var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddSingleton<IActionSelector, CrudActionSelector>();
 
+            var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
             services.Configure<RazorViewEngineOptions>(o =>
             {
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
@@ -52,7 +61,7 @@ namespace JCTools.GenericCrud
             builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, Settings.CustomServiceBasedControllerActivator>());
 
             Options = new Options();
-            options?.Invoke(Options);
+            optionsFactory?.Invoke(Options);
 
             builder.ConfigureApplicationPartManager(p =>
                 p.FeatureProviders.Add(new GenericControllerFeatureProvider())
@@ -60,7 +69,7 @@ namespace JCTools.GenericCrud
 
             return services;
         }
-        
+
         /// <summary>
         /// Add the routes of all models related at the cruds
         /// </summary>

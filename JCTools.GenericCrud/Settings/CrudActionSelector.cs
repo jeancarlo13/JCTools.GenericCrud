@@ -6,35 +6,49 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Core;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.DotNet.PlatformAbstractions;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace JCTools.GenericCrud.Settings
 {
-    public class CrudActionSelector : IActionSelector
+    /// <summary>
+    /// Provides an mechanics for selecting an MVC action to invoke for the current request.
+    /// </summary>
+    public partial class CrudActionSelector : IActionSelector
     {
+        /// <summary>
+        /// Empty collection to be used when haven't matches
+        /// </summary>
         private static readonly IReadOnlyList<ActionDescriptor> EmptyActions = Array.Empty<ActionDescriptor>();
-
+        /// <summary>
+        /// Used for get the access to the action descriptors
+        /// </summary>
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
+        /// <summary>
+        /// Allows access to the cache of the action constraints
+        /// </summary>
         private readonly ActionConstraintCache _actionConstraintCache;
+
+        /// <summary>
+        /// The logger instance to be use for send the app messages 
+        /// </summary>
         private readonly ILogger _logger;
 
-        private Cache _cache;
+        /// <summary>
+        /// Store the current cache of the action selector
+        /// </summary>
+        private CrudActionSelectorCache _cache;
 
         /// <summary>
         /// Creates a new <see cref="ActionSelector"/>.
         /// </summary>
-        /// <param name="actionDescriptorCollectionProvider">
-        /// The <see cref="IActionDescriptorCollectionProvider"/>.
-        /// </param>
-        /// <param name="actionConstraintCache">The <see cref="ActionConstraintCache"/> that
-        /// providers a set of <see cref="IActionConstraint"/> instances.</param>
-        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/>.</param>
+        /// <param name="actionDescriptorCollectionProvider">The <see cref="IActionDescriptorCollectionProvider"/> 
+        /// to be used for get the access to the action descriptors </param>
+        /// <param name="actionConstraintCache">The <see cref="ActionConstraintCache"/> that providers 
+        /// a set of <see cref="IActionConstraint"/> instances.</param>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> to be use for generate the logger instance</param>
         public CrudActionSelector(
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
             ActionConstraintCache actionConstraintCache,
@@ -45,46 +59,43 @@ namespace JCTools.GenericCrud.Settings
             _actionConstraintCache = actionConstraintCache;
         }
 
-        private Cache Current
+        /// <summary>
+        /// Allows access to the current cache of the action selector
+        /// </summary>
+        private CrudActionSelectorCache GetCurrentCache()
         {
-            get
-            {
-                var actions = _actionDescriptorCollectionProvider.ActionDescriptors;
-                var cache = Volatile.Read(ref _cache);
+            var actions = _actionDescriptorCollectionProvider.ActionDescriptors;
+            var cache = Volatile.Read(ref _cache);
 
-                if (cache != null && cache.Version == actions.Version)
-                {
-                    return cache;
-                }
-
-                cache = new Cache(actions);
-                Volatile.Write(ref _cache, cache);
+            if (cache != null && cache.Version == actions.Version)
                 return cache;
-            }
-        }
 
+            cache = new CrudActionSelectorCache(actions);
+            Volatile.Write(ref _cache, cache);
+            return cache;
+        }
+        /// <summary>
+        /// Selects a set of <see cref="ActionDescriptor"/> candidates for the current request associated with context.
+        /// </summary>
+        /// <param name="context">The <see cref="RouteContext"/> associated with the current request.</param>
+        /// <returns>A set of <see cref="ActionDescriptor"/> candidates or null.</returns>
         public IReadOnlyList<ActionDescriptor> SelectCandidates(RouteContext context)
         {
             if (context == null)
-            {
                 throw new ArgumentNullException(nameof(context));
-            }
 
-            var cache = Current;
+            var cache = GetCurrentCache();
 
             // The Cache works based on a string[] of the route values in a pre-calculated order. This code extracts
             // those values in the correct order.
-            var keys = cache.RouteKeys;
-            var values = new string[keys.Length];
-            for (var i = 0; i < keys.Length; i++)
-            {
-                context.RouteData.Values.TryGetValue(keys[i], out object value);
-
-                if (value != null)
+            var values = cache.RouteKeys
+                .Select(k =>
                 {
-                    values[i] = value as string ?? Convert.ToString(value);
-                }
-            }
+                    if (context.RouteData.Values.TryGetValue(k, out object value))
+                        return value as string ?? Convert.ToString(value);
+                    return null;
+                })
+                .ToArray();
 
             if (cache.OrdinalEntries.TryGetValue(values, out var matchingRouteValues) ||
                 cache.OrdinalIgnoreCaseEntries.TryGetValue(values, out matchingRouteValues))
@@ -96,43 +107,38 @@ namespace JCTools.GenericCrud.Settings
             _logger.LogDebug($"No actions matched the current request. Route values: {context.RouteData.Values}");
             return EmptyActions;
         }
-
+        /// <summary>
+        /// Selects the best <see cref="ActionDescriptor"/> candidate from candidates 
+        /// for the current request associated with context.
+        /// </summary>
+        /// <param name="context">The <see cref="RouteContext"/> associated with the current request</param>
+        /// <param name="candidates">The set of <see cref="ActionDescriptor"/> candidates to be evaluated</param>
+        /// <returns>The best <see cref="ActionDescriptor"/> candidate for the current request or null</returns>
+        /// <exception cref="AmbiguousActionException">Thrown when action selection results in an ambiguity</exception>
+        /// <exception cref="ArgumentNullException">Thrown when the context or the candidates arguments are nulls</exception>
         public ActionDescriptor SelectBestCandidate(RouteContext context, IReadOnlyList<ActionDescriptor> candidates)
         {
             if (context == null)
-            {
                 throw new ArgumentNullException(nameof(context));
-            }
 
             if (candidates == null)
-            {
                 throw new ArgumentNullException(nameof(candidates));
-            }
 
-            var matches = EvaluateActionConstraints(context, candidates);
-
-            var finalMatches = SelectBestActions(matches);
-            if (finalMatches == null || finalMatches.Count == 0)
-            {
+            var matches = SelectBestActions(EvaluateActionConstraints(context, candidates));
+            if (matches == null || matches.Count == 0)
                 return null;
-            }
-            else if (finalMatches.Count == 1)
-            {
-                var selectedAction = finalMatches[0];
-
-                return selectedAction;
-            }
+            else if (matches.Count == 1)
+                return matches[0];
             else
             {
-                IReadOnlyList<ActionDescriptor> crudMatches = MatchCrudActions(context, candidates);
-                if (crudMatches.Count == 1)
-                    return crudMatches[0];
+                matches = MatchCrudActions(context, candidates);
+                if (matches.Count == 1)
+                    return matches[0];
                 else
                 {
-
                     var actionNames = string.Join(
                         Environment.NewLine,
-                        crudMatches.Select(a => a.DisplayName));
+                        matches.Select(a => a.DisplayName));
 
                     _logger.LogError($"Request matched multiple actions resulting in ambiguity. Matching actions: {actionNames}");
 
@@ -144,27 +150,30 @@ namespace JCTools.GenericCrud.Settings
                 }
             }
         }
-
+        /// <summary>
+        /// Find the match of the current request with the CRUD controllers
+        /// </summary>
+        /// <param name="context">The <see cref="RouteContext"/> associated with the current request</param>
+        /// <param name="candidates">The set of <see cref="ActionDescriptor"/> candidates to be evaluated</param>
+        /// <returns>The best <see cref="ActionDescriptor"/> candidate for the current request or all candidate if not match</returns>
         private IReadOnlyList<ActionDescriptor> MatchCrudActions(RouteContext context, IReadOnlyList<ActionDescriptor> candidates)
         {
             var requestedModelType = context.RouteData.DataTokens[Configurator.ModelTypeTokenName] as Type;
 
-            var castedCandidates = candidates
-                .Select(c => c as ControllerActionDescriptor)
-                .Where(c => c != null);
+            var results = candidates
+                .Where(c =>
+                {
+                    var candidate = c as ControllerActionDescriptor;
+                    if (candidate == null)
+                        return false;
 
-            var results = new List<ActionDescriptor>();
+                    var genericTypes = candidate.ControllerTypeInfo.GetGenericArguments();
+                    return (requestedModelType != null && genericTypes.Contains(requestedModelType))
+                        || candidate.ControllerName != "GenericController`3";
+                })
+                .ToList();
 
-            foreach (var candidate in castedCandidates)
-            {
-                var genericTypes = candidate.ControllerTypeInfo.GetGenericArguments();
-                if (requestedModelType != null && genericTypes.Contains(requestedModelType))
-                    results.Add(candidate);
-                else if (requestedModelType == null && candidate.ControllerName != "GenericController`3")
-                    results.Add(candidate);
-            }
             return results.Any() ? results : candidates;
-
         }
 
         /// <summary>
@@ -173,41 +182,37 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="actions">The set of actions that satisfy all constraints.</param>
         /// <returns>A list of the best matching actions.</returns>
         protected virtual IReadOnlyList<ActionDescriptor> SelectBestActions(IReadOnlyList<ActionDescriptor> actions)
-        {
-            return actions;
-        }
+            => actions;
 
+        /// <summary>
+        /// Tries find the candidate with more constraints coincidences for the current request
+        /// </summary>
+        /// <param name="context">The <see cref="RouteContext"/> associated with the current request.</param>
+        /// <param name="actions">The set of <see cref="ActionDescriptor"/> candidates to be evaluated</param>
+        /// <returns>The candidates that match with the current request or null</returns>
         private IReadOnlyList<ActionDescriptor> EvaluateActionConstraints(
             RouteContext context,
             IReadOnlyList<ActionDescriptor> actions)
         {
-            var candidates = new List<ActionSelectorCandidate>();
-
-            // Perf: Avoid allocations
-            for (var i = 0; i < actions.Count; i++)
+            var candidates = actions.Select(action =>
             {
-                var action = actions[i];
                 var constraints = _actionConstraintCache.GetActionConstraints(context.HttpContext, action);
-                candidates.Add(new ActionSelectorCandidate(action, constraints));
-            }
+                return new ActionSelectorCandidate(action, constraints);
+            }).ToList();
 
             var matches = EvaluateActionConstraintsCore(context, candidates, startingOrder: null);
 
-            List<ActionDescriptor> results = null;
-            if (matches != null)
-            {
-                results = new List<ActionDescriptor>(matches.Count);
-                // Perf: Avoid allocations
-                for (var i = 0; i < matches.Count; i++)
-                {
-                    var candidate = matches[i];
-                    results.Add(candidate.Action);
-                }
-            }
-
-            return results;
+            return matches?
+                .Select(candidate => candidate.Action)
+                .ToList();
         }
-
+        /// <summary>
+        /// Tries find the candidate with more constraints coincidences for the current request
+        /// </summary>
+        /// <param name="context">The <see cref="RouteContext"/> associated with the current request.</param>
+        /// <param name="candidates">The candidates for the selection of the action to invoke for the current request</param>
+        /// <param name="startingOrder">The candidate index to be used for start the search</param>
+        /// <returns>The candidates that match with the current request</returns>
         private IReadOnlyList<ActionSelectorCandidate> EvaluateActionConstraintsCore(
             RouteContext context,
             IReadOnlyList<ActionSelectorCandidate> candidates,
@@ -237,9 +242,7 @@ namespace JCTools.GenericCrud.Settings
 
             // If we don't find a next then there's nothing left to do.
             if (order == null)
-            {
                 return candidates;
-            }
 
             // Since we have a constraint to process, bisect the set of actions into those with and without a
             // constraint for the current order.
@@ -278,13 +281,9 @@ namespace JCTools.GenericCrud.Settings
                 }
 
                 if (isMatch && foundMatchingConstraint)
-                {
                     actionsWithConstraint.Add(candidate);
-                }
                 else if (isMatch)
-                {
                     actionsWithoutConstraint.Add(candidate);
-                }
             }
 
             // If we have matches with constraints, those are better so try to keep processing those
@@ -292,183 +291,14 @@ namespace JCTools.GenericCrud.Settings
             {
                 var matches = EvaluateActionConstraintsCore(context, actionsWithConstraint, order);
                 if (matches?.Count > 0)
-                {
                     return matches;
-                }
             }
 
             // If the set of matches with constraints can't work, then process the set without constraints.
             if (actionsWithoutConstraint.Count == 0)
-            {
                 return null;
-            }
             else
-            {
                 return EvaluateActionConstraintsCore(context, actionsWithoutConstraint, order);
-            }
-        }
-
-        // The action selector cache stores a mapping of route-values -> action descriptors for each known set of
-        // of route-values. We actually build two of these mappings, one for case-sensitive (fast path) and one for
-        // case-insensitive (slow path).
-        //
-        // This is necessary because MVC routing/action-selection is always case-insensitive. So we're going to build
-        // a case-sensitive dictionary that will behave like the a case-insensitive dictionary when you hit one of the
-        // canonical entries. When you don't hit a case-sensitive match it will try the case-insensitive dictionary
-        // so you still get correct behaviors.
-        //
-        // The difference here is because while MVC is case-insensitive, doing a case-sensitive comparison is much 
-        // faster. We also expect that most of the URLs we process are canonically-cased because they were generated
-        // by Url.Action or another routing api.
-        //
-        // This means that for a set of actions like:
-        //      { controller = "Home", action = "Index" } -> HomeController::Index1()
-        //      { controller = "Home", action = "index" } -> HomeController::Index2()
-        //
-        // Both of these actions match "Index" case-insensitively, but there exist two known canonical casings,
-        // so we will create an entry for "Index" and an entry for "index". Both of these entries match **both**
-        // actions.
-        private class Cache
-        {
-            public Cache(ActionDescriptorCollection actions)
-            {
-                // We need to store the version so the cache can be invalidated if the actions change.
-                Version = actions.Version;
-
-                // We need to build two maps for all of the route values.
-                OrdinalEntries = new Dictionary<string[], List<ActionDescriptor>>(StringArrayComparer.Ordinal);
-                OrdinalIgnoreCaseEntries = new Dictionary<string[], List<ActionDescriptor>>(StringArrayComparer.OrdinalIgnoreCase);
-
-                // We need to first identify of the keys that action selection will look at (in route data). 
-                // We want to only consider conventionally routed actions here.
-                var routeKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                for (var i = 0; i < actions.Items.Count; i++)
-                {
-                    var action = actions.Items[i];
-                    if (action.AttributeRouteInfo == null)
-                    {
-                        // This is a conventionally routed action - so make sure we include its keys in the set of
-                        // known route value keys.
-                        foreach (var kvp in action.RouteValues)
-                        {
-                            routeKeys.Add(kvp.Key);
-                        }
-                    }
-                }
-
-                // We need to hold on to an ordered set of keys for the route values. We'll use these later to
-                // extract the set of route values from an incoming request to compare against our maps of known
-                // route values.
-                RouteKeys = routeKeys.ToArray();
-
-                for (var i = 0; i < actions.Items.Count; i++)
-                {
-                    var action = actions.Items[i];
-                    if (action.AttributeRouteInfo != null)
-                    {
-                        // This only handles conventional routing. Ignore attribute routed actions.
-                        continue;
-                    }
-
-                    // This is a conventionally routed action - so we need to extract the route values associated
-                    // with this action (in order) so we can store them in our dictionaries.
-                    var routeValues = new string[RouteKeys.Length];
-                    for (var j = 0; j < RouteKeys.Length; j++)
-                    {
-                        action.RouteValues.TryGetValue(RouteKeys[j], out routeValues[j]);
-                    }
-
-                    if (!OrdinalIgnoreCaseEntries.TryGetValue(routeValues, out var entries))
-                    {
-                        entries = new List<ActionDescriptor>();
-                        OrdinalIgnoreCaseEntries.Add(routeValues, entries);
-                    }
-
-                    entries.Add(action);
-
-                    // We also want to add the same (as in reference equality) list of actions to the ordinal entries.
-                    // We'll keep updating `entries` to include all of the actions in the same equivalence class -
-                    // meaning, all conventionally routed actions for which the route values are equalignoring case.
-                    //
-                    // `entries` will appear in `OrdinalIgnoreCaseEntries` exactly once and in `OrdinalEntries` once
-                    // for each variation of casing that we've seen.
-                    if (!OrdinalEntries.ContainsKey(routeValues))
-                    {
-                        OrdinalEntries.Add(routeValues, entries);
-                    }
-                }
-            }
-
-            public int Version { get; }
-
-            public string[] RouteKeys { get; }
-
-            public Dictionary<string[], List<ActionDescriptor>> OrdinalEntries { get; }
-
-            public Dictionary<string[], List<ActionDescriptor>> OrdinalIgnoreCaseEntries { get; }
-        }
-
-        private class StringArrayComparer : IEqualityComparer<string[]>
-        {
-            public static readonly StringArrayComparer Ordinal = new StringArrayComparer(StringComparer.Ordinal);
-
-            public static readonly StringArrayComparer OrdinalIgnoreCase = new StringArrayComparer(StringComparer.OrdinalIgnoreCase);
-
-            private readonly StringComparer _valueComparer;
-
-            private StringArrayComparer(StringComparer valueComparer)
-            {
-                _valueComparer = valueComparer;
-            }
-
-            public bool Equals(string[] x, string[] y)
-            {
-                if (object.ReferenceEquals(x, y))
-                {
-                    return true;
-                }
-
-                if (x == null ^ y == null)
-                {
-                    return false;
-                }
-
-                if (x.Length != y.Length)
-                {
-                    return false;
-                }
-
-                for (var i = 0; i < x.Length; i++)
-                {
-                    if (string.IsNullOrEmpty(x[i]) && string.IsNullOrEmpty(y[i]))
-                    {
-                        continue;
-                    }
-
-                    if (!_valueComparer.Equals(x[i], y[i]))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            public int GetHashCode(string[] obj)
-            {
-                if (obj == null)
-                {
-                    return 0;
-                }
-
-                var hash = new HashCodeCombiner();
-                for (var i = 0; i < obj.Length; i++)
-                {
-                    hash.Add(obj[i], _valueComparer);
-                }
-
-                return hash.CombinedHash;
-            }
         }
     }
 

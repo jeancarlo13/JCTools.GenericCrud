@@ -6,7 +6,7 @@ using Microsoft.Extensions.Localization;
 namespace JCTools.GenericCrud.Settings
 {
     public class ControllerOptions<TModel, TKey> : Options, IControllerOptions
-    where TModel : class, new()
+        where TModel : class, new()
     {
         public ControllerOptions(string keyPropertyName) : base()
         {
