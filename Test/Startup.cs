@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Controllers;
@@ -58,10 +59,13 @@ namespace Test
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.ConfigureGenericCrud(o =>
+            services.AddDbContext<Data.Context>(builder =>
+                builder.UseSqlite("Data Source=Data/MoviesGallery.db")
+            );
+
+            services.AddGenericCrud<Data.Context>(o =>
             {
                 o.UseModals = false;
-                o.ContextCreator = () => new Test.Data.Context();
                 o.Models.Add<Models.Country>();
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
                 o.Models.Add<Models.Movie, int, MovieController, Data.Context>();

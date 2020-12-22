@@ -1,12 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Models;
-using JCTools.GenericCrud.Settings;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Helpers

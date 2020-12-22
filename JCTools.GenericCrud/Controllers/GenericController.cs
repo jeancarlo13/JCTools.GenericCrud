@@ -8,14 +8,21 @@ using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using JCTools.GenericCrud;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JCTools.GenericCrud.Controllers
 {
@@ -25,7 +32,6 @@ namespace JCTools.GenericCrud.Controllers
     /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
-    /// <returns></returns>
     public class GenericController<TContext, TModel, TKey> : Controller
         where TContext : DbContext
         where TModel : class, new()
@@ -61,10 +67,10 @@ namespace JCTools.GenericCrud.Controllers
             string keyPropertyName = "Id"
         )
         {
-            if (Configurator.Options.ContextCreator == null)
-                throw new ArgumentNullException(nameof(Configurator.Options.ContextCreator));
-            else
-                DbContext = Configurator.Options.ContextCreator.Invoke() as TContext;
+            DbContext = serviceProvider.GetRequiredService<TContext>();
+
+            if (DbContext == null)
+                throw new ArgumentException("Failure generating the database context.");
 
             _renderingService = serviceProvider.GetService(typeof(IViewRenderService)) as IViewRenderService;
             _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer;

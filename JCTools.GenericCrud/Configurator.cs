@@ -11,14 +11,28 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 
 namespace JCTools.GenericCrud
 {
+    /// <summary>
+    /// Provides methods for initialize, registered and configure the package in the client app
+    /// </summary>
     public static class Configurator
     {
+        /// <summary>
+        /// The name of the <see cref="Controllers.GenericController{TContext, TModel, TKey}" /> type
+        /// </summary>
+        internal static readonly Type GenericControllerType = typeof(Controllers.GenericController<,,>);
+
+        /// <summary>
+        /// The type of the database context to be use
+        /// </summary>
+        internal static Type DatabaseContextType;
+
         /// <summary>
         /// The name of the token with the model type of a CRUD
         /// </summary>
@@ -28,11 +42,25 @@ namespace JCTools.GenericCrud
         /// </summary>
         internal const string KeyTokenName = "ModelKey";
         /// <summary>
-        /// The configured settins for all CRUDs
+        /// The configured settings for all CRUDs
         /// </summary>
         internal static Options Options;
-        public static IServiceCollection ConfigureGenericCrud(this IServiceCollection services, Action<Options> optionsFactory = null)
+
+        /// <summary>
+        /// Allows adds the services and settings for the use of the package into the client app
+        /// </summary>
+        /// <param name="services">The application services collection to be use for registered the required services</param>
+        /// <param name="optionsFactory">Action to invoke for get the custom settings of the client app</param>
+        /// <typeparam name="TDbContext">The type of the database context to be used for interacts with the entities</typeparam>
+        /// <returns>The modified application services collection</returns>
+        public static IServiceCollection AddGenericCrud<TDbContext>(
+            this IServiceCollection services,
+            Action<Options> optionsFactory = null
+        )
+            where TDbContext : DbContext
         {
+            DatabaseContextType = typeof(TDbContext);
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -64,7 +92,9 @@ namespace JCTools.GenericCrud
             optionsFactory?.Invoke(Options);
 
             builder.ConfigureApplicationPartManager(p =>
-                p.FeatureProviders.Add(new GenericControllerFeatureProvider())
+                p.FeatureProviders.Add(
+                    new GenericControllerFeatureProvider(services.BuildServiceProvider())
+                )
             );
 
             return services;
@@ -86,7 +116,7 @@ namespace JCTools.GenericCrud
                     { KeyTokenName, item.KeyPropertyName }
                 };
 
-                var controller = string.IsNullOrWhiteSpace(item.ControllerName) ? "GenericController`3" : item.ControllerName;
+                var controller = string.IsNullOrWhiteSpace(item.ControllerName) ? GenericControllerType.Name : item.ControllerName;
 
                 routes.MapRoute(item.Type, "Details", controller, "{model}/{id}/details", dataTokens);
                 routes.MapRoute(item.Type, "Delete", controller, "{model}/{id}/delete", dataTokens);

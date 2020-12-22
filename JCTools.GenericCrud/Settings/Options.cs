@@ -34,7 +34,8 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// Function to be invoke for get a new instance of the database context
         /// </summary>
-        public Func<DbContext> ContextCreator { get; set; }
+        [Obsolete("Use dependency injection for get the correctly database context.", error: true)]
+        public Func<IServiceProvider, DbContext> ContextCreator { get; set; }
 
         public CrudTypeCollection Models { get; set; } = new CrudTypeCollection();
     }

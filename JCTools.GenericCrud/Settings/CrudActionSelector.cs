@@ -169,7 +169,7 @@ namespace JCTools.GenericCrud.Settings
 
                     var genericTypes = candidate.ControllerTypeInfo.GetGenericArguments();
                     return (requestedModelType != null && genericTypes.Contains(requestedModelType))
-                        || candidate.ControllerName != "GenericController`3";
+                        || candidate.ControllerName != Configurator.GenericControllerType.Name;
                 })
                 .ToList();
 

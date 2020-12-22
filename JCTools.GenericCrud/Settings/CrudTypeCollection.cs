@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using JCTools.GenericCrud.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -60,5 +59,19 @@ namespace JCTools.GenericCrud.Settings
         /// <returns>the generated enumerator</returns>
         internal IEnumerator<CrudType> GetEnumerator()
             => _types.GetEnumerator();
+
+        /// <summary>
+        /// Returns an enumerable that iterates through the configured <see cref="CrudType"/> items
+        /// </summary>
+        /// <returns>the generated enumerable</returns>
+        internal IEnumerable<CrudType> AsEnumerable()
+            => _types;
+        /// <summary>
+        /// Returns a <see cref="List{CrudType}"/> that iterates through the configured <see cref="CrudType"/> items
+        /// </summary>
+        /// <returns>The generated list</returns>
+        internal IReadOnlyList<CrudType> ToList()
+            => _types;
     }
 }
+
