@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JCTools.GenericCrud.Controllers;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Settings
@@ -13,12 +15,12 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// The configured types collection
         /// </summary>
-        private readonly List<CrudType> _types;
+        private readonly List<ICrudType> _types;
         /// <summary>
         /// Initialize the default CRUD types collection
         /// </summary>
         public CrudTypeCollection()
-            => _types = new List<CrudType>();
+            => _types = new List<ICrudType>();
 
         /// <summary>
         /// Allows add a new CRUD type
@@ -28,7 +30,11 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="controllerName">The custom controller name to be used for the CRUD; string empty for used a generic controller</param>
         [Obsolete("Use other Add method", error: true)]
         public void Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")
-            => _types.Add(new CrudType(modelType, keyPropertyName, controllerName));
+        {
+            var instanceType = typeof(CrudType<>).MakeGenericType(modelType);
+            var instance = Activator.CreateInstance(instanceType, args: new { keyPropertyName, controllerName }) as ICrudType;
+            _types.Add(instance);
+        }
 
         /// <summary>
         /// Allows add a new CRUD type
@@ -37,7 +43,7 @@ namespace JCTools.GenericCrud.Settings
         /// <typeparam name="TModel">The type of the model to add</typeparam>
         public void Add<TModel>(string keyPropertyName = "Id")
             where TModel : class, new()
-            => _types.Add(new CrudType(typeof(TModel), keyPropertyName));
+            => _types.Add(new CrudType<TModel>(keyPropertyName));
 
         /// <summary>
         /// Allows add a new CRUD type using a custom controller 
@@ -51,27 +57,61 @@ namespace JCTools.GenericCrud.Settings
             where TModel : class, new()
             where TContext : DbContext
             where TCustomController : GenericController<TContext, TModel, TKey>
-            => _types.Add(new CrudType(typeof(TModel), keyPropertyName, typeof(TCustomController).Name));
+            => _types.Add(new CrudType<TModel, TKey, TCustomController, TContext>(keyPropertyName));
 
         /// <summary>
-        /// Returns an enumerator that iterates through the configured <see cref="CrudType"/> items
+        /// Returns an enumerator that iterates through the configured <see cref="ICrudType"/> items
         /// </summary>
         /// <returns>the generated enumerator</returns>
-        internal IEnumerator<CrudType> GetEnumerator()
+        internal IEnumerator<ICrudType> GetEnumerator()
             => _types.GetEnumerator();
 
         /// <summary>
-        /// Returns an enumerable that iterates through the configured <see cref="CrudType"/> items
+        /// Returns an enumerable that iterates through the configured <see cref="ICrudType"/> items
         /// </summary>
         /// <returns>the generated enumerable</returns>
-        internal IEnumerable<CrudType> AsEnumerable()
+        internal IEnumerable<ICrudType> AsEnumerable()
             => _types;
         /// <summary>
-        /// Returns a <see cref="List{CrudType}"/> that iterates through the configured <see cref="CrudType"/> items
+        /// Returns a <see cref="List{ICrudType}"/> that iterates through the configured <see cref="ICrudType"/> items
         /// </summary>
+        /// <param name="predicate">The filter to be applied to the crud enumeration</param>
         /// <returns>The generated list</returns>
-        internal IReadOnlyList<CrudType> ToList()
-            => _types;
+        internal IReadOnlyList<ICrudType> ToList(Func<ICrudType, bool> predicate = null)
+        {
+            if (predicate == null)
+                return _types;
+
+            return _types.Where(predicate).ToList();
+        }
+        /// <summary>
+        /// Allows get the CRUD with the specified data
+        /// </summary>
+        /// <param name="model">The type of the related model to the searched CRUD</param>
+        /// <param name="key">The name of the Key/Id property of the related model to the searched CRUD</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[Type model, string key]
+        {
+            get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.KeyPropertyName == key);
+        }
+        /// <summary>
+        /// Allows get the CRUD with the specified data
+        /// </summary>
+        /// <param name="routeData">The data of the current request that desire an CRUD controller</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[RouteValueDictionary routeData]
+        {
+            get
+            {
+                if (routeData[Configurator.ModelTypeTokenName] is Type modelType && modelType != null)
+                {
+                    var keyName = routeData[Configurator.KeyTokenName]?.ToString() ?? "Id";
+                    return this[modelType, keyName];
+                }
+
+                return null;
+            }
+        }
     }
 }
 

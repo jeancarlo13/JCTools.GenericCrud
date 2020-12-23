@@ -33,11 +33,12 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="feature">The feature instance to populate.</param>
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            foreach (var item in Configurator.Options.Models.ToList())
-            {
-                var genericControllerType = ServiceProviderExtensors.CreateGenericControllerType(_serviceProvider, item.Type, item.KeyPropertyName);
-                feature.Controllers.Add(genericControllerType.GetTypeInfo());
-            }
+            var cruds = Configurator.Options.Models
+                .ToList(item => item.UseGenericController);
+                
+            foreach (var crud in cruds)
+                feature.Controllers.Add(crud.ControllerType.GetTypeInfo());
+
         }
     }
 }

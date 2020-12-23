@@ -32,31 +32,11 @@ namespace JCTools.GenericCrud.Settings
             DeleteOptions = this.CreateDeleteModel(_localizer);
         }
 
-        public ICrudList ListOptions
-        {
-            get;
-            set;
-        }
-        public ICrudDetails DetailsOptions
-        {
-            get;
-            set;
-        }
-        public ICrudEdit EditOptions
-        {
-            get;
-            set;
-        }
-        public ICrudEdit CreateOptions
-        {
-            get;
-            set;
-        }
-        public ICrudDetails DeleteOptions
-        {
-            get;
-            set;
-        }
+        public ICrudList ListOptions { get; set; }
+        public ICrudDetails DetailsOptions { get; set; }
+        public ICrudEdit EditOptions { get; set; }
+        public ICrudEdit CreateOptions { get; set; }
+        public ICrudDetails DeleteOptions { get; set; }
         private string _keyPropertyName;
         public string KeyPropertyName
         {

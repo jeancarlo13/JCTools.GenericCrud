@@ -15,13 +15,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace JCTools.GenericCrud.Controllers
 {
+
     /// <summary>
     /// Used for create the controllers that are the entry points for the custom cruds
     /// </summary>
     /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
-    public class GenericController<TContext, TModel, TKey> : Controller
+    public class GenericController<TContext, TModel, TKey> : Controller, IGenericController
         where TContext : DbContext
         where TModel : class, new()
     {
@@ -46,6 +47,7 @@ namespace JCTools.GenericCrud.Controllers
         /// The instance of <see cref="ILogger"/> used for send to log the message of the controller
         /// </summary>
         private readonly ILogger _logger;
+
         /// <summary>
         /// Create an instace of the controller with the specific parameter
         /// </summary>

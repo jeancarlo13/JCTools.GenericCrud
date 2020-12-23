@@ -23,9 +23,11 @@ namespace JCTools.GenericCrud.Settings
 
             if (actionContext.RouteData.Values["controller"]?.ToString().Equals(Configurator.GenericControllerType.Name) ?? false)
             {
-                var modelType = actionContext.RouteData.DataTokens[Configurator.ModelTypeTokenName] as Type;
-                var keyName = actionContext.RouteData.DataTokens[Configurator.KeyTokenName]?.ToString() ?? "Id";
-                return actionContext.HttpContext.RequestServices.CreateGenericController(modelType, keyName);
+                var crud = Configurator.Options.Models[actionContext.RouteData.DataTokens];
+                if (crud == null)
+                    throw new InvalidOperationException($"The \"{actionContext.RouteData.Values["controller"]}\" is not appropriated registered.");
+
+                return crud.GetControllerInstance(actionContext.HttpContext.RequestServices);
             }
 
             var controllerType = actionContext.ActionDescriptor.ControllerTypeInfo.AsType();

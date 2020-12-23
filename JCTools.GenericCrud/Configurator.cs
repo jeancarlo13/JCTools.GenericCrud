@@ -106,66 +106,89 @@ namespace JCTools.GenericCrud
         /// <param name="routes">the application route collection</param>
         public static void MapCrudRoutes(this IRouteBuilder routes)
         {
-            var cruds = Options.Models.GetEnumerator();
-            while (cruds.MoveNext())
+            foreach (var crudType in Options.Models.ToList())
             {
-                var item = cruds.Current;
-                var dataTokens = new RouteValueDictionary()
-                {
-                    { ModelTypeTokenName, item.Type },
-                    { KeyTokenName, item.KeyPropertyName }
-                };
-
-                var controller = string.IsNullOrWhiteSpace(item.ControllerName) ? GenericControllerType.Name : item.ControllerName;
-
-                routes.MapRoute(item.Type, "Details", controller, "{model}/{id}/details", dataTokens);
-                routes.MapRoute(item.Type, "Delete", controller, "{model}/{id}/delete", dataTokens);
-                routes.MapRoute(item.Type, "DeleteConfirm", controller, "{model}/{id}/deleteconfirm", dataTokens);
-                routes.MapRoute(item.Type, "Create", controller, "{model}/create", dataTokens);
-                routes.MapRoute(item.Type, "Save", controller, "{model}/Save", dataTokens);
-                routes.MapRoute(item.Type, "Edit", controller, "{model}/{id}/edit", dataTokens);
-                routes.MapRoute(item.Type, "SaveChangesAsync", controller, "{model}/SaveChanges/{id}", dataTokens);
-                routes.MapRoute(item.Type, "GetScript", controller, "{model}/{filename}.js", dataTokens);
-                routes.MapRoute(item.Type, "Index", controller, "{model}", dataTokens);
-                routes.MapRoute(item.Type, $"{item.Type.Name}_RedirectedIndex", "Index", controller, "{model}/{id}/index", dataTokens);
-
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Details",
+                    template: "{model}/{id}/details"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Delete",
+                    template: "{model}/{id}/delete"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "DeleteConfirm",
+                    template: "{model}/{id}/deleteconfirm"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Create",
+                    template: "{model}/create"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Save",
+                    template: "{model}/save"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Edit",
+                    template: "{model}/{id}/edit"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "SaveChangesAsync",
+                    template: "{model}/SaveChanges/{id}"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "GetScript",
+                    template: "{model}/{filename}.js"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Index",
+                    template: "{model}"
+                );
+                routes.MapRoute(
+                    crudType: crudType,
+                    action: "Index",
+                    template: "{model}/{id}/index",
+                    routeName: $"{crudType.ModelType.Name}_RedirectedIndex"
+                );
             }
         }
         /// <summary>
         /// Add a new route into the routes collections
         /// </summary>
         /// <param name="routes">Collection of routes of the app</param>
-        /// <param name="type">The model type to map</param>
+        /// <param name="crudType">The model type to map</param>
         /// <param name="action">the action name to map </param>
-        /// <param name="controllerName">The name of the controller to be received the requests</param>
         /// <param name="template">The string with the template of the route</param>
-        /// <param name="tokens">The tokes to add at the route</param>
         private static void MapRoute(
             this IRouteBuilder routes,
-            Type type,
+            ICrudType crudType,
             string action,
-            string controllerName,
-            string template,
-            RouteValueDictionary tokens)
-            => MapRoute(routes, type, $"{type.Name}_{action}", action, controllerName, template, tokens);
+            string template
+        )
+            => MapRoute(routes, crudType, action, template, $"{crudType.ModelType.Name}_{action}");
         /// <summary>
         /// Add a new route into the routes collections
         /// </summary>
         /// <param name="routes">Collection of routes of the app</param>
-        /// <param name="type">The model type to map</param>
+        /// <param name="crudType">The model type to map</param>
         /// <param name="routeName">The name of the route to be generated</param>
         /// <param name="action">the action name to map </param>
-        /// <param name="controllerName">The name of the controller to be received the requests</param>
         /// <param name="template">The string with the template of the route</param>
-        /// <param name="tokens">The tokes to add at the route</param>
         private static void MapRoute(
             this IRouteBuilder routes,
-            Type type,
-            string routeName,
+            ICrudType crudType,
             string action,
-            string controllerName,
             string template,
-            RouteValueDictionary tokens
+            string routeName
         )
         {
             routes.MapRoute(
@@ -173,14 +196,18 @@ namespace JCTools.GenericCrud
                 template: template,
                 defaults: new
                 {
-                    controller = controllerName,
+                    controller = crudType.ControllerType.Name,
                     action = action
                 },
                 constraints: new
                 {
-                    model = new Settings.CrudRouteConstraint(type, template)
+                    model = new Settings.CrudRouteConstraint(crudType.ModelType, template)
                 },
-                dataTokens: tokens
+                dataTokens: new RouteValueDictionary()
+                {
+                    { ModelTypeTokenName, crudType.ModelType },
+                    { KeyTokenName, crudType.KeyPropertyName }
+                }
             );
         }
     }
