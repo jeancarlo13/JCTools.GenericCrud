@@ -1,4 +1,4 @@
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Models
 {
     /// <summary>
     /// Allows defined the css classes of the icon/button of the CRUD actions 

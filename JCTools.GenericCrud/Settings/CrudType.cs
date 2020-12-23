@@ -1,6 +1,5 @@
 using System;
 using JCTools.GenericCrud.Controllers;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Settings
@@ -24,7 +23,7 @@ namespace JCTools.GenericCrud.Settings
         /// </summary>
         /// <remarks>The default controller is <see cref="GenericController{TContext, TModel, TKey}"/></remarks>
         public override Type ControllerType { get => typeof(TCustomController); }
-        
+
         /// <summary>
         /// Generate a new instance for any model
         /// </summary>
@@ -48,29 +47,29 @@ namespace JCTools.GenericCrud.Settings
         /// The type of the model to be used into the CRUD
         /// </summary>
         public virtual Type ModelType { get => typeof(TModel); }
-        
+
         /// <summary>
         /// The name of the property used how to key/id of the model
         /// </summary>
         public virtual string KeyPropertyName { get; }
-        
+
         /// <summary>
         /// The type of the property used how to key/id of the model
         /// </summary>
         public Type KeyPropertyType { get; }
-        
+
         /// <summary>
         /// The controller to be used for entry to the CRUD actions
         /// </summary>
         /// <remarks>The default controller is <see cref="GenericController{TContext, TModel, TKey}"/></remarks>
         public virtual Type ControllerType { get; }
-        
+
         /// <summary>
         /// True if the controller to be used into the current represented CRUD 
         /// is <see cref="GenericController{TContext, TModel, TKey}"/>; Another, false
         /// </summary>
         public bool UseGenericController { get; protected set; }
-        
+
         /// <summary>
         /// Generate a new instance for any model
         /// </summary>

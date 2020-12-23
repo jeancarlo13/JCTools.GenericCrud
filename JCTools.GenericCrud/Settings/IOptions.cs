@@ -1,3 +1,5 @@
+using JCTools.GenericCrud.Models;
+
 namespace JCTools.GenericCrud.Settings
 {
     /// <summary>

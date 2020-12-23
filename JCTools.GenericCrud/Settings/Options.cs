@@ -1,4 +1,5 @@
 using System;
+using JCTools.GenericCrud.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Settings

@@ -1,4 +1,4 @@
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Models
 {
     /// <summary>
     /// Defines the settings to be used for represent/create all actions of the CRUD
