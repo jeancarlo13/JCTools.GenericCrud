@@ -1,7 +1,8 @@
-using System;
-
 namespace JCTools.GenericCrud.Settings
 {
+    /// <summary>
+    /// Define the customizable options of the package
+    /// </summary>
     public interface IOptions
     {
         /// <summary>
@@ -28,6 +29,9 @@ namespace JCTools.GenericCrud.Settings
         /// True if the deletion of the entities is allowed; False if locked
         /// </summary>
         bool AllowDeletionAction { get; set; }
+        /// <summary>
+        /// Defines the settings to be use for represent/create the CRUD actions
+        /// </summary>
         ActionOptions Actions { get; set; }
 
     }

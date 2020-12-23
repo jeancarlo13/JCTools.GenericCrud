@@ -44,7 +44,7 @@ namespace JCTools.GenericCrud.Helpers
         /// <returns>Collection of the properties names to show</returns>
         public static IEnumerable<string> GetModelColumns<TModel, TKey>(this Base<TModel, TKey> list, IStringLocalizer localizer)
             where TModel : class, new()
-            => GetListProperties<TModel, TKey>(list).Select(p => GetPropertyDisplay(p, localizer));
+            => GetPropertiesList<TModel, TKey>(list).Select(p => GetPropertyDisplay(p, localizer));
 
         private static string GetPropertyDisplay(Property p, IStringLocalizer localizer)
         {
@@ -58,7 +58,7 @@ namespace JCTools.GenericCrud.Helpers
         }
         public static IEnumerable<IEnumerable<Data>> GetModelValues(this ICrudList list)
         {
-            var properties = InvokeListProperties(list);
+            var properties = InvokePropertiesListMethod(list);
             return list.GetData()
                 .Select(d =>
                     properties.Select(p => new Data
@@ -73,7 +73,7 @@ namespace JCTools.GenericCrud.Helpers
         public static IEnumerable<Data> GetModelValues(this IBaseDetails details)
         {
             var model = details.GetData();
-            var properties = InvokeListProperties(details);
+            var properties = InvokePropertiesListMethod(details);
             return properties.Select(p => new Data
             {
                 Name = p.Info.Name,
@@ -83,23 +83,30 @@ namespace JCTools.GenericCrud.Helpers
                 UseCustomView = p.List?.UseCustomView ?? false
             });
         }
-        private static IEnumerable<Property> InvokeListProperties(IBase config)
+        
+        /// <summary>
+        /// Located and invoke the correct <see cref="GetPropertiesList{TModel, TKey}(IBase, bool)"/> method
+        /// </summary>
+        /// <param name="config">The object to be used into the method invocation</param>
+        /// <returns>The found collection of properties</returns>
+        private static IEnumerable<Property> InvokePropertiesListMethod(IBase config)
         {
             MethodInfo method = typeof(ModelExtensions)
                 .GetMethod(
-                    nameof(GetListProperties),
+                    nameof(GetPropertiesList),
                     BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy
                 );
             MethodInfo generic = method.MakeGenericMethod(config.GetModelGenericType(), config.GetKeyGenericType());
             return generic.Invoke(null, new object[] { config, true }) as IEnumerable<Property>;
         }
+
         /// <summary>
         /// Allows get the properties that should appear into the crud list    
         /// </summary>
         /// <param name="includeNoVisibleColumns">True for include the not visible columns; False for return only the visible columns</param>
         /// <param name="config">The configuration of the list</param>
         /// <returns>Collection of properties</returns>
-        private static IEnumerable<Property> GetListProperties<TModel, TKey>(IBase config, bool includeNoVisibleColumns = false)
+        private static IEnumerable<Property> GetPropertiesList<TModel, TKey>(IBase config, bool includeNoVisibleColumns = false)
             where TModel : class, new()
         {
             return config.GetModelGenericType().GetTypeInfo().GetProperties()

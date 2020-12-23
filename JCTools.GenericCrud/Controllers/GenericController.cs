@@ -11,17 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using JCTools.GenericCrud;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JCTools.GenericCrud.Controllers
@@ -78,7 +67,6 @@ namespace JCTools.GenericCrud.Controllers
                 .CreateLogger<GenericController<TContext, TModel, TKey>>();
 
             Settings = new ControllerOptions<TModel, TKey>(Configurator.Options, keyPropertyName, _localizer);
-
         }
 
         /// <summary>

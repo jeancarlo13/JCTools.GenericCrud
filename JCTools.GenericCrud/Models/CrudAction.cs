@@ -2,7 +2,7 @@ using JCTools.GenericCrud.Settings;
 
 namespace JCTools.GenericCrud.Models
 {
-    public class CrudAction : CrudActionBase
+    public class CrudAction : BaseAction
     {
         public bool Visible
         {
