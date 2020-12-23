@@ -1,14 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using JCTools.GenericCrud.Helpers;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
 
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Settings.DependencyInjection
 {
     /// <summary>
     /// Allows configured the required controllers for generate the configured CRUDs 
@@ -35,7 +31,7 @@ namespace JCTools.GenericCrud.Settings
         {
             var cruds = Configurator.Options.Models
                 .ToList(item => item.UseGenericController);
-                
+
             foreach (var crud in cruds)
                 feature.Controllers.Add(crud.ControllerType.GetTypeInfo());
 

@@ -1,10 +1,9 @@
 using System;
-using JCTools.GenericCrud.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Settings.DependencyInjection
 {
     /// <summary>
     /// Provides methods for generate the <see cref="Controllers.GenericController{TContext, TModel, TKey}" /> instances
@@ -33,6 +32,7 @@ namespace JCTools.GenericCrud.Settings
             var controllerType = actionContext.ActionDescriptor.ControllerTypeInfo.AsType();
             return actionContext.HttpContext.RequestServices.GetRequiredService(controllerType);
         }
+        
         /// <summary>
         ///  Releases a controller.
         /// </summary>

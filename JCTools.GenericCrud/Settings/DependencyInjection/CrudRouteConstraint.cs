@@ -2,7 +2,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Settings.DependencyInjection
 {
     /// <summary>
     /// Defines the contract that a class must implement in order to check whether a

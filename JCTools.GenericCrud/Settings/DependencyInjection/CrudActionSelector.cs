@@ -11,12 +11,12 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace JCTools.GenericCrud.Settings
+namespace JCTools.GenericCrud.Settings.DependencyInjection
 {
     /// <summary>
     /// Provides an mechanics for selecting an MVC action to invoke for the current request.
     /// </summary>
-    public partial class CrudActionSelector : IActionSelector
+    public class CrudActionSelector : IActionSelector
     {
         /// <summary>
         /// Empty collection to be used when haven't matches

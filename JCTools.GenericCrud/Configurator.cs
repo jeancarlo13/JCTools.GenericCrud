@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
+using JCTools.GenericCrud.Settings.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -86,7 +87,7 @@ namespace JCTools.GenericCrud
             });
             builder.AddControllersAsServices();
 
-            builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, Settings.CustomServiceBasedControllerActivator>());
+            builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
 
             Options = new Options();
             optionsFactory?.Invoke(Options);
@@ -201,7 +202,7 @@ namespace JCTools.GenericCrud
                 },
                 constraints: new
                 {
-                    model = new Settings.CrudRouteConstraint(crudType.ModelType, template)
+                    model = new CrudRouteConstraint(crudType.ModelType, template)
                 },
                 dataTokens: new RouteValueDictionary()
                 {
