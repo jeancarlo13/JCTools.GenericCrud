@@ -1,4 +1,3 @@
-using JCTools.GenericCrud.Helpers;
 using System.Collections.Generic;
 
 namespace JCTools.GenericCrud.Models
@@ -11,12 +10,12 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The data of all properties of the entity to be used in the CRUD views 
         /// </summary>
-        IEnumerable<Property> Properties { get; }
+        IEnumerable<PropertyData> Properties { get; }
 
         // <summary>
         /// The data of the visible properties of the entity to be used in the CRUD views 
         /// </summary>
-        IEnumerable<Property> VisibleProperties { get; }
+        IEnumerable<PropertyData> VisibleProperties { get; }
 
         /// <summary>
         /// Provides access to the real entity 
@@ -35,6 +34,6 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <param name="property">The property to be review</param>
         /// <returns>The property value of the specified object.</returns>
-        object GetPropertyValue(Property property);
+        object GetPropertyValue(PropertyData property);
     }
 }

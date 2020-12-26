@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Models
 {
     /// <summary>
     /// Defines the required data for represent the entities into the Index view 
     /// </summary>
-    public interface IListModel : IViewModel
+    public interface IIndexModel : IViewModel
     {
         /// <summary>
         /// True if the columns with the CRUD actions (buttons/icons)
@@ -44,6 +42,7 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         CrudAction DeleteAction { get; set; }
 
+        
         /// <summary>
         /// Allows get the entire data of all entities to be displayed into the view
         /// </summary>

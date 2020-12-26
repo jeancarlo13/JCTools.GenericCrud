@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JCTools.GenericCrud.Controllers;
-using JCTools.GenericCrud.Helpers;
+using JCTools.GenericCrud.Models;
 using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Settings
@@ -54,7 +54,7 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
         /// <returns>The found properties</returns>
-        IEnumerable<Property> GetProperties(IStringLocalizer localizer, bool includeNoVisibleColumns = false);
+        IEnumerable<PropertyData> GetProperties(IStringLocalizer localizer, bool includeNoVisibleColumns = false);
 
 
         /// <summary>

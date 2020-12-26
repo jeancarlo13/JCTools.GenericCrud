@@ -1,7 +1,0 @@
-
-            @model Test.Models.Movie;
-            @ViewData.ModelState.Keys.Count()
-            @Html.HiddenFor(m => Model.Id, new { htmlAttributes = new { @class = "form-control" }})
-            <span asp-validation-for="Id" class="text-danger"></span>
-            @Html.ValidationMessageFor(m => Model.Id, "", new { @class = "text-danger" })
-            

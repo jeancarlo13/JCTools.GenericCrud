@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JCTools.GenericCrud.Controllers;
-using JCTools.GenericCrud.Helpers;
+using JCTools.GenericCrud.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
@@ -140,11 +140,11 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
         /// <returns>The found properties</returns>
-        public IEnumerable<Property> GetProperties(IStringLocalizer localizer, bool includeNoVisibleColumns = false)
+        public IEnumerable<PropertyData> GetProperties(IStringLocalizer localizer, bool includeNoVisibleColumns = false)
         {
             return ModelType.GetTypeInfo()
                 .GetProperties()
-                .Select(p => new Property(p, localizer))
+                .Select(p => new PropertyData(p, localizer))
                 .Where(p => p.IsVisible || includeNoVisibleColumns)
                 .OrderBy(p => p.Order);
         }

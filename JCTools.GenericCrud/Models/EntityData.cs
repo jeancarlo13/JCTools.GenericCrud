@@ -1,4 +1,3 @@
-using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Settings;
 using Microsoft.Extensions.Localization;
 using System.Collections.Generic;
@@ -25,19 +24,14 @@ namespace JCTools.GenericCrud.Models
         private TKey _KeyValue;
 
         /// <summary>
-        /// The type of the related crud to the entity to be used 
-        /// </summary>
-        private readonly ICrudType _crudType;
-
-        /// <summary>
         /// The data of all properties of the entity to be used in the CRUD views 
         /// </summary>
-        public IEnumerable<Property> Properties { get; }
+        public IEnumerable<PropertyData> Properties { get; }
 
         /// <summary>
         /// The data of the visible properties of the entity to be used in the CRUD views 
         /// </summary>
-        public IEnumerable<Property> VisibleProperties { get; }
+        public IEnumerable<PropertyData> VisibleProperties { get; }
 
         /// <summary>
         /// Initialize the instance
@@ -49,7 +43,6 @@ namespace JCTools.GenericCrud.Models
         internal EntityData(TModel entity, ICrudType crudType, IStringLocalizer localizer)
         {
             _entity = entity;
-            _crudType = crudType;
             Properties = crudType.GetProperties(localizer, includeNoVisibleColumns: true);
             VisibleProperties = Properties.Where(p => p.IsVisible);
             _KeyValue = entity == null ? default(TKey) : (TKey)crudType.GetKeyPropertyValue(entity);
@@ -72,7 +65,7 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <param name="property">The property to be review</param>
         /// <returns>The property value of the specified object.</returns>
-        public object GetPropertyValue(Property property)
+        public object GetPropertyValue(PropertyData property)
             => property.GetValue(_entity);
     }
 }

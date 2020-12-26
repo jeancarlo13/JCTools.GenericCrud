@@ -3,12 +3,12 @@ using System.Reflection;
 using JCTools.GenericCrud.DataAnnotations;
 using Microsoft.Extensions.Localization;
 
-namespace JCTools.GenericCrud.Helpers
+namespace JCTools.GenericCrud.Models
 {
     /// <summary>
     /// Represents a property to be used by the CRUD views 
     /// </summary>
-    public class Property
+    public class PropertyData
     {
         /// /// </summary>
         /// <summary>
@@ -58,7 +58,7 @@ namespace JCTools.GenericCrud.Helpers
         /// the property attributes and grant access to their metadata</param>
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
-        public Property(PropertyInfo property, IStringLocalizer localizer)
+        public PropertyData(PropertyInfo property, IStringLocalizer localizer)
         {
             _info = property;
 

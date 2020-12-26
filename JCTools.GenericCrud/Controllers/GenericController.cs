@@ -97,7 +97,7 @@ namespace JCTools.GenericCrud.Controllers
             IndexMessages message = IndexMessages.None
         )
         {
-            var model = Settings as IListModel;
+            var model = Settings as IIndexModel;
             model.SetData(DbContext.Set<TModel>());
             model.Message = new ViewMessage()
             {

@@ -1,6 +1,5 @@
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using JCTools.GenericCrud.Helpers;
@@ -14,7 +13,7 @@ namespace JCTools.GenericCrud.Models
     /// </summary>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
-    public class CrudModel<TModel, TKey> : IDetailsModel, IEditModel, IListModel
+    public class CrudModel<TModel, TKey> : IDetailsModel, IEditModel, IIndexModel
         where TModel : class, new()
     {
         /// <summary>
@@ -411,7 +410,7 @@ namespace JCTools.GenericCrud.Models
         /// Allows get the entire data of all entities to be displayed into the view
         /// </summary>
         /// <returns>The stored data</returns>
-        IEnumerable<IEntityData> IListModel.GetData()
+        IEnumerable<IEntityData> IIndexModel.GetData()
         {
             var data = _data is IEnumerable<TModel> enumerated
                  ? enumerated
