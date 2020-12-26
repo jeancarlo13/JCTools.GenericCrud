@@ -7,7 +7,7 @@
         }
     },
     {
-        "Key": "GenericCrud.List.Subtitle",
+        "Key": "GenericCrud.Index.Subtitle",
         "Values": {
             "en-US": "All data",
             "es-MX": "Todos los datos"

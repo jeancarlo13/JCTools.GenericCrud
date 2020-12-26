@@ -1,15 +1,14 @@
 @using JCTools.GenericCrud.Helpers
-@using JCTools.GenericCrud.Controllers
 
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 @using Microsoft.AspNetCore.Mvc.Localization
-@model JCTools.GenericCrud.Models.ICrudEdit
+@model JCTools.GenericCrud.Models.IEditModel
 @inject IViewLocalizer Localizer
 
 @{
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
-    var values = @Model.GetModelValues();
+    var entity = @Model.GetData();
 
     Model.IndexAction.Url = Url.Action("Index");
     Model.SaveAction.UseSubmit = true;
@@ -21,25 +20,28 @@
     <h3>@Model.Subtitle</h3>
 }
 <div class="row">
-    <form action="@(Model.UseModals ? "" : ViewBag.Action)"  method="POST" asp-anti-forgery="true">
-        @foreach(var value in values)
+    <form action="@(Model.UseModals ? "" : ViewBag.Action)" method="POST" asp-anti-forgery="true">
+        @foreach (var property in entity.Properties)
         {
-            if (value.Visible)
+            if (property.IsVisible)
             {
                 <div class="form-group row">
-                    @if (value.UseCustomView){
-                        @await RenderingServices.RenderViewFor(Model, Html, ViewData, value.Name)
-                    } else {
-                        <label class="col-md-2 text-right" for="@value.Name">@value.Display</label>
+                    @if (property.UseCustomView)
+                    {
+                        @await RenderingServices.RenderEditViewFor(Model, Html, ViewData, property.Name)
+                    }
+                    else
+                    {
+                        <label class="col-md-2 text-right" for="@property.Name">@property</label>
                         <div class="col-md-10">
-                            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name)
+                            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
                         </div>
                     }
                 </div>
             }
-            else 
-            {                
-                @await RenderingServices.CreateEditorFor(Model, Html, ViewData, value.Name, "HiddenFor")
+            else
+            {
+                @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name, "HiddenFor")
             }
         }
         @if (!Model.UseModals)

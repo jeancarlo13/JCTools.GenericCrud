@@ -34,7 +34,7 @@ namespace JCTools.GenericCrud.Controllers
         /// Instance of the Settings of the crud.
         /// </summary>
         /// <remarks>You can use its for customize the current crud only</remarks>
-        protected ControllerOptions<TModel, TKey> Settings { get; set; }
+        protected IViewModel Settings { get; set; }
         /// <summary>
         /// The instance of <see cref="IViewRenderService"/> used for render the embedded views
         /// </summary>
@@ -52,11 +52,29 @@ namespace JCTools.GenericCrud.Controllers
         /// Create an instace of the controller with the specific parameter
         /// </summary>
         /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used of access to the configured services into the startup class</param>
+        /// <param name="crud">The CRUD type to be used for configure the instance</param>
+        internal GenericController(
+            IServiceProvider serviceProvider,
+            ICrudType crud
+        ) : this(serviceProvider)
+            => Settings = new CrudModel<TModel, TKey>(crud, _localizer);
+
+        /// <summary>
+        /// Create an instace of the controller with the specific parameter
+        /// </summary>
+        /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used of access to the configured services into the startup class</param>
         /// <param name="keyPropertyName">The name of the model property to be used how to identifier of the entities</param>
         public GenericController(
             IServiceProvider serviceProvider,
             string keyPropertyName = "Id"
-        )
+        ) : this(serviceProvider)
+            => Settings = new CrudModel<TModel, TKey>(keyPropertyName, _localizer);
+
+        /// <summary>
+        /// Initialize an instace of the controller with the required services
+        /// </summary>
+        /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used of access to the configured services into the startup class</param>
+        private GenericController(IServiceProvider serviceProvider)
         {
             DbContext = serviceProvider.GetRequiredService<TContext>();
 
@@ -67,8 +85,6 @@ namespace JCTools.GenericCrud.Controllers
             _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer;
             _logger = (serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory)
                 .CreateLogger<GenericController<TContext, TModel, TKey>>();
-
-            Settings = new ControllerOptions<TModel, TKey>(Configurator.Options, keyPropertyName, _localizer);
         }
 
         /// <summary>
@@ -76,36 +92,30 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
-        public virtual async Task<IActionResult> Index(object id = null, IndexMessages message = IndexMessages.None)
+        public virtual async Task<IActionResult> Index(
+            TKey id,
+            IndexMessages message = IndexMessages.None
+        )
         {
-            var all = DbContext.Set<TModel>();
-            var model = Settings.ListOptions;
-            model.SetData(all);
-            model.Message = message != IndexMessages.None ? _localizer[$"GenericCrud.Index.{message.ToString()}Message"] : string.Empty;
-            model.MessageClass =
-                message == IndexMessages.EditSuccess ? "alert-success" :
-                message == IndexMessages.CreateSuccess ? "alert-success" :
-                message == IndexMessages.DeleteSuccess ? "alert-success" :
-                "alert-info";
-            if (id != null)
+            var model = Settings as IListModel;
+            model.SetData(DbContext.Set<TModel>());
+            model.Message = new ViewMessage()
             {
-                try
-                {
-                    var realId = (TKey)Convert.ChangeType(id, typeof(TKey));
-                    model.SetId(realId);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogCritical(e, $"The '{id}' is not a valid value for {typeof(TKey)}.");
-                }
-            }
+                Text = message != IndexMessages.None
+                    ? _localizer[$"GenericCrud.Index.{message.ToString()}Message"]
+                    : string.Empty,
+                CssClass = message == IndexMessages.EditSuccess ? "alert-success"
+                    : message == IndexMessages.CreateSuccess ? "alert-success"
+                    : message == IndexMessages.DeleteSuccess ? "alert-success"
+                    : "alert-info"
+            };
 
+            if (id != null && !id.Equals(default(TKey)))
+                model.SetId(id);
+
+            model.CurrentProcess = CrudProcesses.Index;
             return Content(
-                await _renderingService.RenderToStringAsync(
-                    nameof(Index),
-                    model,
-                    ViewData
-                ),
+                await _renderingService.RenderToStringAsync(nameof(Index), model, ViewData),
                 "text/html"
             );
         }
@@ -122,41 +132,13 @@ namespace JCTools.GenericCrud.Controllers
             if (entity == null)
                 return NotFound();
 
-            var model = Settings.DetailsOptions;
+            var model = Settings as IDetailsModel;
             model.SetData(entity);
 
+            model.CurrentProcess = CrudProcesses.Details;
             return await RenderView(nameof(Details), model);
         }
-        /// <summary>
-        /// Generate the view to be display to the user
-        /// </summary>
-        /// <param name="view">The name of the view to render</param>
-        /// <param name="model">The model with the data to display</param>
-        /// <param name="commitAction">The action to be invoked when the user desired save the changes made</param>
-        /// <returns>The task to be invoked</returns>
-        private async Task<IActionResult> RenderView(
-            string view,
-            IBase model,
-            CrudAction commitAction = null)
-        {
-            object popupModel = model;
-            if (Settings.UseModals)
-            {
-                popupModel = new Popup()
-                {
-                    Model = model,
-                    InnerView = view,
-                    CommitAction = commitAction
-                };
 
-                view = "_popup";
-            }
-
-            return Content(
-                await _renderingService.RenderToStringAsync(view, popupModel, ViewData),
-                "text/html"
-            );
-        }
 
         /// <summary>
         /// Allows render the delete view
@@ -170,19 +152,17 @@ namespace JCTools.GenericCrud.Controllers
             if (entity == null)
                 return NotFound();
 
-            var model = Settings.DeleteOptions;
+            var model = Settings as IDetailsModel;
             model.SetData(entity);
-            model.SetId(id);
 
             ViewBag.IsDelete = true;
 
-            var action = Settings.ConfigureDeleteAction(Settings.GetModelName(_localizer), _localizer);
-            action.Url = Url.Action(nameof(DeleteConfirm), new
-            {
-                id
-            });
+            model.DeleteAction.Url = Url.Action(nameof(DeleteConfirm), new { id });
+            if (!model.DeleteAction.UseModals)
+                model.DeleteAction.UseText = true;
 
-            return await RenderView(nameof(Details), model, action);
+            model.CurrentProcess = CrudProcesses.Delete;
+            return await RenderView(nameof(Details), model, model.DeleteAction);
         }
 
         /// <summary>
@@ -219,7 +199,7 @@ namespace JCTools.GenericCrud.Controllers
                 );
             }
 
-            return SendSuccessResponse(nameof(Index), null, IndexMessages.DeleteSuccess);
+            return SendSuccessResponse(nameof(Index), default(TKey), IndexMessages.DeleteSuccess);
         }
 
         /// <summary>
@@ -228,14 +208,12 @@ namespace JCTools.GenericCrud.Controllers
         [HttpGet]
         public virtual async Task<IActionResult> Create()
         {
-            var model = Settings.CreateOptions;
+            var model = Settings as IEditModel;
+            model.SaveAction.Url = Url.Action(nameof(Save));
+            ViewBag.Action = model.SaveAction.Url;
 
-            ViewBag.Action = Url.Action(nameof(Save));
-
-            var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
-            action.Url = ViewBag.Action;
-
-            return await RenderView(nameof(Edit), model, action);
+            model.CurrentProcess = CrudProcesses.Create;
+            return await RenderView(nameof(Edit), model, model.SaveAction);
         }
 
         /// <summary>
@@ -245,10 +223,9 @@ namespace JCTools.GenericCrud.Controllers
         [HttpPost]
         public virtual async Task<IActionResult> Save([FromForm] TModel model)
         {
-            ModelState.Remove(Settings.CreateOptions.KeyPropertyName);
+            ModelState.Remove(Settings.KeyPropertyName);
             if (ModelState.IsValid)
             {
-
                 await DbContext.AddAsync(model);
 
                 try
@@ -263,7 +240,7 @@ namespace JCTools.GenericCrud.Controllers
 
                 return SendSuccessResponse(
                     nameof(Index),
-                    typeof(TModel).GetProperty(Settings.CreateOptions.KeyPropertyName)?.GetValue(model),
+                    (TKey)Settings.GetKeyPropertyValue(model),
                     IndexMessages.CreateSuccess
                 );
             }
@@ -306,19 +283,14 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entity">The entity to edit</param>
         private async Task<IActionResult> Edit(TKey id, TModel entity)
         {
-            var model = Settings.EditOptions;
+            var model = Settings as IEditModel;
             model.SetData(entity);
-            model.SetId(id);
+            model.SaveAction.Url = Url.Action(nameof(SaveChangesAsync), new { id = id });
 
-            ViewBag.Action = Url.Action(nameof(SaveChangesAsync), new
-            {
-                id = id
-            });
+            ViewBag.Action = model.SaveAction.Url;
 
-            var action = Settings.ConfigureSaveAction(Settings.GetModelName(_localizer), _localizer);
-            action.Url = ViewBag.Action;
-
-            return await RenderView(nameof(Edit), model, action);
+            model.CurrentProcess = CrudProcesses.Edit;
+            return await RenderView(nameof(Edit), model, model.SaveAction);
         }
 
         /// <summary>
@@ -329,7 +301,7 @@ namespace JCTools.GenericCrud.Controllers
         [HttpPost]
         public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm] TModel model)
         {
-            var key = (TKey)Convert.ChangeType(model.GetType().GetProperty(Settings.KeyPropertyName)?.GetValue(model), typeof(TKey));
+            var key = (TKey)Settings.GetKeyPropertyValue(model);
             if (!id.Equals(key))
                 return NotFound();
 
@@ -365,8 +337,18 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the affected entity</param>
         /// <param name="message">The message to be sent into the response</param>
         /// <returns>The generated action result</returns>
-        private IActionResult SendSuccessResponse(string action, object id, IndexMessages message = IndexMessages.None)
+        private IActionResult SendSuccessResponse(
+            string action,
+            TKey id,
+            IndexMessages message = IndexMessages.None
+        )
         {
+            var urlValues = new
+            {
+                message = message,
+                id = id
+            };
+
             if (Settings.UseModals)
             {
                 var strId = id == null ? string.Empty : $"{id}/index";
@@ -374,19 +356,13 @@ namespace JCTools.GenericCrud.Controllers
                 return Json(new JsonResponse
                 {
                     Success = true,
-                    RedirectUrl = Url.Action(nameof(Index), new
-                    {
-                        message = message,
-                        id = id
-                    })
+                    RedirectUrl = Url.Action(nameof(Index), urlValues)
                 });
             }
+            else if (!Settings.UseCustomController && id != null && !id.Equals(default(TKey)))
+                return RedirectToRoute($"{Settings.GetModelType().Name}_RedirectedIndex", urlValues);
             else
-                return RedirectToAction(action, new
-                {
-                    message = id,
-                    id = message
-                });
+                return RedirectToAction(action, urlValues);
         }
 
         /// <summary>
@@ -411,6 +387,37 @@ namespace JCTools.GenericCrud.Controllers
                 var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
                 return File(bytes, "application/javascript");
             }
+        }
+
+        /// <summary>
+        /// Generate the view to be display to the user
+        /// </summary>
+        /// <param name="view">The name of the view to render</param>
+        /// <param name="model">The model with the data to display</param>
+        /// <param name="commitAction">The action to be invoked when the user desired save the changes made</param>
+        /// <returns>The task to be invoked</returns>
+        private async Task<IActionResult> RenderView(
+            string view,
+            IViewModel model,
+            CrudAction commitAction = null)
+        {
+            object popupModel = model;
+            if (Settings.UseModals)
+            {
+                popupModel = new Popup()
+                {
+                    Model = model,
+                    InnerView = view,
+                    CommitAction = commitAction
+                };
+
+                view = "_popup";
+            }
+
+            return Content(
+                await _renderingService.RenderToStringAsync(view, popupModel, ViewData),
+                "text/html"
+            );
         }
     }
 }

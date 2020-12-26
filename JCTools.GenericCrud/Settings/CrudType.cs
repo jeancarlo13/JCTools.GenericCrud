@@ -1,6 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using JCTools.GenericCrud.Controllers;
+using JCTools.GenericCrud.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Settings
 {
@@ -32,6 +37,27 @@ namespace JCTools.GenericCrud.Settings
             : base(keyPropertyName)
         {
             UseGenericController = false;
+        }
+
+        /// <summary>
+        /// Allows get the Key/Id property value of the specific instance
+        /// </summary>
+        /// <param name="obj">The instance to be evaluated</param>
+        /// <returns>The found Key/Id property value or null</returns>
+        public new TKey GetKeyPropertyValue(object obj)
+        {
+            if (obj is TModel instance)
+            {
+                var value = (TKey)ModelType
+                   .GetTypeInfo()
+                   .GetProperty(KeyPropertyName)?
+                   .GetValue(obj);
+
+                if (value != null)
+                    return value;
+            }
+
+            return default(TKey);
         }
     }
 
@@ -96,6 +122,46 @@ namespace JCTools.GenericCrud.Settings
         /// of access to the configured services into the startup class</param>
         /// <returns>The generated instance</returns>
         public IGenericController GetControllerInstance(IServiceProvider serviceProvider)
-            => Activator.CreateInstance(ControllerType, serviceProvider, KeyPropertyName) as IGenericController;
+        {
+            var constructor = ControllerType.GetConstructor(
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                null,
+                new Type[] { typeof(IServiceProvider), typeof(ICrudType) },
+                null
+            );
+            return constructor.Invoke(new object[] { serviceProvider, this }) as IGenericController;
+        }
+
+        /// <summary>
+        /// Allows get the properties that should appear into the CRUD views
+        /// </summary>
+        /// <param name="includeNoVisibleColumns">True for include the not visible columns; 
+        /// False for return only the visible columns</param>
+        /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
+        /// the texts to displayed into the view</param>
+        /// <returns>The found properties</returns>
+        public IEnumerable<Property> GetProperties(IStringLocalizer localizer, bool includeNoVisibleColumns = false)
+        {
+            return ModelType.GetTypeInfo()
+                .GetProperties()
+                .Select(p => new Property(p, localizer))
+                .Where(p => p.IsVisible || includeNoVisibleColumns)
+                .OrderBy(p => p.Order);
+        }
+
+        /// <summary>
+        /// Allows get the Key/Id property value of the specific instance
+        /// </summary>
+        /// <param name="obj">The instance to be evaluated</param>
+        /// <returns>The found Key/Id property value or null</returns>
+        public object GetKeyPropertyValue(object obj)
+        {
+            if (obj is TModel instance)
+                return ModelType.GetTypeInfo()
+                .GetProperty(KeyPropertyName)?
+                .GetValue(obj) ?? null;
+
+            return null;
+        }
     }
 }

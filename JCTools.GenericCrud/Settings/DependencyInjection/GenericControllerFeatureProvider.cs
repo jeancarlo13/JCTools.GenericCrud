@@ -34,7 +34,6 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
 
             foreach (var crud in cruds)
                 feature.Controllers.Add(crud.ControllerType.GetTypeInfo());
-
         }
     }
 }

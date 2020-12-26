@@ -1,11 +1,11 @@
-@using JCTools.GenericCrud.Helpers
 @model JCTools.GenericCrud.Models.CrudAction
 
 @if(Model.Visible)
 {
     @if (Model.UseSubmit || Model.UseModals)
     {
-        <button type="@(Model.UseSubmit ? "submit": "button")" onclick="@Model.OnClientClick" data-url="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
+        <button type="@(Model.UseSubmit ? "submit": "button")" onclick="@Model.OnClientClick" 
+        data-url="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
             @if(string.IsNullOrWhiteSpace(Model.IconClass) || Model.UseText)
             {
                 @Model.Text
@@ -19,7 +19,7 @@
     else 
     {
         <a href="@Model.Url" title="@Model.Caption" class="@Model.ButtonClass">
-            @if(string.IsNullOrWhiteSpace(Model.IconClass))
+            @if(string.IsNullOrWhiteSpace(Model.IconClass) || Model.UseText)
             {
                 @Model.Text
             }

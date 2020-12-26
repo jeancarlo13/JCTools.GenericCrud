@@ -2,20 +2,22 @@
   <PropertyGroup>
     <AssemblyName>JCTools.GenericCrud</AssemblyName>
     <PackageId>JCTools.GenericCrud</PackageId>
-    
+
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Version>2.0.0-beta1</Version>   
-    
+    <Version>2.0.0-beta1</Version>
+
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
     <NeutralLanguage>en-US</NeutralLanguage>
-    
+
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <Description>Simplification of the Create, Read, Update and Delete pages of the application models.
     v2.0.0-beta1: Refactorización de la colección de tipos CRUD para refinar los métodos para agregarlos al inicio de la aplicación.
     </Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>     
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />

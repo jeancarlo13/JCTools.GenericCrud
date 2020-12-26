@@ -1,6 +1,6 @@
 @using JCTools.GenericCrud.Helpers
 @using Microsoft.AspNetCore.Mvc.Localization
-@model JCTools.GenericCrud.Models.ICrudList
+@model JCTools.GenericCrud.Models.IListModel
 @inject IViewLocalizer Localizer
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
@@ -18,75 +18,72 @@
         Model.NewAction.OnClientClick = "genericCrud.showModal.call(this)";
         Model.DetailsAction.OnClientClick = Model.NewAction.OnClientClick;
         Model.EditAction.OnClientClick = Model.NewAction.OnClientClick;
-        Model.DeleteAction.OnClientClick = Model.NewAction.OnClientClick;        
+        Model.DeleteAction.OnClientClick = Model.NewAction.OnClientClick;
     }
 }
 
 <h2>@Model.Title</h2>
 <h3>@Model.Subtitle</h2>
-@if (!string.IsNullOrWhiteSpace(Model.Message))
-{
-    <div class="alert @(Model.MessageClass) alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-        @Model.Message
-    </div>
-}
-<table class="table table-striped table-condensed table-hover">
-    <thead>
-        <tr>
-            @foreach(var title in Model.Columns)
-            {
-                <th>@title</th>
-            }
-            @if(Model.ActionsColumnIsVisible)
-            {
-                <th class="text-center">
-                    @Html.Partial("_action", Model.NewAction)
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            var data = Model.GetData().ToList();
-            var rows = Model.GetModelValues().ToList();
-            for(var i = 0; i < rows.Count(); i++)
-            {
-                var row = rows[i];            
-                var isSelected = row.FirstOrDefault(v => v.Name == Model.KeyPropertyName)?.Value.Equals( Model.GetId());
-                var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
-                <tr @Html.Raw(classAttribute) >
-                    @foreach(var value in row)
-                    {
-                        if (value.Visible)
+    @if (Model.Message != null && !string.IsNullOrWhiteSpace(Model.Message.Text))
+    {
+        <div class="alert @(Model.Message.CssClass) alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+            @Model.Message.Text
+        </div>
+    }
+    <table class="table table-striped table-condensed table-hover">
+        <thead>
+            <tr>
+                @foreach (var title in Model.Columns)
+                {
+                    <th>@title</th>
+                }
+                @if (Model.ShowActionsColumns)
+                {
+                    <th class="text-center">
+                        @Html.Partial("_action", Model.NewAction)
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var entities = Model.GetData();
+                foreach (var item in entities)
+                {
+                    var key = item.GetKeyValue();
+                    var isSelected = key?.Equals(Model.GetId());
+                    var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
+
+                    <tr @Html.Raw(classAttribute)>
+                        @foreach (var property in item.VisibleProperties)
                         {
-                            if (value.UseCustomView){
-                                <td>
-                                    @await RenderingServices.RenderViewFor(Model, Html, ViewData, value.Name, data[i])
-                                </td>
-                            }else {
-                                <td>@value.Value</td>
+                            if (property.UseCustomView)
+                            {
+                                <td>@await RenderingServices.RenderViewFor(Model, Html, ViewData, property.Name, item.GetEntity())</td>
+                            }
+                            else
+                            {
+                                <td>@item.GetPropertyValue(property)</td>
                             }
                         }
-                    }
-                    @if(Model.ActionsColumnIsVisible)
-                    {
-                        <td class="text-center">
-                            @{
-                                var value = row.FirstOrDefault(d => d.Name == Model.KeyPropertyName).Value;
-                                Model.DetailsAction.Url = Url.Action("Details", new { id = value });
-                                Model.EditAction.Url = Url.Action("Edit", new { id = value });
-                                Model.DeleteAction.Url = Url.Action("Delete", new { id = value });
-                            }
-                            @Html.Partial("_action", Model.DetailsAction)
-                            @Html.Partial("_action", Model.EditAction)
-                            @Html.Partial("_action", Model.DeleteAction)
-                        </td>
-                    }
-                </tr>
+                        @if (Model.ShowActionsColumns)
+                        {
+                            <td class="text-center">
+                                @{
+                                    Model.DetailsAction.Url = Url.Action("Details", new { id = key });
+                                    Model.EditAction.Url = Url.Action("Edit", new { id = key });
+                                    Model.DeleteAction.Url = Url.Action("Delete", new { id = key });
+                                }
+                                @Html.Partial("_action", Model.DetailsAction)
+                                @Html.Partial("_action", Model.EditAction)
+                                @Html.Partial("_action", Model.DeleteAction)
+                            </td>
+                        }
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
-<script src="@(Url.Action("GetScript", new { fileName = "genericCrud"}))"></script>
+    <script src="@(Url.Action("GetScript", new { fileName = "genericCrud"}))"></script>

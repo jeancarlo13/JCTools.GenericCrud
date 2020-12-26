@@ -16,7 +16,7 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The entity to be displayed to the user
         /// </summary>
-        public IBase Model { get; set; }
+        public IViewModel Model { get; set; }
         /// <summary>
         /// The view to be used for display the entity data to the user
         /// </summary>

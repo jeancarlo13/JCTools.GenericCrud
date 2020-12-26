@@ -1,15 +1,15 @@
 @using JCTools.GenericCrud.Helpers
 @using Microsoft.AspNetCore.Mvc.Localization
-@model JCTools.GenericCrud.Models.ICrudDetails
+@model JCTools.GenericCrud.Models.IDetailsModel
 @inject IViewLocalizer Localizer
 
 @{
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
-    var values = @Model.GetModelValues();
-    
+    var entity = @Model.GetData();
+
     Model.IndexAction.Url = Url.Action("Index");
-    Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() } );
+    Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() });
 }
 @if (!Model.UseModals)
 {
@@ -18,29 +18,26 @@
 }
 <div class="row">
     <dl class="dl-horizontal">
-        @foreach(var value in values)
+        @foreach (var property in entity.VisibleProperties)
         {
-            if (value.Visible)
-            {
-                <dt>
-                    @value.Display
-                </dt>
-                <dd>
-                    @value.Value
-                </dd>
-            }
+            <dt>
+                @property
+            </dt>
+            <dd>
+                @entity.GetPropertyValue(property)
+            </dd>
         }
     </dl>
 </div>
 @if (!Model.UseModals)
 {
     <div class="row">
-        <div class="col-md-12">
-            @Html.Partial("_action", Model.IndexAction)
-            @if (ViewBag.IsDelete == true)
-            {
-                @Html.Partial("_action", Model.DeleteAction)
-            }
+    <div class="col-md-12">
+        @Html.Partial("_action", Model.IndexAction)
+        @if (ViewBag.IsDelete == true)
+        {
+            @Html.Partial("_action", Model.DeleteAction)
+        }
         </div>
     </div>
 }
