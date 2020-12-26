@@ -26,12 +26,23 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The data of all properties of the entity to be used in the CRUD views 
         /// </summary>
-        public IEnumerable<PropertyData> Properties { get; }
+        public readonly IEnumerable<PropertyData> _allProperties;
 
         /// <summary>
-        /// The data of the visible properties of the entity to be used in the CRUD views 
+        /// The data of the user visible properties of the entity to be used in the CRUD views 
         /// </summary>
-        public IEnumerable<PropertyData> VisibleProperties { get; }
+        public IEnumerable<PropertyData> VisibleProperties
+        {
+            get => _allProperties.Where(p => p.IsVisible).ToArray();
+        }
+
+        /// <summary>
+        /// The data of the no user visible properties of the entity to be used in the CRUD views 
+        /// </summary>
+        public IEnumerable<PropertyData> NoVisibleProperties
+        {
+            get => _allProperties.Where(p => !p.IsVisible).ToArray();
+        }
 
         /// <summary>
         /// Initialize the instance
@@ -43,8 +54,7 @@ namespace JCTools.GenericCrud.Models
         internal EntityData(TModel entity, ICrudType crudType, IStringLocalizer localizer)
         {
             _entity = entity;
-            Properties = crudType.GetProperties(localizer, includeNoVisibleColumns: true);
-            VisibleProperties = Properties.Where(p => p.IsVisible);
+            _allProperties = crudType.GetProperties(localizer, includeNoVisibleColumns: true);
             _KeyValue = entity == null ? default(TKey) : (TKey)crudType.GetKeyPropertyValue(entity);
         }
 

@@ -1,4 +1,4 @@
-@using JCTools.GenericCrud.Helpers
+@using JCTools.GenericCrud.Models
 @using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.IDetailsModel
 @inject IViewLocalizer Localizer
@@ -31,7 +31,7 @@
     <div class="row">
     <div class="col-md-12">
         @Html.Partial("_action", Model.IndexAction)
-        @if (ViewBag.IsDelete == true)
+        @if (Model.CurrentProcess == CrudProcesses.Delete)
         {
             @Html.Partial("_action", Model.DeleteAction)
         }

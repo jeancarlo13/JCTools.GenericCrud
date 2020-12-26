@@ -156,27 +156,24 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        public virtual async Task<IActionResult> Details(TKey id)
-        {
-            var entity = await DbContext.Set<TModel>().FindAsync(id);
-
-            if (entity == null)
-                return NotFound();
-
-            var model = Settings as IDetailsModel;
-            model.SetData(entity);
-
-            model.CurrentProcess = CrudProcesses.Details;
-            return await RenderView(nameof(Details), model);
-        }
-
+        public virtual Task<IActionResult> Details(TKey id)
+            => ShowDetailsAsync(id);
 
         /// <summary>
         /// Allows render the delete view
         /// </summary>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        public virtual async Task<IActionResult> Delete(TKey id)
+        public virtual Task<IActionResult> Delete(TKey id)
+            => ShowDetailsAsync(id, isForDeletion: true);
+
+        /// <summary>
+        /// Allows render the details view
+        /// </summary>
+        /// <param name="id">The id of the entity to show into the view</param>
+        /// <param name="isForDeletion">True if the view will used for delete the related entity; another, false</param>
+        /// <returns>The task to be invoked</returns>
+        private async Task<IActionResult> ShowDetailsAsync(TKey id, bool isForDeletion = false)
         {
             var entity = await DbContext.Set<TModel>().FindAsync(id);
 
@@ -186,14 +183,8 @@ namespace JCTools.GenericCrud.Controllers
             var model = Settings as IDetailsModel;
             model.SetData(entity);
 
-            ViewBag.IsDelete = true;
-
-            model.DeleteAction.Url = Url.Action(nameof(DeleteConfirm), new { id });
-            if (!model.DeleteAction.UseModals)
-                model.DeleteAction.UseText = true;
-
-            model.CurrentProcess = CrudProcesses.Delete;
-            return await RenderView(nameof(Details), model, model.DeleteAction);
+            model.CurrentProcess = isForDeletion ? CrudProcesses.Delete : CrudProcesses.Details;
+            return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
         }
 
         /// <summary>
@@ -240,9 +231,6 @@ namespace JCTools.GenericCrud.Controllers
         public virtual async Task<IActionResult> Create()
         {
             var model = Settings as IEditModel;
-            model.SaveAction.Url = Url.Action(nameof(Save));
-            ViewBag.Action = model.SaveAction.Url;
-
             model.CurrentProcess = CrudProcesses.Create;
             return await RenderView(nameof(Edit), model, model.SaveAction);
         }
@@ -316,9 +304,6 @@ namespace JCTools.GenericCrud.Controllers
         {
             var model = Settings as IEditModel;
             model.SetData(entity);
-            model.SaveAction.Url = Url.Action(nameof(SaveChangesAsync), new { id = id });
-
-            ViewBag.Action = model.SaveAction.Url;
 
             model.CurrentProcess = CrudProcesses.Edit;
             return await RenderView(nameof(Edit), model, model.SaveAction);
@@ -333,6 +318,7 @@ namespace JCTools.GenericCrud.Controllers
         public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm] TModel model)
         {
             var key = (TKey)Settings.GetKeyPropertyValue(model);
+            // TODO: review when is editable the key/id field
             if (!id.Equals(key))
                 return NotFound();
 

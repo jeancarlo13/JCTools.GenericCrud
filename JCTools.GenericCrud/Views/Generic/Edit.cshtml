@@ -8,35 +8,33 @@
     ViewData["Title"] = Model.Title;
     var entity = @Model.GetData();
 }
+
 @if (!Model.UseModals)
 {
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
 }
 <div class="row">
-    <form action="@(Model.UseModals ? "" : ViewBag.Action)" method="POST" asp-anti-forgery="true">
-        @foreach (var property in entity.Properties)
+    <form action="@Model.SaveAction.Url" method="POST" asp-anti-forgery="true">
+        @foreach (var property in entity.NoVisibleProperties)
         {
-            if (property.IsVisible)
-            {
-                <div class="form-group row">
-                    @if (property.UseCustomView)
-                    {
-                        @await RenderingServices.RenderEditViewFor(Model, Html, ViewData, property.Name)
-                    }
-                    else
-                    {
-                        <label class="col-md-2 text-right" for="@property.Name">@property</label>
-                        <div class="col-md-10">
-                            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
-                        </div>
-                    }
-                </div>
-            }
-            else
-            {
-                @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name, "HiddenFor")
-            }
+            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name, "HiddenFor")
+        }
+        @foreach (var property in entity.VisibleProperties)
+        {
+            <div class="form-group row">
+                @if (property.UseCustomView)
+                {
+                    @await RenderingServices.RenderEditViewFor(Model, Html, ViewData, property.Name)
+                }
+                else
+                {
+                    <label class="col-md-2 text-right" for="@property.Name">@property</label>
+                    <div class="col-md-10">
+                        @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
+                    </div>
+                }
+            </div>
         }
         @if (!Model.UseModals)
         {

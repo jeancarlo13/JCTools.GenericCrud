@@ -7,15 +7,15 @@ namespace JCTools.GenericCrud.Models
     /// </summary>
     public interface IEntityData
     {
-        /// <summary>
-        /// The data of all properties of the entity to be used in the CRUD views 
-        /// </summary>
-        IEnumerable<PropertyData> Properties { get; }
-
         // <summary>
         /// The data of the visible properties of the entity to be used in the CRUD views 
         /// </summary>
         IEnumerable<PropertyData> VisibleProperties { get; }
+
+        /// <summary>
+        /// The data of the no user visible properties of the entity to be used in the CRUD views 
+        /// </summary>
+        IEnumerable<PropertyData> NoVisibleProperties { get; }
 
         /// <summary>
         /// Provides access to the real entity 

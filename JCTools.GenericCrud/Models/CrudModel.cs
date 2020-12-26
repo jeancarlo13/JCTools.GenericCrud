@@ -228,9 +228,13 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Save?.IconClass
                             ?? ActionOptions.DefaultSave.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Save?.ButtonClass
-                            ?? ActionOptions.DefaultSave.ButtonClass,
-                        Url = _urlHelper.Action("SaveChanges")
+                            ?? ActionOptions.DefaultSave.ButtonClass
                     };
+
+                if (CurrentProcess == CrudProcesses.Create)
+                    _saveAction.Url = _urlHelper.Action("Save");
+                else if (CurrentProcess == CrudProcesses.Edit)
+                    _saveAction.Url = _urlHelper.Action("SaveChangesAsync", new { id = _modelId });
 
                 return _saveAction;
             }
@@ -324,22 +328,27 @@ namespace JCTools.GenericCrud.Models
             get
             {
                 if (_deleteAction == null)
+                {
                     _deleteAction = new CrudAction()
                     {
                         Visible = Configurator.Options?.AllowEditionAction ?? true,
                         Caption = _localizer.GetLocalizedString(
-                            "GenericCrud.List.Delete.Caption",
-                            "Delete of the {0}",
-                            GetModelType().Name.ToLower()
-                        ),
+                           "GenericCrud.List.Delete.Caption",
+                           "Delete of the {0}",
+                           GetModelType().Name.ToLower()
+                       ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Delete.Text", "Delete"),
                         IconClass = Configurator.Options?.Actions?.Delete?.IconClass
-                            ?? ActionOptions.DefaultDelete.IconClass,
+                           ?? ActionOptions.DefaultDelete.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Delete?.ButtonClass
-                            ?? ActionOptions.DefaultDelete.ButtonClass,
+                           ?? ActionOptions.DefaultDelete.ButtonClass,
                         OnClientClick = _onActionClickScript,
-                        Url = _urlHelper.Action("DeleteConfirm", new { id = _modelId })
+                        Url = _urlHelper.Action("DeleteConfirm", new { id = _modelId }),
                     };
+
+                    if (!_deleteAction.UseModals)
+                        _deleteAction.UseText = true;
+                }
 
                 return _deleteAction;
             }
