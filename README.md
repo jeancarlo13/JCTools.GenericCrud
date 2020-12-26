@@ -16,11 +16,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
 ```bash
-Install-Package JCTools.GenericCrud -Version 1.0.2
-
+Install-Package JCTools.GenericCrud -Version 2.0.0
+```
 Or
-
-dotnet add package JCTools.GenericCrud --version 1.0.2
+```bash
+dotnet add package JCTools.GenericCrud --version 2.0.0
 ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
 ```cs
@@ -84,6 +84,19 @@ namespace Test.Controllers
 ```
 3. Run to app and access at the url **http://localhost:5000/Movie**,
 
+## Changes of the version 2.0.0
+* The follows interfaces was replaced for a best definition and structure:
+  * IBase -> IViewModel
+  * IBaseDetails, ICrudDetails -> IDetailsModel
+  * ICrudEdit -> IEditModel
+  * ICrudList -> IIndexModel
+* The follows models was replaced by the **CrudModel** class
+  * Base
+  * CrudDetails
+  * CrudEdit
+  * CrudList
+* The **IControllerOptions** interface and **ControllerOptions** class was removed for being unnecessary in the new structure
+* The extensors methods **GetLocalizedString(...)** for the **IStringLocalizer** interfaces was moved to the **StringLocalizerExtensors** class
 
 ## License
 [MIT License](LICENSE)
