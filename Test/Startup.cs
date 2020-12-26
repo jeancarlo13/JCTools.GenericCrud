@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using Askmethat.Aspnet.JsonLocalizer.Extensions;
 using JCTools.GenericCrud;
 using Microsoft.AspNetCore.Builder;
@@ -65,7 +61,7 @@ namespace Test
 
             services.AddGenericCrud<Data.Context>(o =>
             {
-                o.UseModals = false;
+                o.UseModals = true;
                 o.Models.Add<Models.Country>();
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
                 o.Models.Add<Models.Movie, int, MovieController, Data.Context>();

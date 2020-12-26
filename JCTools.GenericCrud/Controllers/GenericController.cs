@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace JCTools.GenericCrud.Controllers
 {
@@ -47,6 +48,10 @@ namespace JCTools.GenericCrud.Controllers
         /// The instance of <see cref="ILogger"/> used for send to log the message of the controller
         /// </summary>
         private readonly ILogger _logger;
+        /// <summary>
+        /// The CRUD type to be used for configure the instance
+        /// </summary>
+        private readonly ICrudType _crudType;
 
         /// <summary>
         /// Create an instace of the controller with the specific parameter
@@ -57,7 +62,7 @@ namespace JCTools.GenericCrud.Controllers
             IServiceProvider serviceProvider,
             ICrudType crud
         ) : this(serviceProvider)
-            => Settings = new CrudModel<TModel, TKey>(crud, _localizer);
+            => _crudType = crud;
 
         /// <summary>
         /// Create an instace of the controller with the specific parameter
@@ -68,7 +73,8 @@ namespace JCTools.GenericCrud.Controllers
             IServiceProvider serviceProvider,
             string keyPropertyName = "Id"
         ) : this(serviceProvider)
-            => Settings = new CrudModel<TModel, TKey>(keyPropertyName, _localizer);
+            => _crudType = Configurator.Options.Models[typeof(TModel), keyPropertyName]
+                ?? throw new ArgumentException($"No found CRUD type related to the model \"{typeof(TModel).FullName}\" and the key \"{keyPropertyName}\".");
 
         /// <summary>
         /// Initialize an instace of the controller with the required services
@@ -85,6 +91,31 @@ namespace JCTools.GenericCrud.Controllers
             _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer;
             _logger = (serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory)
                 .CreateLogger<GenericController<TContext, TModel, TKey>>();
+        }
+
+        /// <summary>
+        /// Called before the action method is invoked. 
+        /// It's required for the <see cref="Settings"/> property initialization
+        /// </summary>
+        /// <param name="filterContext">The action executing context.</param>
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            Settings = Settings ?? new CrudModel<TModel, TKey>(_crudType, _localizer, Url);
+            base.OnActionExecuting(filterContext);
+        }
+        /// <summary>
+        /// Called before the action method is invoked. 
+        /// It's required for the <see cref="Settings"/> property initialization
+        /// </summary>
+        /// <param name="context">The action executing context.</param>
+        /// <param name="next">The <see cref="ActionExecutionDelegate"/> to execute. Invoke
+        /// this delegate in the body of <see cref="Controller.OnActionExecutionAsync(ActionExecutingContext,ActionExecutionDelegate)"/>
+        /// to continue execution of the action.</param>
+        /// <returns>A <see cref="Task"/> instance.</returns>
+        public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            Settings = Settings ?? new CrudModel<TModel, TKey>(_crudType, _localizer, Url);
+            return base.OnActionExecutionAsync(context, next);
         }
 
         /// <summary>

@@ -1,4 +1,3 @@
-@using JCTools.GenericCrud.Helpers
 @using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.IIndexModel
 @inject IViewLocalizer Localizer
@@ -7,19 +6,6 @@
 @{
     Layout = Model.LayoutPage;
     ViewData["Title"] = Model.Title;
-
-    Model.NewAction.Url = Url.Action("Create");
-    Model.NewAction.UseModals = Model.UseModals;
-    Model.DetailsAction.UseModals = Model.UseModals;
-    Model.EditAction.UseModals = Model.UseModals;
-    Model.DeleteAction.UseModals = Model.UseModals;
-    if (Model.UseModals)
-    {
-        Model.NewAction.OnClientClick = "genericCrud.showModal.call(this)";
-        Model.DetailsAction.OnClientClick = Model.NewAction.OnClientClick;
-        Model.EditAction.OnClientClick = Model.NewAction.OnClientClick;
-        Model.DeleteAction.OnClientClick = Model.NewAction.OnClientClick;
-    }
 }
 
 <h2>@Model.Title</h2>

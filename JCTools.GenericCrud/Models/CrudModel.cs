@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Settings;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Models
@@ -17,13 +18,18 @@ namespace JCTools.GenericCrud.Models
         where TModel : class, new()
     {
         /// <summary>
+        /// The js function to invoked when the user required a CRUD action and use modals
+        /// </summary>
+        private const string _onActionClickScript = "genericCrud.showModal.call(this)";
+
+        /// <summary>
         /// The pattern of the localized string to be used for the subtitle property
         /// </summary>
-        private string _subtitleI18NKey = "GenericCrud.{0}.Subtitle";
+        private const string _subtitleI18NKey = "GenericCrud.{0}.Subtitle";
         /// <summary>
         /// The CRUD type to be used for configure the instance
         /// </summary>
-        private ICrudType _crudType;
+        private readonly ICrudType _crudType;
 
         /// <summary>        
         /// The entire data of all entities to be displayed into the view
@@ -33,13 +39,17 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The Id/Key of the related entity to the data to be displayed into the view
         /// </summary>
-        private TKey _id;
+        private TKey _modelId;
 
         /// <summary>
         /// The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view
         /// </summary>
-        private IStringLocalizer _localizer;
+        private readonly IStringLocalizer _localizer;
+        /// <summary>
+        /// The <see cref="IUrlHelper"/> instance to use to generate the action urls
+        /// </summary>
+        private readonly IUrlHelper _urlHelper;
 
         /// <summary>
         /// The process where the current instance to be used
@@ -54,6 +64,7 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// True for use modal for the crud actions; False (default) for use separated pages
         /// </summary>
+        /// <remarks>Required Bootstrap v3.3.7 &gt;= version &lt; v4.0.0</remarks>
         public bool UseModals { get; set; } = Configurator.Options.UseModals;
 
         /// <summary>
@@ -142,7 +153,8 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Index?.IconClass
                             ?? ActionOptions.DefaultIndex.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Index?.ButtonClass
-                            ?? ActionOptions.DefaultIndex.ButtonClass
+                            ?? ActionOptions.DefaultIndex.ButtonClass,
+                        Url = _urlHelper.Action("Index")
                     };
 
                 return _indexAction;
@@ -178,7 +190,9 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.New?.IconClass
                             ?? ActionOptions.DefaultNew.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.New?.ButtonClass
-                            ?? ActionOptions.DefaultNew.ButtonClass
+                            ?? ActionOptions.DefaultNew.ButtonClass,
+                        OnClientClick = _onActionClickScript,
+                        Url = _urlHelper.Action("Create")
                     };
 
                 return _newAction;
@@ -214,7 +228,8 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Save?.IconClass
                             ?? ActionOptions.DefaultSave.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Save?.ButtonClass
-                            ?? ActionOptions.DefaultSave.ButtonClass
+                            ?? ActionOptions.DefaultSave.ButtonClass,
+                        Url = _urlHelper.Action("SaveChanges")
                     };
 
                 return _saveAction;
@@ -247,7 +262,8 @@ namespace JCTools.GenericCrud.Models
                         ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Details.Text", "Details"),
                         IconClass = Configurator.Options?.Actions?.Details?.IconClass ?? ActionOptions.DefaultDetails.IconClass,
-                        ButtonClass = Configurator.Options?.Actions?.Details?.ButtonClass ?? ActionOptions.DefaultDetails.ButtonClass
+                        ButtonClass = Configurator.Options?.Actions?.Details?.ButtonClass ?? ActionOptions.DefaultDetails.ButtonClass,
+                        OnClientClick = _onActionClickScript
                     };
 
                 return _detailsAction;
@@ -283,7 +299,9 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Edit?.IconClass
                             ?? ActionOptions.DefaultEdit.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Edit?.ButtonClass
-                            ?? ActionOptions.DefaultEdit.ButtonClass
+                            ?? ActionOptions.DefaultEdit.ButtonClass,
+                        OnClientClick = _onActionClickScript,
+                        UseSubmit = true
                     };
 
                 return _editAction;
@@ -318,7 +336,9 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Delete?.IconClass
                             ?? ActionOptions.DefaultDelete.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Delete?.ButtonClass
-                            ?? ActionOptions.DefaultDelete.ButtonClass
+                            ?? ActionOptions.DefaultDelete.ButtonClass,
+                        OnClientClick = _onActionClickScript,
+                        Url = _urlHelper.Action("DeleteConfirm", new { id = _modelId })
                     };
 
                 return _deleteAction;
@@ -332,8 +352,9 @@ namespace JCTools.GenericCrud.Models
         /// <param name="keyPropertyName">The name of the Id/Key property</param>
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
-        public CrudModel(string keyPropertyName, IStringLocalizer localizer)
-            : this(Configurator.Options.Models[typeof(TModel), keyPropertyName], localizer)
+        /// <param name="urlHelper">The <see cref="IUrlHelper"/> instance to use to generate the action urls</param>
+        public CrudModel(string keyPropertyName, IStringLocalizer localizer, IUrlHelper urlHelper)
+            : this(Configurator.Options.Models[typeof(TModel), keyPropertyName], localizer, urlHelper)
         { }
 
         /// <summary>
@@ -342,7 +363,8 @@ namespace JCTools.GenericCrud.Models
         /// <param name="crud">The CRUD type to be used for configure the instance</param>
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
-        internal CrudModel(ICrudType crud, IStringLocalizer localizer)
+        /// <param name="urlHelper">The <see cref="IUrlHelper"/> instance to use to generate the action urls</param>
+        internal CrudModel(ICrudType crud, IStringLocalizer localizer, IUrlHelper urlHelper)
         {
             if (crud is null)
                 throw new ArgumentNullException(
@@ -351,7 +373,7 @@ namespace JCTools.GenericCrud.Models
                 );
 
             _localizer = localizer;
-
+            _urlHelper = urlHelper;
             _crudType = crud;
 
             _data = Enumerable.Empty<TModel>();
@@ -400,7 +422,7 @@ namespace JCTools.GenericCrud.Models
             if (model is TModel instance)
             {
                 _data = new List<TModel>() { instance as TModel };
-                _id = (TKey)_crudType.GetKeyPropertyValue(instance);
+                _modelId = (TKey)_crudType.GetKeyPropertyValue(instance);
             }
             else
                 throw new ArgumentException($"The provided object model is not a \"{typeof(TModel)}\" instance.");
@@ -426,7 +448,7 @@ namespace JCTools.GenericCrud.Models
         public void SetData(IEnumerable<object> data)
         {
             _data = data.OfType<TModel>().ToList();
-            _id = default(TKey);
+            _modelId = default(TKey);
         }
 
         /// <summary>
@@ -434,13 +456,13 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <returns>The found value</returns>
         public object GetId()
-            => _id;
+            => _modelId;
 
         /// <summary>
         /// Allows set/change the Id/Key property value of the entity to be displayed into the view
         /// </summary>
         /// <param name="id">The Id/Key property value to be set</param>
-        public void SetId(object id) => _id = (TKey)id;
+        public void SetId(object id) => _modelId = (TKey)id;
 
         /// <summary>
         /// Allows get the Key/Id property value of the specific instance

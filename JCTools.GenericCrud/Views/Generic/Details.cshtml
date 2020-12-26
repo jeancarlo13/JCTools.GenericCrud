@@ -7,9 +7,6 @@
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var entity = @Model.GetData();
-
-    Model.IndexAction.Url = Url.Action("Index");
-    Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() });
 }
 @if (!Model.UseModals)
 {

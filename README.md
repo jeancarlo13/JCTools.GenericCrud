@@ -1,6 +1,4 @@
 # JCTools.GenericCrud
-![v2.0.0-beta1](https://img.shields.io/badge/nuget-v2.0.0%20beta1-blue)
-![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green)
 
 Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete pages of the application models.
 
@@ -11,6 +9,16 @@ All application required multiple pages for edited the base models. This pages g
 This package allows reduce this task at minimum of actions.
 
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
+
+## Status
+![v2.0.0-beta1](https://img.shields.io/badge/nuget-v2.0.0%20beta1-blue)
+
+## Requirements
+![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green)
+
+![.net core 2.1](https://img.shields.io/badge/.bootstrap-v3.3.7-blue)
+
+The bootstrap v4.0.0 and highers are unsupported
 
 ## Usage
 
@@ -77,13 +85,33 @@ namespace Test.Controllers
         public MovieController(IServiceProvider serviceProvider) 
         : base(serviceProvider)
         { 
+            // Add your custom process, eg;
             Settings.UseModals = false;
         }
     }
 }
 ```
-3. Run to app and access at the url **http://localhost:5000/Movie**,
 
+3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
+
+```cs
+    //...
+    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    {        
+        base.OnActionExecuting(filterContext);
+        // Add your custom process here
+
+    }
+    
+    public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        // Add your custom process here
+        return base.OnActionExecutionAsync(context, next);
+    }
+    //...
+```
+
+4. Run to app and access at the url **http://localhost:5000/Movie**,
 ## Changes of the version 2.0.0
 * The follows interfaces was replaced for a best definition and structure:
   * IBase -> IViewModel

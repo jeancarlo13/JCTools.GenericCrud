@@ -21,6 +21,7 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// True for use modal for the crud actions; False (default) for use separated pages
         /// </summary>
+        /// <remarks>Required Bootstrap v3.3.7 &gt;= version &lt; v4.0.0</remarks>
         bool UseModals { get; set; }
 
         /// <summary>

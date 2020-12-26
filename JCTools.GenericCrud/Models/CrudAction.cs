@@ -23,7 +23,8 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// True if the related CRUD use bootstrap modals
         /// </summary>
-        public bool UseModals { get; set; } = false;
+        /// <remarks>Required Bootstrap v3.3.7 &gt;= version &lt; v4.0.0</remarks>
+        public bool UseModals { get; set; }
         /// <summary>
         /// True if is desired that use text for represent the action;
         /// Another, false
@@ -37,5 +38,11 @@ namespace JCTools.GenericCrud.Models
         /// The js function to invoke when the user press the action
         /// </summary>
         public string OnClientClick { get; set; }
+
+        /// <summary>
+        /// Initialize the instance with the correctly user settings
+        /// </summary>
+        public CrudAction()
+            => UseModals = Configurator.Options.UseModals;
     }
 }

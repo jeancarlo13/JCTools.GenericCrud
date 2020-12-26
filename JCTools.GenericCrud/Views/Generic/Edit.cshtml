@@ -1,5 +1,3 @@
-@using JCTools.GenericCrud.Helpers
-
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 @using Microsoft.AspNetCore.Mvc.Localization
 @model JCTools.GenericCrud.Models.IEditModel
@@ -9,10 +7,6 @@
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var entity = @Model.GetData();
-
-    Model.IndexAction.Url = Url.Action("Index");
-    Model.SaveAction.UseSubmit = true;
-    Model.SaveAction.Url = Url.Action("SaveChanges");
 }
 @if (!Model.UseModals)
 {

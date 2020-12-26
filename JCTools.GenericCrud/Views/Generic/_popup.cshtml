@@ -3,31 +3,28 @@
 @inject IViewLocalizer Localizer
 
 <div class="modal fade" tabindex="-1" role="dialog" id="genericCrudModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" 
-                aria-label="@Localizer["GenericCrud.ClosePopup"]" title="@Localizer["GenericCrud.ClosePopup"]">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title">@Model.Title</h4>
-        </div>
-        <div class="modal-body">
-            <div class="container-fluid">
-                @Html.Partial(Model.InnerView, Model.Model)
-                
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                    aria-label="@Localizer["GenericCrud.ClosePopup"]" title="@Localizer["GenericCrud.ClosePopup"]">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">@Model.Title</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    @Html.Partial(Model.InnerView, Model.Model)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default btn-sm"
+                    data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
+                @if (Model.CommitAction != null)
+                {
+                    @Html.Partial("_action", Model.CommitAction)
+                }
             </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
-            @if (Model.CommitAction != null)
-            {
-                Model.CommitAction.UseModals = true;
-                Model.CommitAction.UseText = true;
-                Model.CommitAction.OnClientClick = "genericCrud.executeCommitAction.call(this)";
-                @Html.Partial("_action", Model.CommitAction)
-            }
-        </div>
     </div>
-  </div>
 </div>
