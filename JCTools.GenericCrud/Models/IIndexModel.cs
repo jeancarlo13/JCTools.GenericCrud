@@ -42,13 +42,13 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         CrudAction DeleteAction { get; set; }
 
-        
+
         /// <summary>
         /// Allows get the entire data of all entities to be displayed into the view
         /// </summary>
         /// <returns>The stored data</returns>
-        IEnumerable<IEntityData> GetData();
-        
+        IEnumerable<IEntityData> GetCollectionData();
+
         /// <summary>
         /// Sets a collection of entities to be displayed into the view
         /// </summary>

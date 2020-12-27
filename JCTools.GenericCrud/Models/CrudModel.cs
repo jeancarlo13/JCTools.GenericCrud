@@ -441,7 +441,7 @@ namespace JCTools.GenericCrud.Models
         /// Allows get the entire data of all entities to be displayed into the view
         /// </summary>
         /// <returns>The stored data</returns>
-        IEnumerable<IEntityData> IIndexModel.GetData()
+        public IEnumerable<IEntityData> GetCollectionData()
         {
             var data = _data is IEnumerable<TModel> enumerated
                  ? enumerated

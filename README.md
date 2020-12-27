@@ -1,6 +1,6 @@
 # JCTools.GenericCrud
 
-Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete pages of the application models.
+Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages of the application models.
 
 ## Overview
 

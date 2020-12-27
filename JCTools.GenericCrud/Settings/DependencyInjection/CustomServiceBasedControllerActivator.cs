@@ -32,7 +32,7 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             var controllerType = actionContext.ActionDescriptor.ControllerTypeInfo.AsType();
             return actionContext.HttpContext.RequestServices.GetRequiredService(controllerType);
         }
-        
+
         /// <summary>
         ///  Releases a controller.
         /// </summary>

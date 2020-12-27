@@ -10,10 +10,9 @@ namespace JCTools.GenericCrud.Models
     /// </summary>
     public class PropertyData
     {
-        /// /// </summary>
         /// <summary>
         /// The attribute data of the represented property
-        /// <value></value>
+        /// </summary>
         private readonly PropertyInfo _info;
 
         /// <summary>

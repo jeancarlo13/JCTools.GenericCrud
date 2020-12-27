@@ -1,5 +1,8 @@
 namespace JCTools.GenericCrud.Models
 {
+    /// <summary>
+    /// Defines the actions buttons/icons of the CRUDs
+    /// </summary>
     public class CrudAction : BaseAction
     {
         /// <summary>

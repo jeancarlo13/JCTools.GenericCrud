@@ -34,7 +34,7 @@
         </thead>
         <tbody>
             @{
-                var entities = Model.GetData();
+                var entities = Model.GetCollectionData();
                 foreach (var item in entities)
                 {
                     var key = item.GetKeyValue();
