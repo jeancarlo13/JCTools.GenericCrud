@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JCTools.GenericCrud", "JCTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{D3152510-C205-4FD1-BDC6-3D6B51A3354F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test3.1", "Test3.1\Test3.1.csproj", "{800551C4-2D18-4694-A348-B104335D69DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{D3152510-C205-4FD1-BDC6-3D6B51A3354F}.Release|x64.Build.0 = Release|Any CPU
 		{D3152510-C205-4FD1-BDC6-3D6B51A3354F}.Release|x86.ActiveCfg = Release|Any CPU
 		{D3152510-C205-4FD1-BDC6-3D6B51A3354F}.Release|x86.Build.0 = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|x64.Build.0 = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{800551C4-2D18-4694-A348-B104335D69DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
