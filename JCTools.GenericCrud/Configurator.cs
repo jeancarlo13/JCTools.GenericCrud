@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
+using System.Collections.Generic;
 
 #if NETCOREAPP3_1
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -38,7 +39,10 @@ namespace JCTools.GenericCrud
         /// The type of the database context to be use
         /// </summary>
         internal static Type DatabaseContextType;
-
+        /// <summary>
+        /// The name of the token with the model type of a CRUD
+        /// </summary>
+        internal const string ICrudTypeTokenName = "ICrudType";
         /// <summary>
         /// The name of the token with the model type of a CRUD
         /// </summary>
@@ -119,60 +123,54 @@ namespace JCTools.GenericCrud
 
             return services;
         }
-
-#if NETCOREAPP3_1
-        public static void UseGenericCrud(this IApplicationBuilder app)
+        /// <summary>
+        /// Add the routes of all models related at the cruds
+        /// </summary>
+        /// <param name="toMapAction">The action to invoke for make the correctly route map</param>
+        private static void MapCrudRoutes(Action<Settings.Route, ICrudType> toMapAction)
         {
-            app.Use((context, next) =>
+            var routes = Options.Models
+               .ToList()
+               .Cast<ICrudTypeRoutable>()
+               .SelectMany(ct => Settings.Route.CreateRoutes(ct))
+               .ToList();
+
+            routes.ForEach(r =>
             {
-                var endpointFeature = context.Features[typeof(IEndpointFeature)] as IEndpointFeature;
-                var endpoint = endpointFeature?.Endpoint;
-
-                //note: endpoint will be null, if there was no
-                //route match found for the request by the endpoint route resolver middleware
-                if (endpoint != null)
-                {
-                    var routePattern = (endpoint as RouteEndpoint)?.RoutePattern
-                                                                ?.RawText;
-
-                    Console.WriteLine("Name: " + endpoint.DisplayName);
-                    Console.WriteLine($"Route Pattern: {routePattern}");
-                    Console.WriteLine("Metadata Types: " + string.Join(", ", endpoint.Metadata));
-                }
-                return next();
+                var crudType = r.CrudType as ICrudType;
+                if (crudType != null)
+                    toMapAction(r, crudType);
             });
         }
 
+#if NETCOREAPP3_1   
         /// <summary>
         /// Add the routes of all models related at the cruds
         /// </summary>
         /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the routes to.</param>
         public static void MapCrudRoutes(this IEndpointRouteBuilder endpoints)
         {
-            var routes = Options.Models
-                .ToList()
-                .SelectMany(Settings.Route.CreateRoutes)
-                .ToList();
-
-            routes.ForEach(r => endpoints.MapControllerRoute(
-                    name: r.Name,
-                    pattern: r.Pattern,
+            MapCrudRoutes((route, crudType) =>
+            {
+                endpoints.MapControllerRoute(
+                    name: route.Name,
+                    pattern: route.Pattern,
                     defaults: new
                     {
-                        controller = r.CrudType.ControllerType.Name,
-                        action = r.ActionName
+                        controller = crudType.ControllerType.Name,
+                        action = route.ActionName
                     },
                     constraints: new
                     {
-                        modelType = new CrudRouteConstraint(r.CrudType.ModelType, r.Pattern)
+                        modelType = new CrudRouteConstraint(crudType, route.Pattern)
                     },
                     dataTokens: new RouteValueDictionary()
                     {
-                        { ModelTypeTokenName, r.CrudType.ModelType },
-                        { KeyTokenName, r.CrudType.KeyPropertyName },
-                        { "ICrudType", r.CrudType}
+                        { ModelTypeTokenName, crudType.ModelType },
+                        { KeyTokenName, crudType.KeyPropertyName }
                     }
-                ));
+                );
+            });
         }
 #elif NETCOREAPP2_1
         /// <summary>
@@ -181,28 +179,28 @@ namespace JCTools.GenericCrud
         /// <param name="routes">the application route collection</param>
         public static void MapCrudRoutes(this IRouteBuilder routes)
         {
-            Options.Models
-                .ToList()
-                .SelectMany(Settings.Route.CreateRoutes)
-                .ToList()
-                .ForEach(r => routes.MapRoute(
-                    name: r.Name,
-                    template: r.Pattern,
+            MapCrudRoutes((route, crudType) =>
+            {
+                routes.MapRoute(
+                    name: route.Name,
+                    template: route.Pattern,
                     defaults: new
                     {
-                        controller = r.CrudType.ControllerType.Name,
-                        action = r.ActionName
+                        controller = crudType.ControllerType.Name,
+                        action = route.ActionName
                     },
                     constraints: new
                     {
-                        ModelType = new CrudRouteConstraint(r.CrudType.ModelType, r.Pattern)
+                        ModelType = new CrudRouteConstraint(crudType, route.Pattern)
                     },
                     dataTokens: new RouteValueDictionary()
                     {
-                        { ModelTypeTokenName, r.CrudType.ModelType },
-                        { KeyTokenName, r.CrudType.KeyPropertyName }
+                        { ModelTypeTokenName, crudType.ModelType },
+                        { KeyTokenName, crudType.KeyPropertyName },
+                        { ICrudTypeTokenName, crudType }
                     }
-                ));
+                );
+            });
         }
 #endif
     }

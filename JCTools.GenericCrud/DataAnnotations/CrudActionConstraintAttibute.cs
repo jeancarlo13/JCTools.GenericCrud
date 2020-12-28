@@ -1,6 +1,8 @@
 #if NETCOREAPP3_1
 using System;
 using System.Linq;
+using System.Reflection;
+using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
@@ -32,9 +34,13 @@ namespace JCTools.GenericCrud.DataAnnotations
             if (actionDescriptor == null)
                 return false;
 
-            var modelName = context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName];
+            var crudType = context.RouteContext.RouteData.Values[Configurator.ICrudTypeTokenName] as ICrudType;
+            if (crudType == null)
+                return false;
 
-            return actionDescriptor.ControllerTypeInfo.GenericTypeArguments.Any(gt => gt.Name.ToLowerInvariant().Equals(modelName));
+            var accept = actionDescriptor.ControllerTypeInfo.Equals(crudType.ControllerType.GetTypeInfo());
+            
+            return accept;
         }
     }
 }

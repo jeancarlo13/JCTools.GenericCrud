@@ -65,7 +65,7 @@ namespace JCTools.GenericCrud.Settings
     /// Defines the properties required for generate a CRUD of any model
     /// </summary>
     /// <typeparam name="TModel">The type of the model to be used into the CRUD</typeparam>
-    internal class CrudType<TModel> : ICrudType
+    internal class CrudType<TModel> : ICrudType, ICrudTypeRoutable
         where TModel : class, new()
 
     {
@@ -95,6 +95,16 @@ namespace JCTools.GenericCrud.Settings
         /// is <see cref="GenericController{TContext, TModel, TKey}"/>; Another, false
         /// </summary>
         public bool UseGenericController { get; protected set; }
+
+        /// <summary>
+        /// The name of the model type related to the CRUD
+        /// </summary>
+        public string ModelTypeName => ModelType.Name;
+
+        /// <summary>
+        /// Gets or sets the mvc routes
+        /// </summary>
+        public IReadOnlyList<Route> Routes { get; set; }
 
         /// <summary>
         /// Generate a new instance for any model

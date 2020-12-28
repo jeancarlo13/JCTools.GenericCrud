@@ -8,12 +8,12 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
     /// Defines the contract that a class must implement in order to check whether a
     /// URL parameter value is valid for a constraint.
     /// </summary>
-    public class CrudRouteConstraint : IRouteConstraint
+    internal class CrudRouteConstraint : IRouteConstraint
     {
         /// <summary>
-        /// The type of the related model to the route
+        /// The crud type of the related model to the route
         /// </summary>
-        private string _modelType;
+        private ICrudType _crudType;
         /// <summary>
         /// The template that define the route
         /// </summary>
@@ -21,11 +21,11 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         /// <summary>
         /// Initializes the current instance
         /// </summary>
-        /// <param name="modelType">The type of the related model to the route</param>
+        /// <param name="crudType">The CRUD type of the related model to the route</param>
         /// <param name="template">The template that define the route</param>
-        public CrudRouteConstraint(Type modelType, string template)
+        internal CrudRouteConstraint(ICrudType crudType, string template)
         {
-            _modelType = modelType.Name.ToLowerInvariant();
+            _crudType = crudType;
             _template = template;
         }
         /// <summary>
@@ -45,7 +45,13 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             RouteValueDictionary values,
             RouteDirection routeDirection
         )
-            => values[routeKey]?.ToString().ToLowerInvariant().Equals(_modelType) ?? false;
+        {
+            var isMatch = values[routeKey]?.ToString().ToLowerInvariant().Equals(_crudType.ModelType.Name.ToLowerInvariant()) ?? false;
+            if (isMatch && !values.Keys.Contains(Configurator.ICrudTypeTokenName))
+                values[Configurator.ICrudTypeTokenName] = _crudType;
+
+            return isMatch;
+        }
 
     }
 }
