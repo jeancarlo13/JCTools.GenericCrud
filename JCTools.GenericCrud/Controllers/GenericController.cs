@@ -23,6 +23,9 @@ namespace JCTools.GenericCrud.Controllers
     /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
+#if NETCOREAPP3_1
+    [DataAnnotations.CrudActionConstraint]
+#endif
     public class GenericController<TContext, TModel, TKey> : Controller, IGenericController
         where TContext : DbContext
         where TModel : class, new()
@@ -88,7 +91,14 @@ namespace JCTools.GenericCrud.Controllers
                 throw new ArgumentException("Failure generating the database context.");
 
             _renderingService = serviceProvider.GetService(typeof(IViewRenderService)) as IViewRenderService;
-            _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer;
+#if NETCOREAPP2_1
+            _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer
+                ?? throw new ArgumentException($"No found {typeof(IStringLocalizer).Name} services."); 
+#elif NETCOREAPP3_1
+            _localizer = serviceProvider.GetService<IStringLocalizerFactory>().Create(this.GetType())
+                ?? throw new ArgumentException($"No found {typeof(IStringLocalizer).Name} services.");
+#endif
+
             _logger = (serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory)
                 .CreateLogger<GenericController<TContext, TModel, TKey>>();
         }

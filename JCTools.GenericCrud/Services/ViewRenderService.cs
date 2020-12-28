@@ -81,7 +81,12 @@ namespace JCTools.GenericCrud.Services
             IServiceProvider serviceProvider,
             IModelMetadataProvider metadataProvider,
             IActionContextAccessor actionContextAccessor,
-            IHostingEnvironment environmet)
+#if NETCOREAPP2_1
+            IHostingEnvironment environmet
+#elif NETCOREAPP3_1
+            Microsoft.AspNetCore.Hosting.IWebHostEnvironment environmet
+#endif
+        )
         {
             _viewEngine = viewEngine;
             _httpContextAccessor = httpContextAccessor;

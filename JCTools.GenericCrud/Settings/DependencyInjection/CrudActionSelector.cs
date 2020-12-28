@@ -1,3 +1,4 @@
+#if NETCOREAPP2_1
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -303,3 +304,4 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
     }
 
 }
+#endif

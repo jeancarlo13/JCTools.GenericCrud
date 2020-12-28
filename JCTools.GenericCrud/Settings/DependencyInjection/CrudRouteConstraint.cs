@@ -45,7 +45,7 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             RouteValueDictionary values,
             RouteDirection routeDirection
         )
-            => values[routeKey].ToString().ToLowerInvariant().Equals(_modelType);
+            => values[routeKey]?.ToString().ToLowerInvariant().Equals(_modelType) ?? false;
 
     }
 }

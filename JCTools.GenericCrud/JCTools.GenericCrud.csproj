@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>9.0</LangVersion>
@@ -11,14 +10,25 @@
     <PackageId>JCTools.GenericCrud</PackageId>
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.0.0-beta2: Migration to .net core app 3.1
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
-    <Version>2.0.0-beta1</Version>
+    <Version>2.0.0-beta2</Version>
 
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
+    <PackageProjectUrl>https://github.com/jeancarlo13/JCTools.GenericCrud</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jeancarlo13/JCTools.GenericCrud</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"  Version="3.1.10"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
@@ -26,8 +36,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.14" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="2.1.1" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.6" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.7" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Views\Generic\Index.cshtml" />
     <EmbeddedResource Include="Views\Generic\_action.cshtml" />

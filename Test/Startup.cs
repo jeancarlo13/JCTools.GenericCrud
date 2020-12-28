@@ -56,7 +56,7 @@ namespace Test
             });
 
             services.AddDbContext<Data.Context>(builder =>
-                builder.UseSqlite("Data Source=Data/MoviesGallery.db")
+                builder.UseSqlite("Data Source=../Data/MoviesGallery.db")
             );
 
             services.AddGenericCrud<Data.Context>(o =>

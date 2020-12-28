@@ -5,6 +5,28 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Test3.1.dll",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Test3.1.dll",
+            "program": "${workspaceFolder}/Test3.1/bin/Debug/netcoreapp3.1/Test3.1.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Test3.1",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://localhost:5003"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Test3.1/Views"
+            }
+        },
+        
+        {
             "name": "Launch Test.dll",
             "type": "coreclr",
             "request": "launch",
@@ -22,7 +44,7 @@
                 "ASPNETCORE_URLS": "http://localhost:5002"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/Test/Views"
             }
         },
         {

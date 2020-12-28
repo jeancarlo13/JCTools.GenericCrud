@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if NETCOREAPP2_1
 using Microsoft.DotNet.PlatformAbstractions;
+#endif
 
 namespace JCTools.GenericCrud.Helpers
 {
@@ -69,11 +71,11 @@ namespace JCTools.GenericCrud.Helpers
             if (obj == null)
                 return 0;
 
-            var hash = new HashCodeCombiner();
+            var hash = new System.HashCode();
             for (var i = 0; i < obj.Length; i++)
                 hash.Add(obj[i], _valueComparer);
 
-            return hash.CombinedHash;
+            return hash.ToHashCode();
         }
     }
 }
