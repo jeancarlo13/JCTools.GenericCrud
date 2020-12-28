@@ -154,7 +154,7 @@ namespace JCTools.GenericCrud.Models
                             ?? ActionOptions.DefaultIndex.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Index?.ButtonClass
                             ?? ActionOptions.DefaultIndex.ButtonClass,
-                        Url = _urlHelper.Action("Index")
+                        Url = _urlHelper.RouteUrl(Settings.Route.IndexActionName, _crudType as ICrudTypeRoutable)
                     };
 
                 return _indexAction;
@@ -192,7 +192,7 @@ namespace JCTools.GenericCrud.Models
                         ButtonClass = Configurator.Options?.Actions?.New?.ButtonClass
                             ?? ActionOptions.DefaultNew.ButtonClass,
                         OnClientClick = _onActionClickScript,
-                        Url = _urlHelper.Action("Create")
+                        Url = _urlHelper.RouteUrl(Settings.Route.CreateActionName, _crudType as ICrudTypeRoutable)
                     };
 
                 return _newAction;
@@ -232,9 +232,9 @@ namespace JCTools.GenericCrud.Models
                     };
 
                 if (CurrentProcess == CrudProcesses.Create)
-                    _saveAction.Url = _urlHelper.Action("Save");
+                    _saveAction.Url = _urlHelper.RouteUrl(Settings.Route.SaveActionName, _crudType as ICrudTypeRoutable);
                 else if (CurrentProcess == CrudProcesses.Edit)
-                    _saveAction.Url = _urlHelper.Action("SaveChangesAsync", new { id = _modelId });
+                    _saveAction.Url = _urlHelper.RouteUrl(Settings.Route.SaveChangesActionName, _crudType as ICrudTypeRoutable, _modelId);
 
                 return _saveAction;
             }
@@ -270,6 +270,7 @@ namespace JCTools.GenericCrud.Models
                         OnClientClick = _onActionClickScript
                     };
 
+                _detailsAction.Url = _urlHelper.RouteUrl(Settings.Route.DetailsActionName, _crudType as ICrudTypeRoutable, _modelId);
                 return _detailsAction;
             }
             set => _detailsAction = value;
@@ -308,6 +309,7 @@ namespace JCTools.GenericCrud.Models
                         UseSubmit = true
                     };
 
+                _editAction.Url = _urlHelper.RouteUrl(Settings.Route.EditActionName, _crudType as ICrudTypeRoutable, _modelId);
                 return _editAction;
             }
             set => _editAction = value;
@@ -342,18 +344,28 @@ namespace JCTools.GenericCrud.Models
                            ?? ActionOptions.DefaultDelete.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Delete?.ButtonClass
                            ?? ActionOptions.DefaultDelete.ButtonClass,
-                        OnClientClick = _onActionClickScript,
-                        Url = _urlHelper.Action("DeleteConfirm", new { id = _modelId }),
+                        OnClientClick = _onActionClickScript
                     };
 
                     if (!_deleteAction.UseModals)
                         _deleteAction.UseText = true;
                 }
 
+                if (CurrentProcess == CrudProcesses.Index)
+                    _deleteAction.Url = _urlHelper.RouteUrl(Settings.Route.DeleteActionName, _crudType as ICrudTypeRoutable, _modelId);
+                else
+                    _deleteAction.Url = _urlHelper.RouteUrl(Settings.Route.DeleteConfirmActionName, _crudType as ICrudTypeRoutable, _modelId);
+
                 return _deleteAction;
             }
             set => _deleteAction = value;
         }
+
+        /// <summary>
+        /// The url of the js script to be use into the generic CRUDs
+        /// </summary>
+        /// <returns>The generated url</returns>
+        public string JsScriptUrl => _urlHelper.ScriptRouteUrl(Settings.Route.GetScriptActionName, _crudType as ICrudTypeRoutable, "genericCrud");
 
         /// <summary>
         /// Allows init the instance with the CRUD type related to the specified model and Key/Id property 

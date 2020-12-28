@@ -27,7 +27,7 @@
                 @if (Model.ShowActionsColumns)
                 {
                     <th class="text-center">
-                        @Html.Partial("_action", Model.NewAction)
+                        <partial name="_action" model="Model.NewAction"/>
                     </th>
                 }
             </tr>
@@ -35,10 +35,11 @@
         <tbody>
             @{
                 var entities = Model.GetCollectionData();
+                var modelId = Model.GetId();
                 foreach (var item in entities)
                 {
                     var key = item.GetKeyValue();
-                    var isSelected = key?.Equals(Model.GetId());
+                    var isSelected = key?.Equals(modelId);
                     var classAttribute = isSelected.HasValue && isSelected.Value ? "class=\"active\"" : string.Empty;
 
                     <tr @Html.Raw(classAttribute)>
@@ -55,15 +56,11 @@
                         }
                         @if (Model.ShowActionsColumns)
                         {
+                            Model.SetId(key);
                             <td class="text-center">
-                                @{
-                                    Model.DetailsAction.Url = Url.Action("Details", new { id = key });
-                                    Model.EditAction.Url = Url.Action("Edit", new { id = key });
-                                    Model.DeleteAction.Url = Url.Action("Delete", new { id = key });
-                                }
-                                @Html.Partial("_action", Model.DetailsAction)
-                                @Html.Partial("_action", Model.EditAction)
-                                @Html.Partial("_action", Model.DeleteAction)
+                                <partial name="_action" model="Model.DetailsAction" />
+                                <partial name="_action" model="Model.EditAction" />
+                                <partial name="_action" model="Model.DeleteAction" />
                             </td>
                         }
                     </tr>
@@ -72,4 +69,4 @@
         </tbody>
     </table>
 
-    <script src="@(Url.Action("GetScript", new { fileName = "genericCrud"}))"></script>
+    <script src="@Model.JsScriptUrl"></script>

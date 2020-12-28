@@ -42,6 +42,11 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         CrudAction DeleteAction { get; set; }
 
+        /// <summary>
+        /// The url of the generic js script to be use
+        /// </summary>
+        string JsScriptUrl { get; }
+
 
         /// <summary>
         /// Allows get the entire data of all entities to be displayed into the view

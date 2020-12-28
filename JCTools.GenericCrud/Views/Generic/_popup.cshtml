@@ -14,7 +14,7 @@
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    @Html.Partial(Model.InnerView, Model.Model)
+                    <partial name="@Model.InnerView" model="Model.Model" />
                 </div>
             </div>
             <div class="modal-footer">
@@ -22,7 +22,7 @@
                     data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
                 @if (Model.CommitAction != null)
                 {
-                    @Html.Partial("_action", Model.CommitAction)
+                    <partial name="_action" model="Model.CommitAction" />
                 }
             </div>
         </div>

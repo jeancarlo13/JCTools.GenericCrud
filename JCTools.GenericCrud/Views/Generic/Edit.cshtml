@@ -40,8 +40,8 @@
         {
             <div class="row">
                 <div class="col-md-12">
-                    @Html.Partial("_action", Model.IndexAction)
-                    @Html.Partial("_action", Model.SaveAction)
+                    <partial name="_action" model="Model.IndexAction" />
+                    <partial name="_action" model="Model.SaveAction" />
                 </div>
             </div>
         }
