@@ -122,7 +122,7 @@ namespace JCTools.GenericCrud.Settings
                     new Route(crudType, CreateActionName, _defaultPattern),
                     new Route(crudType, SaveActionName, _defaultPattern),
                     new Route(crudType, EditActionName),
-                    new Route(crudType, SaveChangesActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/SaveChanges/{{{{id}}}}"),
+                    new Route(crudType, SaveChangesActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{id}}}}/SaveChanges"),
                     new Route(crudType, GetScriptActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{filename}}}}.js"),
                     new Route(crudType, IndexActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}"),
                     new Route(crudType, IndexActionName, routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName))

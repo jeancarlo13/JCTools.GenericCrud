@@ -93,7 +93,13 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
                 .Select(k =>
                 {
                     if (context.RouteData.Values.TryGetValue(k, out object value))
-                        return value as string ?? Convert.ToString(value);
+                    {
+                        var v = value as string ?? Convert.ToString(value);    
+                        if (k == "controller" && !v.Equals(Configurator.GenericControllerType.Name))
+                            v = v.Replace("Controller", string.Empty);
+                            
+                        return v;
+                    }
                     return null;
                 })
                 .ToArray();

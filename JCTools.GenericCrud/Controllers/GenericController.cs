@@ -39,6 +39,7 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <remarks>You can use its for customize the current crud only</remarks>
         protected IViewModel Settings { get; set; }
+
         /// <summary>
         /// The instance of <see cref="IViewRenderService"/> used for render the embedded views
         /// </summary>
@@ -54,7 +55,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <summary>
         /// The CRUD type to be used for configure the instance
         /// </summary>
-        private readonly ICrudType _crudType;
+        internal readonly ICrudType CrudType;
 
         /// <summary>
         /// Create an instace of the controller with the specific parameter
@@ -65,7 +66,7 @@ namespace JCTools.GenericCrud.Controllers
             IServiceProvider serviceProvider,
             ICrudType crud
         ) : this(serviceProvider)
-            => _crudType = crud;
+            => CrudType = crud;
 
         /// <summary>
         /// Create an instace of the controller with the specific parameter
@@ -76,7 +77,7 @@ namespace JCTools.GenericCrud.Controllers
             IServiceProvider serviceProvider,
             string keyPropertyName = "Id"
         ) : this(serviceProvider)
-            => _crudType = Configurator.Options.Models[typeof(TModel), keyPropertyName]
+            => CrudType = Configurator.Options.Models[typeof(TModel), keyPropertyName]
                 ?? throw new ArgumentException($"No found CRUD type related to the model \"{typeof(TModel).FullName}\" and the key \"{keyPropertyName}\".");
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="filterContext">The action executing context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(_crudType, _localizer, Url);
+            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url);
             base.OnActionExecuting(filterContext);
         }
         /// <summary>
@@ -124,7 +125,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <returns>A <see cref="Task"/> instance.</returns>
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(_crudType, _localizer, Url);
+            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url);
             return base.OnActionExecutionAsync(context, next);
         }
 
@@ -265,6 +266,7 @@ namespace JCTools.GenericCrud.Controllers
                 {
                     _logger.LogWarning(ex, "Failure saving changes.");
                     AddSaveChangesErrorMessage();
+                    return await Create();
                 }
 
                 return SendSuccessResponse(
@@ -325,6 +327,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="model">Instance with the changes of the entity to save</param>
         /// <param name="id">The id of the entity to change</param>
         [HttpPost]
+        [ActionName(Route.SaveChangesActionName)]
         public virtual async Task<IActionResult> SaveChangesAsync(TKey id, [FromForm] TModel model)
         {
             var key = (TKey)Settings.GetKeyPropertyValue(model);
@@ -370,12 +373,6 @@ namespace JCTools.GenericCrud.Controllers
             IndexMessages message = IndexMessages.None
         )
         {
-            var urlValues = new
-            {
-                message = message,
-                id = id
-            };
-
             if (Settings.UseModals)
             {
                 var strId = id == null ? string.Empty : $"{id}/index";
@@ -383,13 +380,19 @@ namespace JCTools.GenericCrud.Controllers
                 return Json(new JsonResponse
                 {
                     Success = true,
-                    RedirectUrl = Url.Action(nameof(Index), urlValues)
+                    RedirectUrl = Url.Action(
+                        nameof(Index),
+                        new
+                        {
+                            message = message,
+                            id = id
+                        })
                 });
             }
             else if (!Settings.UseCustomController && id != null && !id.Equals(default(TKey)))
-                return RedirectToRoute($"{Settings.GetModelType().Name}_RedirectedIndex", urlValues);
+                return this.CrudRedirect(Route.RedirectIndexActionNamePattern, id, message);
             else
-                return RedirectToAction(action, urlValues);
+                return this.CrudRedirect(action, message);
         }
 
         /// <summary>

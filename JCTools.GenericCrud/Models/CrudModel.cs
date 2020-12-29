@@ -228,13 +228,16 @@ namespace JCTools.GenericCrud.Models
                         IconClass = Configurator.Options?.Actions?.Save?.IconClass
                             ?? ActionOptions.DefaultSave.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Save?.ButtonClass
-                            ?? ActionOptions.DefaultSave.ButtonClass
+                            ?? ActionOptions.DefaultSave.ButtonClass,
+                        UseSubmit = true
                     };
 
                 if (CurrentProcess == CrudProcesses.Create)
                     _saveAction.Url = _urlHelper.RouteUrl(Settings.Route.SaveActionName, _crudType as ICrudTypeRoutable);
                 else if (CurrentProcess == CrudProcesses.Edit)
                     _saveAction.Url = _urlHelper.RouteUrl(Settings.Route.SaveChangesActionName, _crudType as ICrudTypeRoutable, _modelId);
+                else
+                    _saveAction.UseSubmit = false;
 
                 return _saveAction;
             }
@@ -305,8 +308,7 @@ namespace JCTools.GenericCrud.Models
                             ?? ActionOptions.DefaultEdit.IconClass,
                         ButtonClass = Configurator.Options?.Actions?.Edit?.ButtonClass
                             ?? ActionOptions.DefaultEdit.ButtonClass,
-                        OnClientClick = _onActionClickScript,
-                        UseSubmit = true
+                        OnClientClick = _onActionClickScript
                     };
 
                 _editAction.Url = _urlHelper.RouteUrl(Settings.Route.EditActionName, _crudType as ICrudTypeRoutable, _modelId);
@@ -347,7 +349,7 @@ namespace JCTools.GenericCrud.Models
                         OnClientClick = _onActionClickScript
                     };
 
-                    if (!_deleteAction.UseModals)
+                    if (!_deleteAction.UseModals && CurrentProcess != CrudProcesses.Index)
                         _deleteAction.UseText = true;
                 }
 

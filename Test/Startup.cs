@@ -61,7 +61,7 @@ namespace Test
 
             services.AddGenericCrud<Data.Context>(o =>
             {
-                o.UseModals = false;
+                o.UseModals = true;
                 o.BootstrapVersion = JCTools.GenericCrud.Settings.Bootstrap.Version3;
                 o.Models.Add<Models.Country>();
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));

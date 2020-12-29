@@ -34,7 +34,7 @@ namespace Test3._1
 
              services.AddGenericCrud<Data.Context>(o =>
             {
-                o.UseModals = false;
+                o.UseModals = true;
                 o.Models.Add<Models.Country>();
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
                 // o.Models.Add<Models.Movie, int, MovieController, Data.Context>();
