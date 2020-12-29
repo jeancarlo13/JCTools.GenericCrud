@@ -39,22 +39,32 @@ namespace JCTools.GenericCrud
         /// The type of the database context to be use
         /// </summary>
         internal static Type DatabaseContextType;
+
         /// <summary>
         /// The name of the token with the model type of a CRUD
         /// </summary>
         internal const string ICrudTypeTokenName = "ICrudType";
+
         /// <summary>
         /// The name of the token with the model type of a CRUD
         /// </summary>
         internal const string ModelTypeTokenName = "ModelType";
+
         /// <summary>
         /// The name of the token with the Id/Key property name to be use into a CRUD 
         /// </summary>
         internal const string KeyTokenName = "ModelKey";
+
         /// <summary>
         /// The configured settings for all CRUDs
         /// </summary>
         internal static Options Options;
+
+        /// <summary>
+        /// Gets the version of bootstrap to be used;
+        /// Default <see cref="Bootstrap.Version4"/>
+        /// </summary>
+        public static Bootstrap BootstrapVersion { get => Options.BootstrapVersion; }
 
         /// <summary>
         /// Allows adds the services and settings for the use of the package into the client app
@@ -65,7 +75,7 @@ namespace JCTools.GenericCrud
         /// <returns>The modified application services collection</returns>
         public static IServiceCollection AddGenericCrud<TDbContext>(
             this IServiceCollection services,
-            Action<Options> optionsFactory = null
+            Action<IOptions> optionsFactory = null
         )
             where TDbContext : DbContext
         {

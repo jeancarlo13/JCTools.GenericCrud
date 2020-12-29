@@ -7,7 +7,7 @@ namespace JCTools.GenericCrud.Settings
     /// <summary>
     /// Define the customizable options of the package
     /// </summary>
-    public class Options : IOptions
+    internal class Options : IOptions
     {
         /// <summary>
         /// The path at the layout page; by default is /Views/Shared/_Layout.cshtml
@@ -51,5 +51,11 @@ namespace JCTools.GenericCrud.Settings
         /// Allows defined the models to be used for the CRUDs creation
         /// </summary>
         public CrudTypeCollection Models { get; set; } = new CrudTypeCollection();
+
+        /// <summary>
+        /// Allows set the version of bootstrap to be used;
+        /// Default <see cref="Bootstrap.Version4"/>
+        /// </summary>
+        public Bootstrap BootstrapVersion { get; set; } = Bootstrap.Version4;
     }
 }

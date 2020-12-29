@@ -13,28 +13,26 @@
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
 }
-<div class="row">
-    <dl class="dl-horizontal">
-        @foreach (var property in entity.VisibleProperties)
-        {
-            <dt>
-                @property
-            </dt>
-            <dd>
-                @entity.GetPropertyValue(property)
-            </dd>
-        }
-    </dl>
-</div>
+<dl class="dl-horizontal row">
+    @foreach (var property in entity.VisibleProperties)
+    {
+        <dt class="col-2">
+            @property
+        </dt>
+        <dd class="col-10">
+            @entity.GetPropertyValue(property)
+        </dd>
+    }
+</dl>
 @if (!Model.UseModals)
 {
     <div class="row">
-    <div class="col-md-12">
-        <partial name="_action" model="Model.IndexAction" />
-        @if (Model.CurrentProcess == CrudProcesses.Delete)
-        {
-            <partial name="_action" model="Model.DeleteAction" />
-        }
+        <div class="col-md-12">
+            <partial name="_action" model="Model.IndexAction" />
+            @if (Model.CurrentProcess == CrudProcesses.Delete)
+            {
+                <partial name="_action" model="Model.DeleteAction" />
+            }
         </div>
     </div>
 }

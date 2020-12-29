@@ -1,12 +1,18 @@
-@inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 @using Microsoft.AspNetCore.Mvc.Localization
+@using JCTools.GenericCrud;
+@using JCTools.GenericCrud.Services;
+@using JCTools.GenericCrud.Settings;
+
 @model JCTools.GenericCrud.Models.IEditModel
+
+@inject IViewRenderService RenderingServices
 @inject IViewLocalizer Localizer
 
 @{
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
     var entity = @Model.GetData();
+    var useBootstrap3 = Configurator.BootstrapVersion == Bootstrap.Version3;
 }
 
 @if (!Model.UseModals)
@@ -14,36 +20,41 @@
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
 }
-<div class="row">
-    <form action="@Model.SaveAction.Url" method="POST" asp-anti-forgery="true">
-        @foreach (var property in entity.NoVisibleProperties)
-        {
-            @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name, "HiddenFor")
-        }
-        @foreach (var property in entity.VisibleProperties)
-        {
-            <div class="form-group row">
-                @if (property.UseCustomView)
-                {
-                    @await RenderingServices.RenderEditViewFor(Model, Html, ViewData, property.Name)
-                }
-                else
-                {
-                    <label class="col-md-2 text-right" for="@property.Name">@property</label>
-                    <div class="col-md-10">
-                        @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
-                    </div>
-                }
-            </div>
-        }
-        @if (!Model.UseModals)
-        {
-            <div class="row">
-                <div class="col-md-12">
-                    <partial name="_action" model="Model.IndexAction" />
-                    <partial name="_action" model="Model.SaveAction" />
+<form action="@Model.SaveAction.Url" method="POST" asp-anti-forgery="true" class="@(useBootstrap3? "row" : "")">
+    @foreach (var property in entity.NoVisibleProperties)
+    {
+        @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name, "HiddenFor")
+    }
+    @foreach (var property in entity.VisibleProperties)
+    {
+        <div class="form-group row">
+            @if (property.UseCustomView)
+            {
+                @await RenderingServices.RenderEditViewFor(Model, Html, ViewData, property.Name)
+            }
+            else if (useBootstrap3)
+            {
+                <label class="col-md-2 text-right" for="@property.Name">@property</label>
+                <div class="col-md-10">
+                    @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
                 </div>
+            }
+            else
+            {
+                <label for="@property.Name" class="col-sm-2 col-form-label">@property</label>
+                <div class="col-sm-10">
+                    @await RenderingServices.CreateEditorFor(Model, Html, ViewData, property.Name)
+                </div>
+            }
+        </div>
+    }
+    @if (!Model.UseModals)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <partial name="_action" model="Model.IndexAction" />
+                <partial name="_action" model="Model.SaveAction" />
             </div>
-        }
-    </form>
-</div>
+        </div>
+    }
+</form>

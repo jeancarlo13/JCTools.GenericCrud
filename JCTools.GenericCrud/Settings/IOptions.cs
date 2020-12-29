@@ -37,5 +37,15 @@ namespace JCTools.GenericCrud.Settings
         /// </summary>
         ActionOptions Actions { get; set; }
 
+        /// <summary>
+        /// Allows defined the models to be used for the CRUDs creation
+        /// </summary>
+        CrudTypeCollection Models { get; set; }
+
+        /// <summary>
+        /// Allows set the version of bootstrap to be used;
+        /// Default <see cref="Bootstrap.Version4"/>
+        /// </summary>
+        Bootstrap BootstrapVersion { get; set; }
     }
 }

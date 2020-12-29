@@ -16,9 +16,10 @@ You only require create and configure your models, and this package create the n
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green)
 
-![.net core 2.1](https://img.shields.io/badge/.bootstrap-v3.3.7-blue)
+![bootstrap 3.3.7](https://img.shields.io/badge/bootstrap-v3.3.7-blue) or
+![bootstrap 4.3.1](https://img.shields.io/badge/bootstrap-v4.3.1-blue)
 
-The bootstrap v4.0.0 and highers are unsupported
+![font awesome 5.0.6](https://img.shields.io/badge/font%20awesome-v5.0.6-blue)
 
 ## Usage
 
@@ -36,6 +37,8 @@ dotnet add package JCTools.GenericCrud --version 2.0.0
     {
         // Indicate if desired use Modals 
         o.UseModals = true;
+        // Set the bootstrap version to be used (default v4.3.1)
+        o.BootstrapVersion = Settings.Bootstrap.Version3;
         // add the models type to manage with the package
         o.Models.Add<Models.Country>(); 
         o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
@@ -51,7 +54,7 @@ dotnet add package JCTools.GenericCrud --version 2.0.0
  ```cs
  routes.MapCrudRoutes();
  ```
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Your code should see similar to the next code
+Your code should see similar to the next code
  ```cs
     app.UseMvc(routes =>
     {
@@ -113,6 +116,7 @@ namespace Test.Controllers
 
 4. Run to app and access at the url **http://localhost:5000/Movie**,
 ## Changes of the version 2.0.0
+* Add support to Bootstrap 4.0
 * The follows interfaces was replaced for a best definition and structure:
   * IBase -> IViewModel
   * IBaseDetails, ICrudDetails -> IDetailsModel
