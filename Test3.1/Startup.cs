@@ -85,58 +85,14 @@ namespace Test3._1
             // app.UseHttpRequestLogger(loggerFactory.CreateLogger<Startup>());
             // app.UseCrud();
 
-            var logger = loggerFactory.CreateLogger<Startup>();
-
-            var routes = actionDescriptorCollectionProvider.ActionDescriptors.Items
-                        .Cast<ControllerActionDescriptor>()
-                        .Select(x => new
-                        {
-                            Action = x.ActionName,
-                            Controller = x.ControllerName,
-                            Name = x.AttributeRouteInfo?.Name,
-                            DisplayName = x.DisplayName,
-                            Template = x.AttributeRouteInfo?.Template,
-                            Method = x.MethodInfo.ToString(),
-                            RouteValues = x.RouteValues,
-                            Properties = x.Properties,
-                            ActionConstraints = x.ActionConstraints,
-                            Parameters = x.Parameters.Select(p => p.Name),
-                            BoundProperties = x.BoundProperties.Select(p => p.Name),
-                            FilterDescriptors = x.FilterDescriptors
-                        })
-                        // .Where(x => string.IsNullOrWhiteSpace(controllerName) || x.Controller.Equals(controllerName))
-                        .ToList();
-
-            logger.LogDebug($"Routes: {Newtonsoft.Json.JsonConvert.SerializeObject(routes)}");
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapCrudRoutes();
+                // endpoints.MapCrudRoutes();
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-            routes = actionDescriptorCollectionProvider.ActionDescriptors.Items
-                        .Cast<ControllerActionDescriptor>()
-                        .Select(x => new
-                        {
-                            Action = x.ActionName,
-                            Controller = x.ControllerName,
-                            Name = x.AttributeRouteInfo?.Name,
-                            DisplayName = x.DisplayName,
-                            Template = x.AttributeRouteInfo?.Template,
-                            Method = x.MethodInfo.ToString(),
-                            RouteValues = x.RouteValues,
-                            Properties = x.Properties,
-                            ActionConstraints = x.ActionConstraints,
-                            Parameters = x.Parameters.Select(p => p.Name),
-                            BoundProperties = x.BoundProperties.Select(p => p.Name),
-                            FilterDescriptors = x.FilterDescriptors
-                        })
-                        // .Where(x => string.IsNullOrWhiteSpace(controllerName) || x.Controller.Equals(controllerName))
-                        .ToList();
 
-            logger.LogDebug($"Routes: {Newtonsoft.Json.JsonConvert.SerializeObject(routes)}");
         }
     }
 }

@@ -23,9 +23,6 @@ namespace JCTools.GenericCrud.Controllers
     /// <typeparam name="TContext">The type of the database context to be used by get/stored the entities </typeparam>
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
-#if NETCOREAPP3_1
-    // [DataAnnotations.CrudActionConstraint]
-#endif
     public class GenericController<TContext, TModel, TKey> : Controller, IGenericController
         where TContext : DbContext
         where TModel : class, new()
