@@ -1,0 +1,6 @@
+@using System.Collections.Generic;
+@using System.Collections;
+@using System.Linq;
+@model Test3._1.Models.Movie
+
+@((ViewBag.Countries as IEnumerable<Test3._1.Models.Country>).First(c => c.Id == Model.Country)?.Name)

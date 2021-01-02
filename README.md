@@ -87,13 +87,22 @@ namespace Test.Controllers
     {
         public MovieController(IServiceProvider serviceProvider) 
         : base(serviceProvider)
-        { 
-            // Add your custom process, eg;
+        {}
+
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            // Add your custom settings here, eg;
             Settings.UseModals = false;
+            Settings.Subtitle = "All entities";
+            // ...
+
+            base.OnActionExecuting(filterContext);
         }
     }
 }
 ```
+
+**Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
 
 3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
 

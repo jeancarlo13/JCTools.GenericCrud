@@ -19,6 +19,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using System.IO;
+#if NETCOREAPP3_1
+using Microsoft.AspNetCore.Routing.Matching;
+#endif
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Internal;
+using Microsoft.Extensions.Options;
 
 #if NETCOREAPP3_1
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -58,7 +71,7 @@ namespace JCTools.GenericCrud
         /// <summary>
         /// The configured settings for all CRUDs
         /// </summary>
-        internal static Options Options;
+        internal static Settings.Options Options;
 
         /// <summary>
         /// Gets the version of bootstrap to be used;
@@ -83,31 +96,23 @@ namespace JCTools.GenericCrud
 
             var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
 
+            Options = new Settings.Options();
+            optionsFactory?.Invoke(Options);
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-
 #if NETCOREAPP2_1
             services.AddSingleton<IActionSelector, CrudActionSelector>();
-
             services.Configure<RazorViewEngineOptions>(o =>
             {
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
             });
-#elif NETCOREAPP3_1
-            services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
-            {
-                o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
-            });
-
-            services.AddRazorPages().AddRazorRuntimeCompilation();
-#endif
 
             var builder = services.AddMvc();
             builder.AddRazorOptions(o =>
             {
-#if NETCOREAPP2_1
                 var previous = o.CompilationCallback;
                 o.CompilationCallback = context =>
                 {
@@ -115,21 +120,46 @@ namespace JCTools.GenericCrud
                     context.Compilation =
                         context.Compilation.AddReferences(MetadataReference.CreateFromFile(currentAssembly.Location));
                 };
-#endif
                 o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
             });
+
             builder.AddControllersAsServices();
-
             builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
+            builder.ConfigureApplicationPartManager(manager =>
+                {
+                    manager.FeatureProviders.Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
+                });
 
-            Options = new Options();
-            optionsFactory?.Invoke(Options);
+#elif NETCOREAPP3_1
+            var defaultEndpointSelector = services.BuildServiceProvider().GetService<EndpointSelector>();
+            services.AddSingleton<EndpointSelector>(provider => new CrudEndpointSelector(defaultEndpointSelector));
 
-            builder.ConfigureApplicationPartManager(p =>
-                p.FeatureProviders.Add(
-                    new GenericControllerFeatureProvider(services.BuildServiceProvider())
-                )
-            );
+            services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
+            {
+                o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
+            });
+
+            services.AddRazorPages()
+                .AddRazorOptions(o =>
+                {
+                    o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
+                })
+                .AddRazorRuntimeCompilation();
+
+            services
+                .AddControllers(o =>
+                {
+
+                })
+                .AddControllersAsServices()
+                .ConfigureApplicationPartManager(manager =>
+                {
+                    manager.FeatureProviders
+                        .Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
+                });
+
+            services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
+#endif
 
             return services;
         }
@@ -139,19 +169,62 @@ namespace JCTools.GenericCrud
         /// <param name="toMapAction">The action to invoke for make the correctly route map</param>
         private static void MapCrudRoutes(Action<Settings.Route, ICrudType> toMapAction)
         {
-            var routes = Options.Models
-               .ToList()
-               .Cast<ICrudTypeRoutable>()
-               .SelectMany(ct => Settings.Route.CreateRoutes(ct))
-               .ToList();
+            if (toMapAction is null)
+                return;
 
-            routes.ForEach(r =>
+            var cruds = Options.Models.ToList();
+
+            foreach (var crud in cruds)
             {
-                var crudType = r.CrudType as ICrudType;
-                if (crudType != null)
-                    toMapAction(r, crudType);
-            });
+                if (crud is ICrudTypeRoutable routable)
+                {
+                    Settings.Route.CreateRoutes(routable)
+                        .ToList()
+                        .ForEach(r => toMapAction(r, crud));
+                }
+            }
         }
+
+        // public static IApplicationBuilder UseHttpRequestLogger(this IApplicationBuilder app, ILogger logger)
+        // {
+        //     app.Use(async (context, next) =>
+        //     {
+        //         logger.LogInformation($"Header: {JsonConvert.SerializeObject(context.Request.Headers, Formatting.Indented)}");
+
+        //         context.Request.EnableBuffering();
+        //         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        //         logger.LogInformation($"Body: {body}");
+        //         context.Request.Body.Position = 0;
+
+        //         logger.LogInformation($"Host: {context.Request.Host.Host}");
+        //         logger.LogInformation($"Client IP: {context.Connection.RemoteIpAddress}");
+        //         await next?.Invoke();
+        //     });
+
+        //     return app;
+        // }
+
+        // public static IApplicationBuilder UseCrud(this IApplicationBuilder app)
+        // {
+        //     Options.Models.AsEnumerable()
+        //        .ToList()
+        //        .ForEach(ct =>
+        //        {
+        //            app.Map(
+        //                new PathString($"/{ct.ModelType.Name}"),
+        //                builder => builder.Use(async (context, next) =>
+        //                {
+        //                    context.Request.RouteValues.TryAdd("controller", ct.ControllerType.Name);
+        //                    context.Request.RouteValues.TryAdd(Configurator.ModelTypeTokenName, ct.ModelType.Name);
+        //                    context.Request.RouteValues.TryAdd(Configurator.KeyTokenName, ct.KeyPropertyName);
+        //                    context.Request.RouteValues.TryAdd(Configurator.ICrudTypeTokenName, ct);
+        //                    await next();
+        //                })
+        //            );
+        //        });
+
+        //     return app;
+        // }
 
 #if NETCOREAPP3_1   
         /// <summary>
@@ -165,22 +238,74 @@ namespace JCTools.GenericCrud
                 endpoints.MapControllerRoute(
                     name: route.Name,
                     pattern: route.Pattern,
-                    defaults: new
-                    {
-                        controller = crudType.ControllerType.Name,
-                        action = route.ActionName
-                    },
+                    defaults: route.DefaultValues,
                     constraints: new
                     {
-                        modelType = new CrudRouteConstraint(crudType, route.Pattern)
-                    },
-                    dataTokens: new RouteValueDictionary()
-                    {
-                        { ModelTypeTokenName, crudType.ModelType },
-                        { KeyTokenName, crudType.KeyPropertyName }
+                        modelType = new CrudRouteConstraint(route.DefaultValues)
                     }
-                );
+                ).WithMetadata(new object[]{
+                    new DataAnnotations.CrudActionConstraintAttribute(),
+                    new ControllerAttribute(),
+                   // CreateActionDescriptor(route.ActionName, crudType.ControllerType),
+                    new DataTokensMetadata(new Dictionary<string, object>())
+                });
+
+                // endpoints.MapControllerRoute(
+                //     name: "customCrudsDefaultRoute",
+                //     pattern: "{controller}/{id}/{action}");
             });
+        }
+
+        private static ControllerActionDescriptor CreateActionDescriptor(string methodName, Type controllerType)
+        {
+            if (string.IsNullOrEmpty(methodName))
+                throw new ArgumentException($"'{nameof(methodName)}' cannot be null or empty.", nameof(methodName));
+
+            var action = new ControllerActionDescriptor();
+            action.SetProperty(new ApiDescriptionActionData());
+
+            if (controllerType == null)
+                throw new ArgumentNullException(nameof(controllerType));
+
+
+            action.MethodInfo = controllerType.GetMethod(methodName)
+                ?? controllerType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? controllerType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic)
+                ?? controllerType.GetMethod($"{methodName}Async", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                ?? controllerType.GetMethod($"{methodName}Async", BindingFlags.Public | BindingFlags.NonPublic)
+                ?? throw new InvalidOperationException($"The method {methodName} was not found.");
+
+            action.ControllerTypeInfo = controllerType.GetTypeInfo();
+            action.BoundProperties = new List<ParameterDescriptor>();
+
+            foreach (var property in controllerType.GetProperties())
+            {
+                var bindingInfo = BindingInfo.GetBindingInfo(property.GetCustomAttributes().OfType<object>());
+                if (bindingInfo != null)
+                {
+                    action.BoundProperties.Add(new ParameterDescriptor()
+                    {
+                        BindingInfo = bindingInfo,
+                        Name = property.Name,
+                        ParameterType = property.PropertyType,
+                    });
+                }
+            }
+
+
+            action.Parameters = new List<ParameterDescriptor>();
+            foreach (var parameter in action.MethodInfo.GetParameters())
+            {
+                action.Parameters.Add(new ControllerParameterDescriptor()
+                {
+                    Name = parameter.Name,
+                    ParameterType = parameter.ParameterType,
+                    BindingInfo = BindingInfo.GetBindingInfo(parameter.GetCustomAttributes().OfType<object>()),
+                    ParameterInfo = parameter
+                });
+            }
+
+            return action;
         }
 #elif NETCOREAPP2_1
         /// <summary>

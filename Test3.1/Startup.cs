@@ -11,6 +11,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing.Matching;
 
 namespace Test3._1
 {
@@ -32,13 +36,13 @@ namespace Test3._1
 
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-             services.AddGenericCrud<Data.Context>(o =>
-            {
-                o.UseModals = true;
-                o.Models.Add<Models.Country>();
-                o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
-                // o.Models.Add<Models.Movie, int, MovieController, Data.Context>();
-            });
+            services.AddGenericCrud<Data.Context>(o =>
+           {
+               o.UseModals = true;
+               o.Models.Add<Models.Country>();
+               o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+               o.Models.Add<Models.Movie, int, Controllers.MovieController, Data.Context>();
+           });
 
             services.AddControllersWithViews()
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -46,7 +50,13 @@ namespace Test3._1
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            ILoggerFactory loggerFactory,
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
+            EndpointSelector selector
+            )
         {
             if (env.IsDevelopment())
             {
@@ -72,14 +82,61 @@ namespace Test3._1
 
             app.UseAuthorization();
 
-            
+            // app.UseHttpRequestLogger(loggerFactory.CreateLogger<Startup>());
+            // app.UseCrud();
+
+            var logger = loggerFactory.CreateLogger<Startup>();
+
+            var routes = actionDescriptorCollectionProvider.ActionDescriptors.Items
+                        .Cast<ControllerActionDescriptor>()
+                        .Select(x => new
+                        {
+                            Action = x.ActionName,
+                            Controller = x.ControllerName,
+                            Name = x.AttributeRouteInfo?.Name,
+                            DisplayName = x.DisplayName,
+                            Template = x.AttributeRouteInfo?.Template,
+                            Method = x.MethodInfo.ToString(),
+                            RouteValues = x.RouteValues,
+                            Properties = x.Properties,
+                            ActionConstraints = x.ActionConstraints,
+                            Parameters = x.Parameters.Select(p => p.Name),
+                            BoundProperties = x.BoundProperties.Select(p => p.Name),
+                            FilterDescriptors = x.FilterDescriptors
+                        })
+                        // .Where(x => string.IsNullOrWhiteSpace(controllerName) || x.Controller.Equals(controllerName))
+                        .ToList();
+
+            logger.LogDebug($"Routes: {Newtonsoft.Json.JsonConvert.SerializeObject(routes)}");
+
             app.UseEndpoints(endpoints =>
-            {                
+            {
                 endpoints.MapCrudRoutes();
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+            routes = actionDescriptorCollectionProvider.ActionDescriptors.Items
+                        .Cast<ControllerActionDescriptor>()
+                        .Select(x => new
+                        {
+                            Action = x.ActionName,
+                            Controller = x.ControllerName,
+                            Name = x.AttributeRouteInfo?.Name,
+                            DisplayName = x.DisplayName,
+                            Template = x.AttributeRouteInfo?.Template,
+                            Method = x.MethodInfo.ToString(),
+                            RouteValues = x.RouteValues,
+                            Properties = x.Properties,
+                            ActionConstraints = x.ActionConstraints,
+                            Parameters = x.Parameters.Select(p => p.Name),
+                            BoundProperties = x.BoundProperties.Select(p => p.Name),
+                            FilterDescriptors = x.FilterDescriptors
+                        })
+                        // .Where(x => string.IsNullOrWhiteSpace(controllerName) || x.Controller.Equals(controllerName))
+                        .ToList();
+
+            logger.LogDebug($"Routes: {Newtonsoft.Json.JsonConvert.SerializeObject(routes)}");
         }
     }
 }

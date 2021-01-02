@@ -33,7 +33,7 @@ namespace JCTools.GenericCrud.Settings
         {
             var instanceType = typeof(CrudType<>).MakeGenericType(modelType);
             var instance = Activator.CreateInstance(instanceType, args: new { keyPropertyName, controllerName }) as ICrudType;
-            _types.Add(instance);
+            Add(instance);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace JCTools.GenericCrud.Settings
         /// <typeparam name="TModel">The type of the model to add</typeparam>
         public void Add<TModel>(string keyPropertyName = "Id")
             where TModel : class, new()
-            => _types.Add(new CrudType<TModel>(keyPropertyName));
+            => Add(new CrudType<TModel>(keyPropertyName));
 
         /// <summary>
         /// Allows add a new CRUD type using a custom controller 
@@ -57,7 +57,19 @@ namespace JCTools.GenericCrud.Settings
             where TModel : class, new()
             where TContext : DbContext
             where TCustomController : GenericController<TContext, TModel, TKey>
-            => _types.Add(new CrudType<TModel, TKey, TCustomController, TContext>(keyPropertyName));
+            => Add(new CrudType<TModel, TKey, TCustomController, TContext>(keyPropertyName));
+
+        /// <summary>
+        /// Allows add a new CRUD type to the CRUD collection
+        /// </summary>
+        /// <param name="toAdd">The <see cref="ICrudType"/> instance to add</param>
+        private void Add(ICrudType toAdd)
+        {
+            if (_types.Any(t => t.ModelType.Equals(toAdd.ModelType)))
+                throw new ArgumentException($"A related CRUD has already been added to the model \"{toAdd.ModelType}\"");
+
+            _types.Add(toAdd);
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the configured <see cref="ICrudType"/> items
@@ -84,6 +96,18 @@ namespace JCTools.GenericCrud.Settings
 
             return _types.Where(predicate).ToList();
         }
+
+        /// <summary>
+        /// Allows get the CRUD with the specified model type
+        /// </summary>
+        /// <param name="model">The type of the related model to the searched CRUD</param>
+        /// <param name="key">The type of the related Id/Key property to the searched CRUD</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[Type model, Type key]
+        {
+            get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.KeyPropertyType.Equals(key));
+        }
+
         /// <summary>
         /// Allows get the CRUD with the specified data
         /// </summary>
@@ -94,6 +118,23 @@ namespace JCTools.GenericCrud.Settings
         {
             get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.KeyPropertyName == key);
         }
+
+        /// <summary>
+        /// Allows get the CRUD with the specified model type
+        /// </summary>
+        /// <param name="modelType">The type of the related model to the searched CRUD</param>
+        /// <param name="keyType">The type of the related Id/Key property to the searched CRUD</param>
+        /// <param name="keyName">The name of the Key/Id property of the related model to the searched CRUD</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[Type modelType, Type keyType, string keyName]
+        {
+            get => _types
+                .FirstOrDefault(c => c.ModelType.Equals(modelType)
+                                && c.KeyPropertyType.Equals(keyType)
+                                && c.KeyPropertyName == keyName
+                );
+        }
+
         /// <summary>
         /// Allows get the CRUD with the specified data
         /// </summary>

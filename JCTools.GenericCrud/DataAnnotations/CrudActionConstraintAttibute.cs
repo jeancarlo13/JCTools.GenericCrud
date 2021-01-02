@@ -5,6 +5,7 @@ using System.Reflection;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace JCTools.GenericCrud.DataAnnotations
 {
@@ -29,19 +30,52 @@ namespace JCTools.GenericCrud.DataAnnotations
         /// <param name="context">The <see cref="ActionConstraintContext"/> with the request data.</param>
         /// <returns>True if the action is valid for selection, otherwise false.</returns>
         public bool Accept(ActionConstraintContext context)
-        {
+        {    
             var actionDescriptor = context.CurrentCandidate.Action as ControllerActionDescriptor;
             if (actionDescriptor == null)
                 return false;
 
             var crudType = context.RouteContext.RouteData.Values[Configurator.ICrudTypeTokenName] as ICrudType;
-            if (crudType == null)
-                return false;
+            var modelType = context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName]?.ToString();
+            var isFoundController = TryFindGenericController(actionDescriptor.ControllerTypeInfo, out Type controllerType);
 
-            var accept = actionDescriptor.ControllerTypeInfo.Equals(crudType.ControllerType.GetTypeInfo());
-            
+            if (crudType == null && isFoundController)
+            {
+                var args = controllerType.GenericTypeArguments.Skip(1);
+                crudType = Configurator.Options.Models[args.First(), args.Last()];
+            }
+
+            var accept = false;
+            if (crudType != null)
+                accept = actionDescriptor.ControllerTypeInfo.Equals(crudType.ControllerType.GetTypeInfo());
+            else if (!string.IsNullOrWhiteSpace(modelType) && isFoundController)
+            {
+                accept = actionDescriptor.ControllerTypeInfo.GenericTypeArguments
+                   .Any(gt => gt.Name.ToLowerInvariant().Equals(modelType.ToLowerInvariant()));
+            }
+
             return accept;
         }
+
+        /// <summary>
+        /// Try find the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition
+        /// used into the specified type
+        /// </summary>
+        /// <param name="controllerType">The controller type to review</param>
+        /// <param name="resultType">The found <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition</param>
+        /// <returns>True if the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition is found, else false</returns>
+        private bool TryFindGenericController(Type controllerType, out Type resultType)
+        {
+            if (controllerType.Name.Equals(Configurator.GenericControllerType.Name))
+                resultType = controllerType;
+            else if (controllerType.BaseType == null)
+                resultType = null;
+            else
+                return TryFindGenericController(controllerType.BaseType, out resultType);
+
+            return resultType != null;
+        }
+
     }
 }
 #endif

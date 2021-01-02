@@ -5,6 +5,9 @@ using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using JCTools.GenericCrud.Models;
+using Microsoft.AspNetCore.Routing;
+using System.Dynamic;
+using Microsoft.AspNetCore.Routing.Template;
 
 namespace JCTools.GenericCrud.Helpers
 {
@@ -28,7 +31,7 @@ namespace JCTools.GenericCrud.Helpers
             ICrudTypeRoutable crudType,
             string scriptName
         )
-            => GetRouteUrl(urlHelper, actionName, crudType, new { modelType = crudType?.ModelTypeName, fileName = scriptName });
+            => GetRouteUrl(urlHelper, actionName, crudType, fileName: scriptName);
 
         /// <summary>
         ///  Generates a URL with an absolute path for the specified CRUD arguments
@@ -42,7 +45,7 @@ namespace JCTools.GenericCrud.Helpers
             string actionName,
             ICrudTypeRoutable crudType
         )
-            => GetRouteUrl(urlHelper, actionName, crudType, new { modelType = crudType?.ModelTypeName });
+            => GetRouteUrl(urlHelper, actionName, crudType);
 
         /// <summary>
         ///  Generates a URL with an absolute path for the specified CRUD arguments
@@ -58,7 +61,7 @@ namespace JCTools.GenericCrud.Helpers
             ICrudTypeRoutable crudType,
             TKey id
         )
-            => GetRouteUrl(urlHelper, actionName, crudType, new { modelType = crudType?.ModelTypeName, id = id });
+            => GetRouteUrl(urlHelper, actionName, crudType, id);
 
         /// <summary>
         ///  Generates a URL with an absolute path for the specified CRUD arguments
@@ -66,18 +69,40 @@ namespace JCTools.GenericCrud.Helpers
         /// <param name="urlHelper">The <see cref="IUrlHelper"/> to be use into the generation.</param>
         /// <param name="actionName">The name of the desired CRUD action </param>
         /// <param name="crudType">The <see cref="ICrudTypeRoutable"/> with the CRUD argument to be used</param>
-        /// <param name="values">Object with the route values to be used</param>
+        /// <param name="fileName">The name of the script to be used for form the url</param>
+        /// <param name="id">The id of the entity related to the url</param>
         /// <returns>The generated URL.</returns>
         private static string GetRouteUrl(
             this IUrlHelper urlHelper,
             string actionName,
             ICrudTypeRoutable crudType,
-            object values = null
+            object id = null,
+            string fileName = null
         )
         {
-            var route = GetRoute(actionName, crudType);
+            var route = GetRoute(actionName, crudType, throwIfNoFoundRoute: false);
 
-            var url = urlHelper.RouteUrl(route.Name, values);
+            var values = new RouteValueDictionary();
+            values.Add(nameof(RouteDefaultValues.Controller), route.DefaultValues.Controller);
+            values.Add(nameof(RouteDefaultValues.Action), route.DefaultValues.Action);
+            values.Add(nameof(RouteDefaultValues.ModelType), route.DefaultValues.ModelType);
+
+            if (id != null)
+                values.Add(nameof(id), id);
+            if (!string.IsNullOrWhiteSpace(fileName))
+                values.Add(nameof(fileName), fileName);
+
+            var url = urlHelper.RouteUrl(route?.Name ?? actionName, values);
+
+            if (string.IsNullOrWhiteSpace(url) && crudType.UseGenericController)
+            {
+                url = route.Pattern;
+                if (id != null)
+                    url = url.Replace("{id}", id.ToString());
+                if (!string.IsNullOrWhiteSpace(fileName))
+                    url = url.Replace("{filename}", fileName);
+            }
+
             return url;
         }
 
@@ -86,21 +111,22 @@ namespace JCTools.GenericCrud.Helpers
         /// </summary>
         /// <param name="actionName">The name of the desired CRUD action </param>
         /// <param name="crudType">The <see cref="ICrudTypeRoutable"/> with the CRUD argument to be used</param>
+        /// <param name="throwIfNoFoundRoute">True for generate a exception if not found a route; Another, false.</param>
         /// <returns>The found route</returns>
-        private static Route GetRoute(string actionName, ICrudTypeRoutable crudType)
+        private static Settings.Route GetRoute(string actionName, ICrudTypeRoutable crudType, bool throwIfNoFoundRoute = true)
         {
             if (crudType is null)
                 throw new System.ArgumentNullException(nameof(crudType));
 
             if (!crudType.Routes?.Any() ?? true)
-                Route.CreateRoutes(crudType);
+                Settings.Route.CreateRoutes(crudType);
 
             var routeName = actionName == Settings.Route.RedirectIndexActionNamePattern
                 ? string.Format(actionName, crudType.ModelTypeName)
                 : $"{crudType.ModelTypeName}_{actionName}";
 
             var route = crudType.Routes.FirstOrDefault(r => r.Name == routeName);
-            if (route == null)
+            if (route == null && throwIfNoFoundRoute)
                 throw new InvalidOperationException($"No found route for the action \"{actionName}\"");
 
             return route;

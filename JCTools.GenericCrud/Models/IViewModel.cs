@@ -27,12 +27,12 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The title to display into the view
         /// </summary>
-        string Title { get; }
+        string Title { get; set; }
 
         /// <summary>
         /// The subtitle to display into the view
         /// </summary>
-        string Subtitle { get; }
+        string Subtitle { get; set; }
 
         /// <summary>
         /// The collection of the column names to be displayed into the view

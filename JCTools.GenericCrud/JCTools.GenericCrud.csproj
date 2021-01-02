@@ -10,7 +10,7 @@
     <PackageId>JCTools.GenericCrud</PackageId>
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
-    - v2.0.0-beta2: Migration to .net core app 3.1
+    - v2.0.0-beta2: Adds .net core 3.1 support
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
     <Version>2.0.0-beta2</Version>
@@ -22,10 +22,11 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation"  Version="3.1.10"/>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">

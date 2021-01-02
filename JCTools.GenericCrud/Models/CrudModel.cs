@@ -70,8 +70,21 @@ namespace JCTools.GenericCrud.Models
         /// <summary>
         /// The title to display into the view
         /// </summary>
-        public virtual string Title { get => GetModelName(); }
+        private string _title = string.Empty;
+        /// <summary>
+        /// The title to display into the view
+        /// Use <see cref="String.Empty"/> for the default title
+        /// </summary>
+        public virtual string Title
+        {
+            get => string.IsNullOrWhiteSpace(_title) ? GetModelName() : _title;
+            set => _title = value;
+        }
 
+        /// <summary>
+        /// The subtitle to display into the view
+        /// </summary>
+        private string _subtitle = string.Empty;
         /// <summary>
         /// The subtitle to display into the view
         /// </summary>
@@ -79,12 +92,16 @@ namespace JCTools.GenericCrud.Models
         {
             get
             {
+                if (!string.IsNullOrWhiteSpace(_subtitle))
+                    return _subtitle;
+
                 var process = CurrentProcess == CrudProcesses.Save ? CrudProcesses.Edit.ToString()
                     : CurrentProcess != CrudProcesses.None ? CurrentProcess.ToString()
                     : string.Empty;
 
                 return _localizer.GetLocalizedString(string.Format(_subtitleI18NKey, process), process);
             }
+            set => _subtitle = value;
         }
 
         /// <summary>
@@ -157,6 +174,7 @@ namespace JCTools.GenericCrud.Models
                         Url = _urlHelper.RouteUrl(Settings.Route.IndexActionName, _crudType as ICrudTypeRoutable)
                     };
 
+                _indexAction.UseModals = UseModals;
                 return _indexAction;
             }
 
@@ -195,6 +213,7 @@ namespace JCTools.GenericCrud.Models
                         Url = _urlHelper.RouteUrl(Settings.Route.CreateActionName, _crudType as ICrudTypeRoutable)
                     };
 
+                _newAction.UseModals = UseModals;
                 return _newAction;
             }
 
@@ -239,6 +258,7 @@ namespace JCTools.GenericCrud.Models
                 else
                     _saveAction.UseSubmit = false;
 
+                _saveAction.UseModals = UseModals;
                 return _saveAction;
             }
             set => _saveAction = value;
@@ -274,6 +294,7 @@ namespace JCTools.GenericCrud.Models
                     };
 
                 _detailsAction.Url = _urlHelper.RouteUrl(Settings.Route.DetailsActionName, _crudType as ICrudTypeRoutable, _modelId);
+                _detailsAction.UseModals = UseModals;
                 return _detailsAction;
             }
             set => _detailsAction = value;
@@ -312,6 +333,7 @@ namespace JCTools.GenericCrud.Models
                     };
 
                 _editAction.Url = _urlHelper.RouteUrl(Settings.Route.EditActionName, _crudType as ICrudTypeRoutable, _modelId);
+                _editAction.UseModals = UseModals;
                 return _editAction;
             }
             set => _editAction = value;
@@ -358,6 +380,7 @@ namespace JCTools.GenericCrud.Models
                 else
                     _deleteAction.Url = _urlHelper.RouteUrl(Settings.Route.DeleteConfirmActionName, _crudType as ICrudTypeRoutable, _modelId);
 
+                _deleteAction.UseModals = UseModals;
                 return _deleteAction;
             }
             set => _deleteAction = value;

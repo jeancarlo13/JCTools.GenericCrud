@@ -3,7 +3,7 @@ using System.Linq;
 using JCTools.GenericCrud.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Test.Controllers
+namespace Test3._1.Controllers
 {
     public class MovieController : GenericController<Data.Context, Models.Movie, int>
     {

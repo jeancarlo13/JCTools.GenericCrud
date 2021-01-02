@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,17 +21,26 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             if (actionContext == null)
                 throw new ArgumentNullException(nameof(actionContext));
 
-            if (actionContext.RouteData.Values["controller"]?.ToString().Equals(Configurator.GenericControllerType.Name) ?? false)
+            var controllerType = actionContext?.ActionDescriptor?.ControllerTypeInfo;
+            ICrudType crud;
+            if (controllerType?.Name.Equals(Configurator.GenericControllerType.Name) ?? false
+                && controllerType.GenericTypeArguments.Length == 3)
             {
-                var crud = Configurator.Options.Models[actionContext.RouteData.DataTokens];
-                if (crud == null)
-                    throw new InvalidOperationException($"The \"{actionContext.RouteData.Values["controller"]}\" is not appropriated registered.");
-
-                return crud.GetControllerInstance(actionContext.HttpContext.RequestServices);
+                var args = controllerType.GenericTypeArguments.Skip(1);
+                crud = Configurator.Options.Models[args.First(), args.Last()];
+            }
+            else if (actionContext.RouteData.Values["controller"]?.ToString().Equals(Configurator.GenericControllerType.Name) ?? false)
+                crud = Configurator.Options.Models[actionContext.RouteData.DataTokens];
+            else
+            {
+                controllerType = actionContext.ActionDescriptor.ControllerTypeInfo;
+                return actionContext.HttpContext.RequestServices.GetRequiredService(controllerType);
             }
 
-            var controllerType = actionContext.ActionDescriptor.ControllerTypeInfo.AsType();
-            return actionContext.HttpContext.RequestServices.GetRequiredService(controllerType);
+            if (crud == null)
+                throw new InvalidOperationException($"The \"{actionContext.RouteData.Values["controller"]}\" is not appropriated registered.");
+                
+            return crud.GetControllerInstance(actionContext.HttpContext.RequestServices);
         }
 
         /// <summary>

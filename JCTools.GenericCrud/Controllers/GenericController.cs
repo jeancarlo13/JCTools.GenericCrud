@@ -24,7 +24,7 @@ namespace JCTools.GenericCrud.Controllers
     /// <typeparam name="TModel">The type of the model that represents the entities to modified</typeparam>
     /// <typeparam name="TKey">The type of the property identifier of the entity model</typeparam>
 #if NETCOREAPP3_1
-    [DataAnnotations.CrudActionConstraint]
+    // [DataAnnotations.CrudActionConstraint]
 #endif
     public class GenericController<TContext, TModel, TKey> : Controller, IGenericController
         where TContext : DbContext
@@ -134,6 +134,7 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
+        //[Route("{ModelType}/{id?}/{action?}/{message?}")]
         public virtual async Task<IActionResult> Index(
             TKey id,
             IndexMessages message = IndexMessages.None
@@ -399,7 +400,10 @@ namespace JCTools.GenericCrud.Controllers
         /// Allows get a javascript embedded file
         /// </summary>
         /// <param name="fileName">The name of the desired file</param>
-        /// <returns>A file with the found file content</returns>
+        /// <returns>A file with the found file content</returns>        
+#if NETCOREAPP3_1
+        // [Route("{ModelType}/{filename}.js", Name = Route.GetScriptActionName)]
+#endif
         public IActionResult GetScript(string fileName)
         {
             var assembly = Settings.GetType().GetTypeInfo().Assembly;

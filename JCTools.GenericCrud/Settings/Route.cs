@@ -41,12 +41,12 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// The name of the CRUD action used for store the entities changes
         /// </summary>
-        internal const string SaveChangesActionName = "SaveChangesAsync";
+        internal const string SaveChangesActionName = "SaveChanges";
 
         /// <summary>
         /// The name of the Crud action used of get access to the js script 
         /// required for use Modals in the CRUD views 
-        /// /// </summary>
+        /// </summary>
         internal const string GetScriptActionName = "GetScript";
 
         /// <summary>
@@ -84,9 +84,14 @@ namespace JCTools.GenericCrud.Settings
         public string ActionName { get; }
 
         /// <summary>
-        /// /// The name of the route.
+        /// The name of the route.
         /// </summary>
         public string Name { get; }
+
+        /// <summary>
+        /// The default values of the route
+        /// </summary>
+        public RouteDefaultValues DefaultValues { get; }
 
         internal Route(
             ICrudTypeRoutable crudType,
@@ -97,11 +102,30 @@ namespace JCTools.GenericCrud.Settings
         {
             CrudType = crudType;
             ActionName = actionName;
+#if NETCOREAPP2_1
             Pattern = string.Format(pattern ?? _defaultIdPattern, actionName.ToLowerInvariant());
+#elif NETCOREAPP3_1
+            Pattern = pattern ?? string.Format(_defaultIdPattern, actionName.ToLowerInvariant());
+#endif
             Name = string.IsNullOrWhiteSpace(routeName)
                 ? $"{CrudType.ModelTypeName}_{ActionName}"
                 : routeName;
+
+            var type = crudType as ICrudType;
+            DefaultValues = new RouteDefaultValues
+            {
+                Controller = type?.ControllerType.Name,
+                Action = ActionName,
+                ModelType = type?.ModelType.Name,
+                ICrudType = type
+            };
         }
+
+        /// <summary>
+        /// Returns the string representation of the class
+        /// </summary>
+        public override string ToString()
+            => $"{Name}, {ActionName}, {Pattern}";
 
         /// <summary>
         /// Generate the mvc routes collection for the specified CRUD type 
@@ -114,6 +138,8 @@ namespace JCTools.GenericCrud.Settings
                 throw new System.ArgumentNullException(nameof(crudType));
 
             if (!crudType.Routes?.Any() ?? true)
+            {
+#if NETCOREAPP2_1
                 crudType.Routes = new List<Route>()
                 {
                     new Route(crudType, DetailsActionName),
@@ -124,12 +150,30 @@ namespace JCTools.GenericCrud.Settings
                     new Route(crudType, EditActionName),
                     new Route(crudType, SaveChangesActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{id}}}}/SaveChanges"),
                     new Route(crudType, GetScriptActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{filename}}}}.js"),
-                    new Route(crudType, IndexActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}"),
-                    new Route(crudType, IndexActionName, routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName))
+                    new Route(crudType, IndexActionName, routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName)),
+                    new Route(crudType, IndexActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}")
                 };
+#elif NETCOREAPP3_1
+                crudType.Routes = new List<Route>()
+                {
+                    new Route(crudType, DetailsActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DetailsActionName}"),
+                    new Route(crudType, DeleteActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DeleteActionName}"),
+                    new Route(crudType, DeleteConfirmActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DeleteConfirmActionName}"),
+                    new Route(crudType, CreateActionName, pattern: $"{crudType.ModelTypeName}/{CreateActionName}"),
+                    new Route(crudType, SaveActionName, pattern: $"{crudType.ModelTypeName}/{SaveActionName}"),
+                    new Route(crudType, EditActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{EditActionName}"),
+                    new Route(crudType, SaveChangesActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{SaveChangesActionName}"),
+                    new Route(crudType, GetScriptActionName, pattern: $"{crudType.ModelTypeName}/{{filename}}.js"),
+                    new Route(crudType, IndexActionName,
+                        routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName),
+                        pattern: $"{crudType.ModelTypeName}/{{id}}/{IndexActionName}/{{message}}"
+                    ),
+                    new Route(crudType, IndexActionName, pattern: crudType.ModelTypeName)
+                };
+#endif
+            }
 
             return crudType.Routes;
         }
-
     }
 }
