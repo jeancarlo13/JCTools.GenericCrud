@@ -45,6 +45,12 @@ namespace JCTools.GenericCrud.Controllers
         /// The instance of <see cref="IStringLocalizer" /> used of the internationalization and localization of the string
         /// </summary>
         private readonly IStringLocalizer _localizer;
+
+        /// <summary>
+        /// The instance of <see cref="ILoggerFactory"/> used for create new logs
+        /// </summary>
+        private readonly ILoggerFactory _loggerFactory;
+
         /// <summary>
         /// The instance of <see cref="ILogger"/> used for send to log the message of the controller
         /// </summary>
@@ -97,8 +103,8 @@ namespace JCTools.GenericCrud.Controllers
                 ?? throw new ArgumentException($"No found {typeof(IStringLocalizer).Name} services.");
 #endif
 
-            _logger = (serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory)
-                .CreateLogger<GenericController<TContext, TModel, TKey>>();
+            _loggerFactory = serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
+            _logger = _loggerFactory.CreateLogger<GenericController<TContext, TModel, TKey>>();
         }
 
         /// <summary>
@@ -108,7 +114,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="filterContext">The action executing context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url);
+            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url, _loggerFactory);
             base.OnActionExecuting(filterContext);
         }
         /// <summary>
@@ -122,7 +128,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <returns>A <see cref="Task"/> instance.</returns>
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url);
+            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url, _loggerFactory);
             return base.OnActionExecutionAsync(context, next);
         }
 

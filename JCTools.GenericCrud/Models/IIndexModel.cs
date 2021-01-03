@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Models
 {
@@ -59,5 +60,11 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <param name="data">The entities collection to be set</param>
         void SetData(IEnumerable<object> data);
+        /// <summary>
+        /// Sets all entities to be displayed into the view
+        /// </summary>
+        /// <param name="source">the <see cref="DbContext"/> instance 
+        /// to be used for get all entities</param>
+        void SetData(DbContext source);
     }
 }

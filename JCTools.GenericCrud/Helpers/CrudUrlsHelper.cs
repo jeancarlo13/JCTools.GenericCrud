@@ -59,9 +59,10 @@ namespace JCTools.GenericCrud.Helpers
             this IUrlHelper urlHelper,
             string actionName,
             ICrudTypeRoutable crudType,
-            TKey id
+            TKey id,
+            IndexMessages message = IndexMessages.None
         )
-            => GetRouteUrl(urlHelper, actionName, crudType, id);
+            => GetRouteUrl(urlHelper, actionName, crudType, id, message: message);
 
         /// <summary>
         ///  Generates a URL with an absolute path for the specified CRUD arguments
@@ -77,7 +78,8 @@ namespace JCTools.GenericCrud.Helpers
             string actionName,
             ICrudTypeRoutable crudType,
             object id = null,
-            string fileName = null
+            string fileName = null,
+            IndexMessages message = IndexMessages.None
         )
         {
             var route = GetRoute(actionName, crudType, throwIfNoFoundRoute: false);
@@ -91,6 +93,8 @@ namespace JCTools.GenericCrud.Helpers
                 values.Add(nameof(id), id);
             if (!string.IsNullOrWhiteSpace(fileName))
                 values.Add(nameof(fileName), fileName);
+            if (message != IndexMessages.None)
+                values.Add(nameof(message), message);
 
             var url = urlHelper.RouteUrl(route?.Name ?? actionName, values);
 
@@ -98,9 +102,20 @@ namespace JCTools.GenericCrud.Helpers
             {
                 url = route.Pattern;
                 if (id != null)
-                    url = url.Replace("{id}", id.ToString());
+                {
+                    var str = id.ToString();
+                    if (string.IsNullOrWhiteSpace(str))
+                        url = url.Replace("/{id}", str);
+                    else
+                        url = url.Replace("{id}", str);
+                }
                 if (!string.IsNullOrWhiteSpace(fileName))
                     url = url.Replace("{filename}", fileName);
+                if (message != IndexMessages.None)
+                    url = url.Replace("{message}", message.ToString());
+
+                if (!url.StartsWith("/"))
+                    url = $"/{url}";
             }
 
             return url;

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Models
 {
@@ -92,5 +94,14 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <returns>The stored data</returns>
         IEntityData GetData();
+
+        /// <summary>
+        /// Allows set/change the entire data of the entity to be displayed into the view
+        /// getting from the specified source
+        /// </summary>
+        /// <param name="source">The <see cref="DbContext"/> the have access to the entity data</param>
+        /// <param name="id">The id of the desired entity</param>
+        /// <returns>The task to be executed</returns>
+        Task SetDataAsync(DbContext source, string id);
     }
 }

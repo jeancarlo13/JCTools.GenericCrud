@@ -131,8 +131,8 @@ namespace JCTools.GenericCrud
                 });
 
 #elif NETCOREAPP3_1
-            var defaultEndpointSelector = services.BuildServiceProvider().GetService<EndpointSelector>();
-            services.AddSingleton<EndpointSelector>(provider => new CrudEndpointSelector(defaultEndpointSelector));
+            // var defaultEndpointSelector = services.BuildServiceProvider().GetService<EndpointSelector>();
+            // services.AddSingleton<EndpointSelector>(provider => new CrudEndpointSelector(defaultEndpointSelector));
 
             services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
             {
@@ -146,19 +146,16 @@ namespace JCTools.GenericCrud
                 })
                 .AddRazorRuntimeCompilation();
 
-            services
-                .AddControllers(o =>
-                {
+            // services
+            //     .AddControllers()
+            //     .AddControllersAsServices()
+            //     .ConfigureApplicationPartManager(manager =>
+            //     {
+            //         manager.FeatureProviders
+            //             .Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
+            //     });
 
-                })
-                .AddControllersAsServices()
-                .ConfigureApplicationPartManager(manager =>
-                {
-                    manager.FeatureProviders
-                        .Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
-                });
-
-            services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
+            // services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
 #endif
 
             return services;

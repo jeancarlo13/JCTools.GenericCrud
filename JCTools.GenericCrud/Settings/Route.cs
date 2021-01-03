@@ -166,7 +166,7 @@ namespace JCTools.GenericCrud.Settings
                     new Route(crudType, GetScriptActionName, pattern: $"{crudType.ModelTypeName}/{{filename}}.js"),
                     new Route(crudType, IndexActionName,
                         routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName),
-                        pattern: $"{crudType.ModelTypeName}/{{id}}/{IndexActionName}/{{message}}"
+                        pattern: $"{crudType.ModelTypeName}/{{id}}/{{message}}"
                     ),
                     new Route(crudType, IndexActionName, pattern: crudType.ModelTypeName)
                 };

@@ -96,6 +96,32 @@ namespace JCTools.GenericCrud.Settings
 
             return _types.Where(predicate).ToList();
         }
+        /// <summary>
+        /// Allows get the CRUD with the specified model type
+        /// </summary>
+        /// <param name="modelName">The type of the related model to the searched CRUD</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[string modelName]
+        {
+            get
+            {
+                var name = string.IsNullOrWhiteSpace(modelName)
+                    ? throw new ArgumentNullException(nameof(modelName))
+                    : modelName.ToLowerInvariant();
+                return _types
+                    .FirstOrDefault(c => c.ModelType.Name.ToLowerInvariant().Equals(name));
+            }
+        }
+
+        /// <summary>
+        /// Allows get the CRUD with the specified model type
+        /// </summary>
+        /// <param name="model">The type of the related model to the searched CRUD</param>
+        /// <value>The found CRUD or null</value>
+        internal ICrudType this[Type model]
+        {
+            get => _types.FirstOrDefault(c => c.ModelType.Equals(model));
+        }
 
         /// <summary>
         /// Allows get the CRUD with the specified model type

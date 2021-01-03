@@ -2,10 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace JCTools.GenericCrud.Models
 {
@@ -50,6 +53,10 @@ namespace JCTools.GenericCrud.Models
         /// The <see cref="IUrlHelper"/> instance to use to generate the action urls
         /// </summary>
         private readonly IUrlHelper _urlHelper;
+        /// <summary>
+        /// The <see cref="ILogger"/> instance to be used for sent the app messages
+        /// </summary>
+        private readonly ILogger _logger;
 
         /// <summary>
         /// The process where the current instance to be used
@@ -399,8 +406,14 @@ namespace JCTools.GenericCrud.Models
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
         /// <param name="urlHelper">The <see cref="IUrlHelper"/> instance to use to generate the action urls</param>
-        public CrudModel(string keyPropertyName, IStringLocalizer localizer, IUrlHelper urlHelper)
-            : this(Configurator.Options.Models[typeof(TModel), keyPropertyName], localizer, urlHelper)
+        /// <param name="loggerFactory">The instance of <see cref="ILoggerFactory"/> used for create new logs</param>
+        public CrudModel(
+            string keyPropertyName,
+            IStringLocalizer localizer,
+            IUrlHelper urlHelper,
+            ILoggerFactory loggerFactory
+        )
+            : this(Configurator.Options.Models[typeof(TModel), keyPropertyName], localizer, urlHelper, loggerFactory)
         { }
 
         /// <summary>
@@ -410,7 +423,13 @@ namespace JCTools.GenericCrud.Models
         /// <param name="localizer">The instance of <see cref="IStringLocalizer"/> used for translate 
         /// the texts to displayed into the view</param>
         /// <param name="urlHelper">The <see cref="IUrlHelper"/> instance to use to generate the action urls</param>
-        internal CrudModel(ICrudType crud, IStringLocalizer localizer, IUrlHelper urlHelper)
+        /// <param name="loggerFactory">The instance of <see cref="ILoggerFactory"/> used for create new logs</param>
+        internal CrudModel(
+            ICrudType crud,
+            IStringLocalizer localizer,
+            IUrlHelper urlHelper,
+            ILoggerFactory loggerFactory
+        )
         {
             if (crud is null)
                 throw new ArgumentNullException(
@@ -420,6 +439,7 @@ namespace JCTools.GenericCrud.Models
 
             _localizer = localizer;
             _urlHelper = urlHelper;
+            _logger = loggerFactory.CreateLogger<CrudModel<TModel, TKey>>();
             _crudType = crud;
 
             _data = Enumerable.Empty<TModel>();
@@ -475,6 +495,29 @@ namespace JCTools.GenericCrud.Models
         }
 
         /// <summary>
+        /// Allows set/change the entire data of the entity to be displayed into the view
+        /// getting from the specified source
+        /// </summary>
+        /// <param name="source">The <see cref="DbContext"/> the have access to the entity data</param>
+        /// <param name="id">The id of the desired entity</param>
+        /// <returns>The task to be executed</returns>
+        public async Task SetDataAsync(DbContext source, string id)
+        {
+            if (!typeof(TKey).Equals(typeof(string)) && id is string str)
+                _modelId = ConvertKeyValue(str);
+
+            var entity = await source.Set<TModel>().FindAsync(_modelId);
+
+            if (entity == null)
+            {
+                _data = new List<TModel>();
+                _modelId = default(TKey);
+            }
+            else
+                SetData(entity);
+        }
+
+        /// <summary>
         /// Allows get the entire data of all entities to be displayed into the view
         /// </summary>
         /// <returns>The stored data</returns>
@@ -496,6 +539,13 @@ namespace JCTools.GenericCrud.Models
             _data = data.OfType<TModel>().ToList();
             _modelId = default(TKey);
         }
+        /// <summary>
+        /// Sets all entities to be displayed into the view
+        /// </summary>
+        /// <param name="source">the <see cref="DbContext"/> instance 
+        /// to be used for get all entities</param>
+        public void SetData(DbContext source)
+            => SetData(source.Set<TModel>());
 
         /// <summary>
         /// Allows get the value of the Id/Key property of the entity
@@ -508,7 +558,13 @@ namespace JCTools.GenericCrud.Models
         /// Allows set/change the Id/Key property value of the entity to be displayed into the view
         /// </summary>
         /// <param name="id">The Id/Key property value to be set</param>
-        public void SetId(object id) => _modelId = (TKey)id;
+        public void SetId(object id)
+        {
+            if (!typeof(TKey).Equals(typeof(string)) && id is string str)
+                _modelId = ConvertKeyValue(str);
+            else
+                _modelId = (TKey)id;
+        }
 
         /// <summary>
         /// Allows get the Key/Id property value of the specific instance
@@ -518,5 +574,37 @@ namespace JCTools.GenericCrud.Models
         public object GetKeyPropertyValue(object obj)
             => _crudType.GetKeyPropertyValue(obj);
 
+        /// <summary>
+        /// Convert the string value to an valid <typeparamref name="TKey"/> value
+        /// </summary>
+        /// <param name="value">the value to be converted</param>
+        /// <param name="throwIfError">True for throw exceptions if fail the convertion process,
+        /// else, False</param>
+        /// <returns>The found valid value</returns>
+        private TKey ConvertKeyValue(string value, bool throwIfError = false)
+        {
+            if (value != null)
+            {
+                try
+                {
+                    return (TKey)Convert.ChangeType(value, typeof(TKey));
+                }
+                catch (Exception e)
+                {
+                    var message = $"The '{value}' is not a valid value for {typeof(TKey)}.";
+                    if (throwIfError)
+                    {
+                        var ex = new InvalidCastException(message, e);
+                        _logger.LogCritical(e, message);
+                        throw ex;
+                    }
+                    else
+                        _logger.LogWarning(e, message);
+
+                }
+            }
+
+            return default(TKey);
+        }
     }
 }
