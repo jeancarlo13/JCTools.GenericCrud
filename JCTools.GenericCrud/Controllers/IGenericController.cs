@@ -5,7 +5,7 @@ namespace JCTools.GenericCrud.Controllers
     /// <summary>
     /// Defines the controllers to be used for receive the CRUD requests
     /// </summary>
-    internal interface IGenericController
+    public interface IGenericController
     {
     }
 }

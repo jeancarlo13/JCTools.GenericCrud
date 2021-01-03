@@ -9,7 +9,7 @@ namespace JCTools.GenericCrud.Settings
     /// <summary>
     /// Defines the properties required for generate a CRUD of any model
     /// </summary>
-    internal interface ICrudType
+    public interface ICrudType
     {
         /// <summary>
         /// The type of the model to be used into the CRUD

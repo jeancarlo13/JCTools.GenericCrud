@@ -146,6 +146,11 @@ namespace JCTools.GenericCrud
                 })
                 .AddRazorRuntimeCompilation();
 
+            services.AddMvcCore(o =>
+            {
+                o.ModelBinderProviders.Insert(0, new Settings.DependencyInjection.CrudModelBinderProvider());
+            });
+
             // services
             //     .AddControllers()
             //     .AddControllersAsServices()

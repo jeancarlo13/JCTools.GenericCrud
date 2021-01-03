@@ -503,8 +503,7 @@ namespace JCTools.GenericCrud.Models
         /// <returns>The task to be executed</returns>
         public async Task SetDataAsync(DbContext source, string id)
         {
-            if (!typeof(TKey).Equals(typeof(string)) && id is string str)
-                _modelId = ConvertKeyValue(str);
+            _modelId = ConvertKeyValue(id);
 
             var entity = await source.Set<TModel>().FindAsync(_modelId);
 

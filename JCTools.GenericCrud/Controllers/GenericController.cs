@@ -131,10 +131,15 @@ namespace JCTools.GenericCrud.Controllers
         /// <returns>The created <see cref="IViewModel"/> instance</returns>
         private IViewModel CreateModel(ActionExecutingContext context)
         {
-            if (!context.ActionArguments.TryGetValue(Constants.EntityNameRouteKey, out object entityName))
+            if (!context.ActionArguments.TryGetValue(Constants.EntitySettingsRouteKey, out object entityName)
+                && !context.RouteData.Values.TryGetValue(Constants.EntitySettingsRouteKey, out entityName))
+            {
                 throw new InvalidOperationException($"Entity name not found.");
+            }
 
-            CrudType = Configurator.Options.Models[entityName.ToString()];
+            CrudType = entityName is ICrudType
+                ? entityName as ICrudType
+                : Configurator.Options.Models[entityName.ToString()];
             if (CrudType == null)
                 throw new InvalidOperationException($"Configured model not found for {entityName}");
 
@@ -158,12 +163,12 @@ namespace JCTools.GenericCrud.Controllers
         /// <summary>
         /// Allows render the index view
         /// </summary>
-        /// <param name="entityName">The name of the related entity to the CRUD</param>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
-        [Route("{entityName}/{id?}/{message?}")]
+        [Route("{entitySettings}/{id?}/{message?}")]
         public virtual async Task<IActionResult> Index(
-            string entityName,
+            ICrudType entitySettings,
             string id,
             IndexMessages message = IndexMessages.None
         )
@@ -194,11 +199,11 @@ namespace JCTools.GenericCrud.Controllers
         /// <summary>
         /// Allows get a javascript embedded file
         /// </summary>
-        /// <param name="entityName">The name of the related entity to the CRUD</param>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="fileName">The name of the desired file</param>
         /// <returns>A file with the found file content</returns>        
-        [Route("{entityName}/{fileName}.js")]
-        public IActionResult GetScript(string entityName, string fileName)
+        [Route("{entitySettings}/{fileName}.js")]
+        public IActionResult GetScript(ICrudType entitySettings, string fileName)
         {
             var assembly = this.GetType().GetTypeInfo().Assembly;
 
@@ -221,51 +226,31 @@ namespace JCTools.GenericCrud.Controllers
         /// <summary>
         /// Allows render the details view
         /// </summary>
-        /// <param name="entityName">The name of the related entity to the CRUD</param>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entityName}/{id}/{action}")]
-        public virtual Task<IActionResult> Details(string entityName, string id)
+        [Route("{entitySettings}/{id}/{action}")]
+        public virtual Task<IActionResult> Details(ICrudType entitySettings, string id)
             => ShowDetailsAsync(id);
 
         /// <summary>
         /// Allows render the delete view
         /// </summary>
-        /// <param name="entityName">The name of the related entity to the CRUD</param>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entityName}/{id}/{action}")]
-        public virtual Task<IActionResult> Delete(string entityName, string id)
+        [Route("{entitySettings}/{id}/{action}")]
+        public virtual Task<IActionResult> Delete(ICrudType entitySettings, string id)
             => ShowDetailsAsync(id, isForDeletion: true);
-
-        /// <summary>
-        /// Allows render the details view
-        /// </summary>
-        /// <param name="id">The id of the entity to show into the view</param>
-        /// <param name="isForDeletion">True if the view will used for delete the related entity;
-        /// another, false</param>
-        /// <returns>The task to be invoked</returns>
-        private async Task<IActionResult> ShowDetailsAsync(string id, bool isForDeletion = false)
-        {
-            var model = Settings as IDetailsModel;
-            await model.SetDataAsync(DbContext, id);
-
-            var entity = model.GetData().GetEntity();
-            if (entity == null)
-                return NotFound();
-
-            model.CurrentProcess = isForDeletion ? CrudProcesses.Delete : CrudProcesses.Details;
-            return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
-        }
 
         /// <summary>
         /// Allows render the delete view
         /// </summary>
-        /// <param name="entityName">The name of the related entity to the CRUD</param>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entityName}/{id}/{action}")]
-        public virtual async Task<IActionResult> DeleteConfirm(string entityName, string id)
+        [Route("{entitySettings}/{id}/{action}")]
+        public virtual async Task<IActionResult> DeleteConfirm(ICrudType entitySettings, string id)
         {
             await Settings.SetDataAsync(DbContext, id);
             var entity = Settings.GetData().GetEntity();
@@ -294,6 +279,171 @@ namespace JCTools.GenericCrud.Controllers
         }
 
         /// <summary>
+        /// Allows render the create view
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        [HttpGet]
+        [Route("{entitySettings}/{action}")]
+        public virtual async Task<IActionResult> Create(ICrudType entitySettings)
+        {
+            var model = Settings as IEditModel;
+            model.CurrentProcess = CrudProcesses.Create;
+            return await RenderView(nameof(Edit), model, model.SaveAction);
+        }
+
+        /// <summary>
+        /// Allows render the Edit view
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="id">The id of the entity to edit into the view</param>
+        [HttpGet]
+        [Route("{entitySettings}/{id}/{action}")]
+        public virtual async Task<IActionResult> Edit(ICrudType entitySettings, string id)
+        {
+            await Settings.SetDataAsync(DbContext, id);
+            var entity = Settings.GetData();
+
+            return await Edit(id, entity);
+        }
+
+        /// <summary>
+        /// Allows save new entities
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">The entity to save</param>
+        [HttpPost]
+        [Route("{entitySettings}/{action}")]
+        public virtual async Task<IActionResult> Save(
+            ICrudType entitySettings,
+            [FromForm] object entityModel
+        )
+        {
+            ModelState.Remove(Settings.KeyPropertyName);
+            if (ModelState.IsValid)
+            {
+                await DbContext.AddAsync(entityModel);
+
+                try
+                {
+                    await DbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogWarning(ex, "Failure saving changes.");
+                    AddSaveChangesErrorMessage();
+                    return await Create(entitySettings);
+                }
+
+                return SendSuccessResponse(
+                    Settings.GetKeyPropertyValue(entityModel).ToString(),
+                    IndexMessages.CreateSuccess
+                );
+            }
+
+            return await Create(entitySettings);
+        }
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">Instance with the changes of the entity to save</param>
+        /// <param name="id">The id of the entity to change</param>
+        [HttpPost]
+        [ActionName(GenericCrud.Settings.Route.SaveChangesActionName)]
+        [Route("{entitySettings}/{id}/{action}")]
+        public virtual async Task<IActionResult> SaveChangesAsync(
+            ICrudType entitySettings,
+            string id,
+            [FromForm] object entityModel
+        )
+        {
+            Settings.SetId(id);
+            var key = Settings.GetId();
+
+            var model = Settings as IEditModel;
+            model.SetData(entityModel);
+
+            // TODO: review when is editable the key/id field
+            if (!model.GetId().Equals(key))
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                await Settings.SetDataAsync(DbContext, id);
+                var entity = Settings.GetData().GetEntity();
+
+                if (entity == null)
+                    return NotFound();
+
+                DbContext.Entry(entity).CurrentValues.SetValues(entityModel);
+
+                try
+                {
+                    await DbContext.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex)
+                {
+                    _logger.LogWarning(ex, "Failure saving changes.");
+                    AddSaveChangesErrorMessage();
+                }
+
+                return SendSuccessResponse(id, IndexMessages.EditSuccess);
+            }
+
+            return await Edit(id, Settings.GetData());
+        }
+
+        /// <summary>
+        /// Allows render the details view
+        /// </summary>
+        /// <param name="id">The id of the entity to show into the view</param>
+        /// <param name="isForDeletion">True if the view will used for delete the related entity;
+        /// another, false</param>
+        /// <returns>The task to be invoked</returns>
+        private async Task<IActionResult> ShowDetailsAsync(string id, bool isForDeletion = false)
+        {
+            var model = Settings as IDetailsModel;
+            await model.SetDataAsync(DbContext, id);
+
+            var entity = model.GetData().GetEntity();
+            if (entity == null)
+                return NotFound();
+
+            model.CurrentProcess = isForDeletion ? CrudProcesses.Delete : CrudProcesses.Details;
+            return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
+        }
+
+        /// <summary>
+        /// Allows render the Edit view
+        /// </summary>
+        /// <param name="id">The id of the entity to edit into the view</param>
+        /// <param name="entity">The entity to edit</param>
+        private async Task<IActionResult> Edit(string id, IEntityData entity)
+        {
+            if (entity == null)
+                return NotFound();
+
+            var model = Settings as IEditModel;
+            model.SetData(entity.GetEntity());
+
+            model.CurrentProcess = CrudProcesses.Edit;
+            return await RenderView(nameof(Edit), model, model.SaveAction);
+        }
+        /// <summary>
+        /// Add a the current Model State a message with the save changes error
+        /// </summary>
+        private void AddSaveChangesErrorMessage()
+        {
+            var message = _localizer["GenericCrud.UnableSaveChangesMessage"];
+            ModelState.AddModelError("",
+                string.IsNullOrWhiteSpace(message) ?
+                "Unable to save changes. Try again, and if the problem persists, see your system administrator." :
+                message
+            );
+        }
+
+        /// <summary>
         /// Generate the correctly response using the specified settings and arguments
         /// </summary>
         /// <param name="id">The id of the affected entity</param>
@@ -309,19 +459,12 @@ namespace JCTools.GenericCrud.Controllers
             );
 
             if (Settings.UseModals)
-            {
-                return Json(new JsonResponse
-                {
-                    Success = true,
-                    RedirectUrl = redirectUrl
-                });
-            }
+                return Json(new JsonResponse { Success = true, RedirectUrl = redirectUrl });
             // else if (string.IsNullOrWhiteSpace(id))
             //     return RedirectToAction(nameof(Index), new { message = message });
             else
                 return Redirect(redirectUrl);
         }
-
 
         /// <summary>
         /// Generate the view to be display to the user
@@ -335,23 +478,22 @@ namespace JCTools.GenericCrud.Controllers
             IViewModel model,
             CrudAction commitAction = null)
         {
-            object popupModel = model;
+            Task<string> contentTask;
             if (Settings.UseModals)
             {
-                popupModel = new Popup()
+                var popupModel = new Popup()
                 {
                     Model = model,
                     InnerView = view,
                     CommitAction = commitAction
                 };
 
-                view = "_popup";
+                contentTask = _renderingService.RenderToStringAsync("_popup", popupModel, ViewData);
             }
+            else
+                contentTask = _renderingService.RenderToStringAsync(view, model, ViewData);
 
-            return Content(
-                await _renderingService.RenderToStringAsync(view, popupModel, ViewData),
-                "text/html"
-            );
+            return Content(await contentTask, "text/html");
         }
     }
 }

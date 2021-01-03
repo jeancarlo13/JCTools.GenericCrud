@@ -6,9 +6,15 @@ namespace JCTools.GenericCrud.Settings
     internal static class Constants
     {
         /// <summary>
-        /// The name of the arguments into the routes for get the entity name\
+        /// The name of the arguments into the routes for get the entity name
         /// related to the CRUD
         /// </summary>
-        internal const string EntityNameRouteKey = "entityName";
+        internal const string EntitySettingsRouteKey = "entitySettings";
+
+        /// <summary>
+        /// The name of the arguments into the routes for get the entity model value
+        /// related to the CRUD
+        /// </summary>
+        internal const string EntityModelRouteKey = "entityModel";
     }
 }

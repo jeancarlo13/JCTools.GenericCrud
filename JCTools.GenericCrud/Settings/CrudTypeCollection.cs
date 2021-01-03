@@ -175,6 +175,8 @@ namespace JCTools.GenericCrud.Settings
                     var keyName = routeData[Configurator.KeyTokenName]?.ToString() ?? "Id";
                     return this[modelType, keyName];
                 }
+                else if (routeData[Constants.EntitySettingsRouteKey] is string entityName && !string.IsNullOrEmpty(entityName))
+                    return this[entityName];
 
                 return null;
             }
