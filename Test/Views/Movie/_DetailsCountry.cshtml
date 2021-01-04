@@ -3,4 +3,8 @@
 @using System.Linq;
 @model Test.Models.Movie
 
-@((ViewBag.Countries as IEnumerable<Test.Models.Country>).First(c => c.Id == Model.Country)?.Name)
+@{
+    var country = (ViewBag.Countries as IEnumerable<Test.Models.Country>)
+            .FirstOrDefault(c => c.Id == Model.Country);
+}
+@(country?.Name ?? string.Empty)

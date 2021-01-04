@@ -29,8 +29,12 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         /// <param name="feature">The feature instance to populate.</param>
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            var cruds = Configurator.Options.Models.ToList();
-                // .ToList(item => item.UseGenericController);
+            var cruds = Configurator.Options.Models
+#if NETCOREAPP2_1
+                .ToList(item => item.UseGenericController);
+#elif NETCOREAPP3_1
+                .ToList();
+#endif
 
             foreach (var crud in cruds)
                 feature.Controllers.Add(crud.ControllerType.GetTypeInfo());

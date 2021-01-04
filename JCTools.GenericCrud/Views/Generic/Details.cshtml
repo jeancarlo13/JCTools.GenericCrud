@@ -1,7 +1,10 @@
 @using JCTools.GenericCrud.Models
 @using Microsoft.AspNetCore.Mvc.Localization
+
 @model JCTools.GenericCrud.Models.IDetailsModel
+
 @inject IViewLocalizer Localizer
+@inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
 @{
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
@@ -20,7 +23,14 @@
             @property
         </dt>
         <dd class="col-10">
-            @entity.GetPropertyValue(property)
+            @if (property.UseCustomView)
+            {                
+                @await RenderingServices.RenderViewFor(Model, Html, ViewData, property.Name, entity.GetEntity())
+            }
+            else
+            {
+                @entity.GetPropertyValue(property)
+            }
         </dd>
     }
 </dl>
