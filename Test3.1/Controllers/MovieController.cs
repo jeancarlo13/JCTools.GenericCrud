@@ -21,7 +21,9 @@ namespace Test3._1.Controllers
             ILoggerFactory loggerFactory
         )
             : base(serviceProvider, renderingService, localizerFactory, loggerFactory, "Id")
-        { }
+        {
+            // add your custom logic here
+        }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -31,7 +33,7 @@ namespace Test3._1.Controllers
             Settings.UseModals = false;
             Settings.Subtitle = "All entities";
             ViewBag.Countries = (DbContext as Context).Countries.ToList();
-            
+
             base.OnActionExecuting(filterContext);
         }
 

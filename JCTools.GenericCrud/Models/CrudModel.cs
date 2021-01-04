@@ -146,7 +146,7 @@ namespace JCTools.GenericCrud.Models
 
         /// <summary>
         /// True if the current CRUD use a custom controller; 
-        /// False if use the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> class
+        /// False if use the a GenericController class
         /// </summary>
         public bool UseCustomController { get => !_crudType.UseGenericController; }
 

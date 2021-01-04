@@ -96,13 +96,8 @@ namespace JCTools.GenericCrud.Controllers
                 throw new ArgumentException("Failure generating the database context.");
 
             _renderingService = serviceProvider.GetService(typeof(IViewRenderService)) as IViewRenderService;
-#if NETCOREAPP2_1
             _localizer = serviceProvider.GetService(typeof(IStringLocalizer)) as IStringLocalizer
                 ?? throw new ArgumentException($"No found {typeof(IStringLocalizer).Name} services."); 
-#elif NETCOREAPP3_1
-            _localizer = serviceProvider.GetService<IStringLocalizerFactory>().Create(this.GetType())
-                ?? throw new ArgumentException($"No found {typeof(IStringLocalizer).Name} services.");
-#endif
 
             _loggerFactory = serviceProvider.GetService(typeof(ILoggerFactory)) as ILoggerFactory;
             _logger = _loggerFactory.CreateLogger<GenericController<TContext, TModel, TKey>>();
@@ -412,9 +407,6 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="fileName">The name of the desired file</param>
         /// <returns>A file with the found file content</returns>        
-#if NETCOREAPP3_1
-        // [Route("{ModelType}/{filename}.js", Name = Route.GetScriptActionName)]
-#endif
         public IActionResult GetScript(string fileName)
         {
             var assembly = Settings.GetType().GetTypeInfo().Assembly;

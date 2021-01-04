@@ -16,7 +16,7 @@ namespace JCTools.GenericCrud.Settings
 
         /// <summary>
         /// True if the controller to be used into the current represented CRUD 
-        /// is <see cref="GenericController{TContext, TModel, TKey}"/>; Another, false
+        /// is <see cref="GenericController"/>; Another, false
         /// </summary>
         bool UseGenericController { get; }
 

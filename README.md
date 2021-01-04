@@ -11,7 +11,7 @@ This package allows reduce this task at minimum of actions.
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
 
 ## Status
-![v2.0.0-beta1](https://img.shields.io/badge/nuget-v2.0.0%20beta1-blue)
+![v2.0.0-beta2](https://img.shields.io/badge/nuget-v2.0.0%20beta2-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green)
@@ -25,11 +25,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
 ```bash
-Install-Package JCTools.GenericCrud -Version 2.0.0
+Install-Package JCTools.GenericCrud -Version 2.0.0-beta2
 ```
 Or
 ```bash
-dotnet add package JCTools.GenericCrud --version 2.0.0
+dotnet add package JCTools.GenericCrud --version 2.0.0-beta2
 ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
 ```cs
@@ -50,7 +50,7 @@ dotnet add package JCTools.GenericCrud --version 2.0.0
     - The method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")*.
     - The *ContextCreator* option
 
-3. Add the next line in the **UseMvc** middleware call, this in the method **Configure** of your **Startup** class
+3. If is using **.net core 2.1**, add the next line in the **UseMvc** middleware call, this in the method **Configure** of your **Startup** class 
  ```cs
  routes.MapCrudRoutes();
  ```
@@ -72,14 +72,16 @@ Your code should see similar to the next code
 If your desired personalize your controllers, add additional actions or override the default actions, then
 
 1. Not add the model to manage in the step 3 of the last section
-2. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController<TDbContext, TModel, TKey>**. sample
+2. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController<TDbContext, TModel, TKey>**. e.g;
 ```cs
+// If using .net core 2.1
 using System;
 using JCTools.GenericCrud.Controllers;
 using JCTools.GenericCrud.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+
 
 namespace Test.Controllers
 {
@@ -89,8 +91,10 @@ namespace Test.Controllers
         : base(serviceProvider)
         {}
 
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
+            // Call the initialization of the Settings property
+            base.InitSettings(context);
             // Add your custom settings here, eg;
             Settings.UseModals = false;
             Settings.Subtitle = "All entities";
@@ -100,24 +104,74 @@ namespace Test.Controllers
         }
     }
 }
-```
+
+// If using .net core 3.1 
+using System;
+using System.Linq;
+using JCTools.GenericCrud.Controllers;
+using JCTools.GenericCrud.Services;
+using JCTools.GenericCrud.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+
+namespace Test3._1.Controllers
+{
+    [CrudConstraint(typeof(Models.Movie))]
+    public class MovieController : GenericController
+    {
+        public MovieController(
+            IServiceProvider serviceProvider,
+            IViewRenderService renderingService,
+            IStringLocalizerFactory localizerFactory,
+            ILoggerFactory loggerFactory
+        )
+            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, "Id")
+        {
+            // add your custom logic here
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            // Call the initialization of the Settings property
+            base.InitSettings(filterContext);
+            // Add your custom settings here, eg;
+            Settings.UseModals = false;
+            Settings.Subtitle = "All entities";
+            ViewBag.Countries = (DbContext as Data.Context).Countries.ToList();
+
+            base.OnActionExecuting(filterContext);
+        }
+
+
+    }
+}
+ ```
 
 **Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
 
-3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
+1. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
 
 ```cs
     //...
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {        
-        base.OnActionExecuting(filterContext);
+        // Call the initialization of the Settings property
+        base.InitSettings(filterContext);
+        
         // Add your custom process here
+        
+        base.OnActionExecuting(filterContext);
 
     }
     
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        // Call the initialization of the Settings property
+        base.InitSettings(filterContext);
+        
         // Add your custom process here
+        
         return base.OnActionExecutionAsync(context, next);
     }
     //...

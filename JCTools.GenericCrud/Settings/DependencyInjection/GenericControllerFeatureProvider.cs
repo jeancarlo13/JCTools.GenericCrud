@@ -23,7 +23,7 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             => _serviceProvider = serviceProvider;
 
         /// <summary>
-        /// Register the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> into the application controller features
+        /// Register the <see cref="Controllers.GenericController"/> into the application controller features
         /// </summary>
         /// <param name="parts">The list of <see cref="ApplicationPart"/> of the application.</param>
         /// <param name="feature">The feature instance to populate.</param>
