@@ -1,4 +1,3 @@
-#if NETCOREAPP3_1
 using System;
 using System.IO;
 using System.Linq;
@@ -213,7 +212,7 @@ namespace JCTools.GenericCrud.Controllers
         [Route("{entitySettings}/{fileName}.js")]
         public IActionResult GetScript(ICrudType entitySettings, string fileName)
         {
-            var assembly = this.GetType().GetTypeInfo().Assembly;
+            var assembly = typeof(GenericController).GetTypeInfo().Assembly;
 
             // This shows the available items.
             string[] resources = assembly.GetManifestResourceNames();
@@ -237,7 +236,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entitySettings}/{id}/{action}")]
+        [Route("{entitySettings}/{id}/[action]")]
         public virtual Task<IActionResult> Details(ICrudType entitySettings, string id)
             => ShowDetailsAsync(id);
 
@@ -247,7 +246,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entitySettings}/{id}/{action}")]
+        [Route("{entitySettings}/{id}/[action]")]
         public virtual Task<IActionResult> Delete(ICrudType entitySettings, string id)
             => ShowDetailsAsync(id, isForDeletion: true);
 
@@ -257,7 +256,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
-        [Route("{entitySettings}/{id}/{action}")]
+        [Route("{entitySettings}/{id}/[action]")]
         public virtual async Task<IActionResult> DeleteConfirm(ICrudType entitySettings, string id)
         {
             await Settings.SetDataAsync(DbContext, id);
@@ -291,7 +290,7 @@ namespace JCTools.GenericCrud.Controllers
         /// </summary>
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         [HttpGet]
-        [Route("{entitySettings}/{action}")]
+        [Route("{entitySettings}/[action]")]
         public virtual async Task<IActionResult> Create(ICrudType entitySettings)
         {
             var model = Settings as IEditModel;
@@ -305,7 +304,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="id">The id of the entity to edit into the view</param>
         [HttpGet]
-        [Route("{entitySettings}/{id}/{action}")]
+        [Route("{entitySettings}/{id}/[action]")]
         public virtual async Task<IActionResult> Edit(ICrudType entitySettings, string id)
         {
             await Settings.SetDataAsync(DbContext, id);
@@ -320,7 +319,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="entityModel">The entity to save</param>
         [HttpPost]
-        [Route("{entitySettings}/{action}")]
+        [Route("{entitySettings}/[action]")]
         public virtual async Task<IActionResult> Save(
             ICrudType entitySettings,
             [FromForm] object entityModel
@@ -359,7 +358,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to change</param>
         [HttpPost]
         [ActionName(GenericCrud.Settings.Route.SaveChangesActionName)]
-        [Route("{entitySettings}/{id}/{action}")]
+        [Route("{entitySettings}/{id}/[action]")]
         public virtual async Task<IActionResult> SaveChangesAsync(
             ICrudType entitySettings,
             string id,
@@ -505,4 +504,3 @@ namespace JCTools.GenericCrud.Controllers
         }
     }
 }
-#endif

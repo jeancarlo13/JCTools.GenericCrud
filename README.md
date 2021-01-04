@@ -33,16 +33,22 @@ dotnet add package JCTools.GenericCrud --version 2.0.0-beta2
 ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
 ```cs
-    services.ConfigureGenericCrud<MyContext>(o =>
+    services.ConfigureGenericCrud<MyContext>(options =>
     {
-        // Indicate if desired use Modals 
-        o.UseModals = true;
+        // options is an instance from JCTools.GenericCrud.Settings.IOptions
+        // use this interface to custom the generated CRUDs globally
+        // eg;
+
+        // Indicate if desired use Modals
+        options.UseModals = true;
         // Set the bootstrap version to be used (default v4.3.1)
-        o.BootstrapVersion = Settings.Bootstrap.Version3;
+        options.BootstrapVersion = Settings.Bootstrap.Version3;
         // add the models type to manage with the package
-        o.Models.Add<Models.Country>(); 
-        o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
-        o.Models.Add<Models.Movie, int, MovieController, Data.Context>();
+        options.Models.Add<Models.Country>(); 
+        options.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+        
+        // add a model with a custom controller
+        options.Models.Add<Models.Movie, int, MovieController, Data.Context>();
     });
 ```
 
@@ -50,62 +56,14 @@ dotnet add package JCTools.GenericCrud --version 2.0.0-beta2
     - The method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")*.
     - The *ContextCreator* option
 
-3. If is using **.net core 2.1**, add the next line in the **UseMvc** middleware call, this in the method **Configure** of your **Startup** class 
- ```cs
- routes.MapCrudRoutes();
- ```
-Your code should see similar to the next code
- ```cs
-    app.UseMvc(routes =>
-    {
-        routes.MapCrudRoutes(); // add this line
-        routes.MapRoute(
-            name: "default",
-            template: "{controller=Home}/{action=Index}/{id?}");
-
-    });
- ```
- 4. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
+3. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
  ![Sample index page](Mockups/sampleIndexPage.png)
 
 ## Custom controllers
 If your desired personalize your controllers, add additional actions or override the default actions, then
 
-1. Not add the model to manage in the step 3 of the last section
-2. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController<TDbContext, TModel, TKey>**. e.g;
+1. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController**. e.g;
 ```cs
-// If using .net core 2.1
-using System;
-using JCTools.GenericCrud.Controllers;
-using JCTools.GenericCrud.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Logging;
-
-
-namespace Test.Controllers
-{
-    public class MovieController : GenericController<Data.Context, Models.Movie, int>
-    {
-        public MovieController(IServiceProvider serviceProvider) 
-        : base(serviceProvider)
-        {}
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            // Call the initialization of the Settings property
-            base.InitSettings(context);
-            // Add your custom settings here, eg;
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
-            // ...
-
-            base.OnActionExecuting(filterContext);
-        }
-    }
-}
-
-// If using .net core 3.1 
 using System;
 using System.Linq;
 using JCTools.GenericCrud.Controllers;
@@ -115,12 +73,12 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
-namespace Test3._1.Controllers
+namespace MyApp.Controllers
 {
-    [CrudConstraint(typeof(Models.Movie))]
-    public class MovieController : GenericController
+    [CrudConstraint(typeof(Models.MyModel))]
+    public class MyController : GenericController
     {
-        public MovieController(
+        public MyController(
             IServiceProvider serviceProvider,
             IViewRenderService renderingService,
             IStringLocalizerFactory localizerFactory,
@@ -130,48 +88,43 @@ namespace Test3._1.Controllers
         {
             // add your custom logic here
         }
-
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            // Call the initialization of the Settings property
-            base.InitSettings(filterContext);
-            // Add your custom settings here, eg;
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
-            ViewBag.Countries = (DbContext as Data.Context).Countries.ToList();
-
-            base.OnActionExecuting(filterContext);
-        }
-
-
     }
 }
  ```
 
 **Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
 
-1. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
+2. Add the related model in the method **ConfigureServices** of your **Startup** class using specifying the custom controller, eg;
+```cs
+    options.Models.Add<Models.Movie, int, MovieController, Data.Context>();
+```
+
+3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
 
 ```cs
     //...
-    public override void OnActionExecuting(ActionExecutingContext filterContext)
-    {        
+    
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
         // Call the initialization of the Settings property
-        base.InitSettings(filterContext);
-        
-        // Add your custom process here
-        
-        base.OnActionExecuting(filterContext);
+        base.InitSettings(context);
+        // Add your custom settings here, eg;
+        Settings.UseModals = false;
+        Settings.Subtitle = "All entities";
+        ViewBag.OtherEntities = (DbContext as Data.Context).OtherEntities.ToList();
 
+        base.OnActionExecuting(context);
     }
     
     public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         // Call the initialization of the Settings property
-        base.InitSettings(filterContext);
-        
-        // Add your custom process here
-        
+        base.InitSettings(context);
+        // Add your custom settings here, eg;
+        Settings.UseModals = false;
+        Settings.Subtitle = "All entities";
+        ViewBag.OtherEntities = (DbContext as Data.Context).OtherEntities.ToList();
+
         return base.OnActionExecutionAsync(context, next);
     }
     //...
@@ -180,6 +133,8 @@ namespace Test3._1.Controllers
 4. Run to app and access at the url **http://localhost:5000/Movie**,
 ## Changes of the version 2.0.0
 * Add support to Bootstrap 4.0
+* Replaces the GenericController<TContext, TModel, TKey> class for the GenericController class
+  * This new class is easier to use
 * The follows interfaces was replaced for a best definition and structure:
   * IBase -> IViewModel
   * IBaseDetails, ICrudDetails -> IDetailsModel
@@ -192,6 +147,15 @@ namespace Test3._1.Controllers
   * CrudList
 * The **IControllerOptions** interface and **ControllerOptions** class was removed for being unnecessary in the new structure
 * The extensors methods **GetLocalizedString(...)** for the **IStringLocalizer** interfaces was moved to the **StringLocalizerExtensors** class
+* Now no need to use endpoint mapping, if you use older version remove the next code from the method **Configure** your **startup** class:
+```cs
+    app.UseMvc(routes =>
+    {
+        routes.MapCrudRoutes(); // remove this line
 
+        // ...
+    });   
+
+```
 ## License
 [MIT License](LICENSE)

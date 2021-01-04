@@ -1,4 +1,3 @@
-#if NETCOREAPP3_1
 using System;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
@@ -64,12 +63,14 @@ namespace JCTools.GenericCrud.DataAnnotations
                     ?? context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName]?.ToString();
 
                 var _crud = Configurator.Options.Models[modelType];
-
-                if (CrudType == null)
-                    accept = _crud?.UseGenericController ?? false;
-                else
-                    accept = CrudType.ModelType.Equals(_crud.ModelType)
-                        && actionDescriptor.ControllerTypeInfo.Equals(CrudType.ControllerType);
+                if (_crud != null)
+                {
+                    if (CrudType == null)
+                        accept = _crud?.UseGenericController ?? false;
+                    else
+                        accept = CrudType.ModelType.Equals(_crud.ModelType)
+                            && actionDescriptor.ControllerTypeInfo.Equals(CrudType.ControllerType);
+                }
             }
 
             return accept;
@@ -95,4 +96,3 @@ namespace JCTools.GenericCrud.DataAnnotations
 
     }
 }
-#endif

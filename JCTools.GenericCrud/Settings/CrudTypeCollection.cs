@@ -56,11 +56,7 @@ namespace JCTools.GenericCrud.Settings
         public void Add<TModel, TKey, TCustomController, TContext>(string keyPropertyName = "Id")
             where TModel : class, new()
             where TContext : DbContext
-#if NETCOREAPP2_1
-            where TCustomController : GenericController<TContext, TModel, TKey>
-#elif NETCOREAPP3_1
             where TCustomController : GenericController
-#endif
             => Add(new CrudType<TModel, TKey, TCustomController, TContext>(keyPropertyName));
 
         /// <summary>

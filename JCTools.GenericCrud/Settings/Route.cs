@@ -102,11 +102,7 @@ namespace JCTools.GenericCrud.Settings
         {
             CrudType = crudType;
             ActionName = actionName;
-#if NETCOREAPP2_1
-            Pattern = string.Format(pattern ?? _defaultIdPattern, actionName.ToLowerInvariant());
-#elif NETCOREAPP3_1
             Pattern = pattern ?? string.Format(_defaultIdPattern, actionName.ToLowerInvariant());
-#endif
             Name = string.IsNullOrWhiteSpace(routeName)
                 ? $"{CrudType.ModelTypeName}_{ActionName}"
                 : routeName;
@@ -139,21 +135,6 @@ namespace JCTools.GenericCrud.Settings
 
             if (!crudType.Routes?.Any() ?? true)
             {
-#if NETCOREAPP2_1
-                crudType.Routes = new List<Route>()
-                {
-                    new Route(crudType, DetailsActionName),
-                    new Route(crudType, DeleteActionName),
-                    new Route(crudType, DeleteConfirmActionName),
-                    new Route(crudType, CreateActionName, _defaultPattern),
-                    new Route(crudType, SaveActionName, _defaultPattern),
-                    new Route(crudType, EditActionName),
-                    new Route(crudType, SaveChangesActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{id}}}}/SaveChanges"),
-                    new Route(crudType, GetScriptActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{filename}}}}.js"),
-                    new Route(crudType, IndexActionName, routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName)),
-                    new Route(crudType, IndexActionName, pattern: $"{{{{{Configurator.ModelTypeTokenName}}}}}")
-                };
-#elif NETCOREAPP3_1
                 crudType.Routes = new List<Route>()
                 {
                     new Route(crudType, DetailsActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DetailsActionName}"),
@@ -170,7 +151,6 @@ namespace JCTools.GenericCrud.Settings
                     ),
                     new Route(crudType, IndexActionName, pattern: crudType.ModelTypeName)
                 };
-#endif
             }
 
             return crudType.Routes;

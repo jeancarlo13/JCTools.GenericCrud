@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using JCTools.GenericCrud.Controllers;
-using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.DataAnnotations;
+using JCTools.GenericCrud.Services;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -20,7 +20,7 @@ namespace Test3._1.Controllers
             IStringLocalizerFactory localizerFactory,
             ILoggerFactory loggerFactory
         )
-            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, "Id")
+            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, nameof(Models.Movie.Id))
         {
             // add your custom logic here
         }
@@ -36,7 +36,5 @@ namespace Test3._1.Controllers
 
             base.OnActionExecuting(filterContext);
         }
-
-
     }
 }

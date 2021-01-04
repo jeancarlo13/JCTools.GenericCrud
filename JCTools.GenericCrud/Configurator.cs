@@ -1,41 +1,22 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using JCTools.GenericCrud.Settings.DependencyInjection;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using System.IO;
+using Microsoft.Extensions.Options;
 #if NETCOREAPP3_1
 using Microsoft.AspNetCore.Routing.Matching;
-#endif
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Internal;
-using Microsoft.Extensions.Options;
-
-#if NETCOREAPP3_1
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 #endif
+
 namespace JCTools.GenericCrud
 {
     /// <summary>
@@ -43,13 +24,6 @@ namespace JCTools.GenericCrud
     /// </summary>
     public static class Configurator
     {
-#if NETCOREAPP2_1
-        /// <summary>
-        /// The name of the <see cref="Controllers.GenericController{TContext, TModel, TKey}" /> type
-        /// </summary>
-        internal static readonly Type GenericControllerType = typeof(Controllers.GenericController<,,>);
-#endif
-
         /// <summary>
         /// The type of the database context to be use
         /// </summary>
@@ -106,13 +80,16 @@ namespace JCTools.GenericCrud
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 #if NETCOREAPP2_1
-            services.AddSingleton<IActionSelector, CrudActionSelector>();
             services.Configure<RazorViewEngineOptions>(o =>
             {
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
             });
 
-            var builder = services.AddMvc()
+            services
+                .AddMvc(o =>
+                {
+                    o.ModelBinderProviders.Insert(0, new CrudModelBinderProvider());
+                })
                 .AddRazorOptions(o =>
                 {
                     var previous = o.CompilationCallback;
@@ -124,12 +101,7 @@ namespace JCTools.GenericCrud
                     };
                     o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
                 })
-                .AddControllersAsServices()
-                .ConfigureApplicationPartManager(manager =>
-                {
-                    manager.FeatureProviders.Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
-                })
-                .Services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
+                .AddControllersAsServices();
 
 #elif NETCOREAPP3_1
             services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
@@ -152,58 +124,5 @@ namespace JCTools.GenericCrud
 
             return services;
         }
-        /// <summary>
-        /// Add the routes of all models related at the cruds
-        /// </summary>
-        /// <param name="toMapAction">The action to invoke for make the correctly route map</param>
-        private static void MapCrudRoutes(Action<Settings.Route, ICrudType> toMapAction)
-        {
-            if (toMapAction is null)
-                return;
-
-            var cruds = Options.Models.ToList();
-
-            foreach (var crud in cruds)
-            {
-                if (crud is ICrudTypeRoutable routable)
-                {
-                    Settings.Route.CreateRoutes(routable)
-                        .ToList()
-                        .ForEach(r => toMapAction(r, crud));
-                }
-            }
-        }
-
-#if NETCOREAPP2_1
-        /// <summary>
-        /// Add the routes of all models related at the cruds
-        /// </summary>
-        /// <param name="routes">the application route collection</param>
-        public static void MapCrudRoutes(this IRouteBuilder routes)
-        {
-            MapCrudRoutes((route, crudType) =>
-            {
-                routes.MapRoute(
-                    name: route.Name,
-                    template: route.Pattern,
-                    defaults: new
-                    {
-                        controller = crudType.ControllerType.Name,
-                        action = route.ActionName
-                    },
-                    constraints: new
-                    {
-                        ModelType = new CrudRouteConstraint(crudType, route.Pattern)
-                    },
-                    dataTokens: new RouteValueDictionary()
-                    {
-                        { ModelTypeTokenName, crudType.ModelType },
-                        { KeyTokenName, crudType.KeyPropertyName },
-                        { ICrudTypeTokenName, crudType }
-                    }
-                );
-            });
-        }
-#endif
     }
 }

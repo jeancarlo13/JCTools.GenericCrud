@@ -1,4 +1,3 @@
-#if NETCOREAPP3_1
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -14,6 +13,7 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         /// The collection of the model binder to be used to bind the models
         /// </summary>
         private readonly IEnumerable<CrudModelBinderMetadata> _binders;
+        
         /// <summary>
         /// Initialize the instance with specified <see cref="CrudModelBinderMetadata"/> collection
         /// </summary>
@@ -21,6 +21,7 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         /// to bind the CRUD models</param>
         public CrudModelBinder(IEnumerable<CrudModelBinderMetadata> binders)
             => _binders = binders ?? throw new ArgumentNullException(nameof(binders));
+        
         /// <summary>
         /// Attempts to bind a model.
         /// </summary>
@@ -74,4 +75,3 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         }
     }
 }
-#endif

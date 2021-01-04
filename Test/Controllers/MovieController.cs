@@ -1,21 +1,40 @@
 using System;
 using System.Linq;
 using JCTools.GenericCrud.Controllers;
+using JCTools.GenericCrud.DataAnnotations;
+using JCTools.GenericCrud.Services;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Test.Data;
+using Test.Models;
 
 namespace Test.Controllers
 {
-    public class MovieController : GenericController<Data.Context, Models.Movie, int>
+    [CrudConstraint(typeof(Movie))]
+    public class MovieController : GenericController
     {
-        public MovieController(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public MovieController(
+            IServiceProvider serviceProvider,
+            IViewRenderService renderingService,
+            IStringLocalizerFactory localizerFactory,
+            ILoggerFactory loggerFactory
+        )
+            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, nameof(Models.Movie.Id))
         {
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
-            ViewBag.Countries = DbContext.Countries.ToList();
-            base.OnActionExecuting(filterContext);
+            // add your custom logic here
         }
 
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            // Call the initialization of the Settings property
+            base.InitSettings(filterContext);
+            // Add your custom settings here, eg;
+            Settings.UseModals = false;
+            Settings.Subtitle = "All entities";
+            ViewBag.Countries = (DbContext as Context).Countries.ToList();
 
+            base.OnActionExecuting(filterContext);
+        }
     }
 }

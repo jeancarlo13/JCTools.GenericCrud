@@ -101,7 +101,6 @@ namespace Test
 
             app.UseMvc(routes =>
             {
-                routes.MapCrudRoutes();
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

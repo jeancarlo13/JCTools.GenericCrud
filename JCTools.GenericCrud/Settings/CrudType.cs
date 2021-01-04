@@ -20,11 +20,7 @@ namespace JCTools.GenericCrud.Settings
     internal class CrudType<TModel, TKey, TCustomController, TContext> : CrudType<TModel>
         where TModel : class, new()
         where TContext : DbContext
-#if NETCOREAPP2_1
-            where TCustomController : GenericController<TContext, TModel, TKey>
-#elif NETCOREAPP3_1
-            where TCustomController : GenericController
-#endif
+        where TCustomController : GenericController
 
     {
         /// <summary>
@@ -120,16 +116,7 @@ namespace JCTools.GenericCrud.Settings
             KeyPropertyType = ModelType.GetProperty(KeyPropertyName)?.PropertyType
                 ?? throw new InvalidOperationException($"The \"{KeyPropertyName}\" is not found in the model \"{ModelType.FullName}\"");
 
-#if NETCOREAPP2_1
-            ControllerType = Configurator.GenericControllerType.MakeGenericType(
-                Configurator.DatabaseContextType,
-                ModelType,
-                KeyPropertyType
-            );
-#elif NETCOREAPP3_1
             ControllerType = typeof(GenericController);
-#endif
-
             UseGenericController = true;
         }
 
