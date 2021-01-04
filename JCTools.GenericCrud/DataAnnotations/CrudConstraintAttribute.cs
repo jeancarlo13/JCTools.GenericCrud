@@ -30,8 +30,6 @@ namespace JCTools.GenericCrud.DataAnnotations
         /// <summary>
         /// Initializes the attribute
         /// </summary>
-        /// <param name="isCustomController">False if the related controller is equals 
-        /// to <see cref="GenericController" />; True if is a derived controller</param>
         internal CrudConstraintAttribute() { }
 
         /// <summary>

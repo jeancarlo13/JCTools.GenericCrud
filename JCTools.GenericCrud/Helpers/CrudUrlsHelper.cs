@@ -54,6 +54,7 @@ namespace JCTools.GenericCrud.Helpers
         /// <param name="actionName">The name of the desired CRUD action </param>
         /// <param name="crudType">The <see cref="ICrudTypeRoutable"/> with the CRUD argument to be used</param>
         /// <param name="id">The id of the entity related to the url</param>
+        /// <param name="message">The message to be displayed to the user</param>
         /// <returns>The generated URL.</returns>
         internal static string RouteUrl<TKey>(
             this IUrlHelper urlHelper,
@@ -72,6 +73,7 @@ namespace JCTools.GenericCrud.Helpers
         /// <param name="crudType">The <see cref="ICrudTypeRoutable"/> with the CRUD argument to be used</param>
         /// <param name="fileName">The name of the script to be used for form the url</param>
         /// <param name="id">The id of the entity related to the url</param>
+        /// <param name="message">The message to be displayed to the user</param>
         /// <returns>The generated URL.</returns>
         private static string GetRouteUrl(
             this IUrlHelper urlHelper,
