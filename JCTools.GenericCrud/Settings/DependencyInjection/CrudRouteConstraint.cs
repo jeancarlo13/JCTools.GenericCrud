@@ -1,3 +1,4 @@
+#if NETCOREAPP2_1
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
@@ -11,12 +12,11 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
     /// </summary>
     internal class CrudRouteConstraint : IRouteConstraint
     {
-#if NETCOREAPP2_1
-
         /// <summary>
         /// The crud type of the related model to the route
         /// </summary>
         private ICrudType _crudType;
+
         /// <summary>
         /// The template that define the route
         /// </summary>
@@ -32,20 +32,6 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             _crudType = crudType;
             _template = template;
         }
-#elif NETCOREAPP3_1
-
-        /// <summary>
-        /// The default values of the CRUD route
-        /// </summary>
-        private RouteDefaultValues _defaultValues;
-
-        /// <summary>
-        /// Initializes the current instance
-        /// </summary>
-        /// <param name="defaultValues">The defaults values of the route</param>
-        internal CrudRouteConstraint(RouteDefaultValues defaultValues)
-            => _defaultValues = defaultValues;
-#endif
 
         /// <summary>
         /// Determines whether the URL parameter contains a valid value for this constraint.
@@ -65,26 +51,17 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
             RouteDirection routeDirection
         )
         {
-
-#if NETCOREAPP2_1
             var modelType = _crudType.ModelType.Name.ToLowerInvariant();  
             var crudType = _crudType;          
-#elif NETCOREAPP3_1
-            var modelType = _defaultValues.ICrudType.ModelType.Name.ToLowerInvariant();
-            var crudType = _defaultValues.ICrudType;
-#endif
             var isMatch = values[routeKey]?.ToString().ToLowerInvariant()
                 .Equals(modelType) ?? false;
 
             if (isMatch && !values.Keys.Contains(Configurator.ICrudTypeTokenName))
                 values[Configurator.ICrudTypeTokenName] = crudType;
 
-#if NETCOREAPP3_1
-            isMatch = isMatch && _defaultValues.IsEquivalent(values);
-#endif
 
             return isMatch;
         }
-
     }
 }
+#endif

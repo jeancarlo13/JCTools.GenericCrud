@@ -149,7 +149,7 @@ namespace JCTools.GenericCrud.Helpers
             return route;
         }
 
-
+#if NETCOREAPP2_1
         /// <summary>
         /// Redirects (<see cref="Microsoft.AspNetCore.Http.StatusCodes.Status302Found"/>) to the specified
         /// CRUD route using the specified action Name
@@ -229,6 +229,6 @@ namespace JCTools.GenericCrud.Helpers
 
             return controller.RedirectToRoute(route.Name, values);
         }
-
+#endif
     }
 }

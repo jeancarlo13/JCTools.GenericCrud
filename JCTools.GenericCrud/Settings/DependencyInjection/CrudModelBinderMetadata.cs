@@ -1,3 +1,4 @@
+#if NETCOREAPP3_1
 using System;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -37,3 +38,4 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         }
     }
 }
+#endif

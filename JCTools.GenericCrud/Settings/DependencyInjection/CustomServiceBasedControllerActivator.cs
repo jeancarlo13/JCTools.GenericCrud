@@ -1,3 +1,5 @@
+
+#if NETCOREAPP2_1
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -53,3 +55,4 @@ namespace JCTools.GenericCrud.Settings.DependencyInjection
         public void Release(ControllerContext context, object controller) { }
     }
 }
+#endif
