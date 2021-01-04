@@ -1,6 +1,5 @@
 #if NETCOREAPP3_1
 using System;
-using System.Reflection;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -71,19 +70,17 @@ namespace JCTools.GenericCrud.DataAnnotations
                 else
                     accept = CrudType.ModelType.Equals(_crud.ModelType)
                         && actionDescriptor.ControllerTypeInfo.Equals(CrudType.ControllerType);
-
             }
 
             return accept;
         }
 
         /// <summary>
-        /// Try find the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition
-        /// used into the specified type
+        /// Try find the <see cref="Controllers.GenericController"/> definition used into the specified type
         /// </summary>
         /// <param name="controllerType">The controller type to review</param>
-        /// <param name="resultType">The found <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition</param>
-        /// <returns>True if the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition is found, else false</returns>
+        /// <param name="resultType">The found <see cref="Controllers.GenericController"/> definition</param>
+        /// <returns>True if the <see cref="Controllers.GenericController"/> definition is found, else false</returns>
         private bool TryFindGenericController(Type controllerType, out Type resultType)
         {
             if (controllerType.Equals(typeof(GenericController)))

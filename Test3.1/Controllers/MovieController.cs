@@ -25,12 +25,16 @@ namespace Test3._1.Controllers
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
+            // Call the initialization of the Settings property
+            base.InitSettings(filterContext);
+            // Add your custom settings here, eg;
             Settings.UseModals = false;
             Settings.Subtitle = "All entities";
             ViewBag.Countries = (DbContext as Context).Countries.ToList();
+            
             base.OnActionExecuting(filterContext);
         }
 
-        
+
     }
 }

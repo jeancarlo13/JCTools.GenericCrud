@@ -111,9 +111,10 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="filterContext">The action executing context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            Settings = Settings ?? CreateModel(filterContext);
+            InitSettings(filterContext);
             base.OnActionExecuting(filterContext);
         }
+
         /// <summary>
         /// Called before the action method is invoked. 
         /// It's required for the <see cref="Settings"/> property initialization
@@ -125,44 +126,47 @@ namespace JCTools.GenericCrud.Controllers
         /// <returns>A <see cref="Task"/> instance.</returns>
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Settings = Settings ?? CreateModel(context);
+            InitSettings(context);
             return base.OnActionExecutionAsync(context, next);
         }
+
         /// <summary>
         /// Tries initializes the <see cref="Settings"/> property
         /// </summary>
         /// <param name="context">The action executing context.</param>
-        /// <returns>The created <see cref="IViewModel"/> instance</returns>
-        private IViewModel CreateModel(ActionExecutingContext context)
+        protected void InitSettings(ActionExecutingContext context)
         {
-            if (!context.ActionArguments.TryGetValue(Constants.EntitySettingsRouteKey, out object entityName)
-                && !context.RouteData.Values.TryGetValue(Constants.EntitySettingsRouteKey, out entityName))
+            if (Settings == null)
             {
-                throw new InvalidOperationException($"Entity name not found.");
-            }
-
-            CrudType = entityName is ICrudType
-                ? entityName as ICrudType
-                : Configurator.Options.Models[entityName.ToString()];
-            if (CrudType == null)
-                throw new InvalidOperationException($"Configured model not found for {entityName}");
-
-            var type = typeof(CrudModel<,>).MakeGenericType(CrudType.ModelType, CrudType.KeyPropertyType);
-            var constructor = type.GetConstructor(
-                bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
-                binder: null,
-                types: new Type[]
+                if (!context.ActionArguments.TryGetValue(Constants.EntitySettingsRouteKey, out object entityName)
+                    && !context.RouteData.Values.TryGetValue(Constants.EntitySettingsRouteKey, out entityName))
                 {
-                    typeof(ICrudType),
-                    typeof(IStringLocalizer),
-                    typeof(IUrlHelper),
-                    typeof(ILoggerFactory)
-                },
-                modifiers: null
-            );
+                    throw new InvalidOperationException($"Entity name not found.");
+                }
 
-            return constructor?.Invoke(new object[] { CrudType, _localizer, Url, _loggerFactory }) as IViewModel
-                ?? null;
+                CrudType = entityName is ICrudType
+                    ? entityName as ICrudType
+                    : Configurator.Options.Models[entityName.ToString()];
+                if (CrudType == null)
+                    throw new InvalidOperationException($"Configured model not found for {entityName}");
+
+                var type = typeof(CrudModel<,>).MakeGenericType(CrudType.ModelType, CrudType.KeyPropertyType);
+                var constructor = type.GetConstructor(
+                    bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
+                    binder: null,
+                    types: new Type[]
+                    {
+                        typeof(ICrudType),
+                        typeof(IStringLocalizer),
+                        typeof(IUrlHelper),
+                        typeof(ILoggerFactory)
+                    },
+                    modifiers: null
+                );
+
+                Settings = constructor?.Invoke(new object[] { CrudType, _localizer, Url, _loggerFactory }) as IViewModel
+                    ?? null;
+            }
         }
         /// <summary>
         /// Allows render the index view

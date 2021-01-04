@@ -1,3 +1,4 @@
+#if NETCOREAPP2_1
 using System;
 using System.IO;
 using System.Reflection;
@@ -114,7 +115,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="filterContext">The action executing context.</param>
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url, _loggerFactory);
+            InitSettings(filterContext);
             base.OnActionExecuting(filterContext);
         }
         /// <summary>
@@ -128,9 +129,16 @@ namespace JCTools.GenericCrud.Controllers
         /// <returns>A <see cref="Task"/> instance.</returns>
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url, _loggerFactory);
+            InitSettings(context);
             return base.OnActionExecutionAsync(context, next);
         }
+
+        /// <summary>
+        /// Tries initializes the <see cref="Settings"/> property
+        /// </summary>
+        /// <param name="context">The action executing context.</param>
+        protected void InitSettings(ActionExecutingContext context)
+            => Settings = Settings ?? new CrudModel<TModel, TKey>(CrudType, _localizer, Url, _loggerFactory);
 
         /// <summary>
         /// Allows render the index view
@@ -458,3 +466,4 @@ namespace JCTools.GenericCrud.Controllers
         }
     }
 }
+#endif

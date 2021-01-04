@@ -43,10 +43,12 @@ namespace JCTools.GenericCrud
     /// </summary>
     public static class Configurator
     {
+#if NETCOREAPP2_1
         /// <summary>
         /// The name of the <see cref="Controllers.GenericController{TContext, TModel, TKey}" /> type
         /// </summary>
         internal static readonly Type GenericControllerType = typeof(Controllers.GenericController<,,>);
+#endif
 
         /// <summary>
         /// The type of the database context to be use
@@ -110,30 +112,26 @@ namespace JCTools.GenericCrud
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
             });
 
-            var builder = services.AddMvc();
-            builder.AddRazorOptions(o =>
-            {
-                var previous = o.CompilationCallback;
-                o.CompilationCallback = context =>
+            var builder = services.AddMvc()
+                .AddRazorOptions(o =>
                 {
-                    previous?.Invoke(context);
-                    context.Compilation =
-                        context.Compilation.AddReferences(MetadataReference.CreateFromFile(currentAssembly.Location));
-                };
-                o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
-            });
-
-            builder.AddControllersAsServices();
-            builder.Services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
-            builder.ConfigureApplicationPartManager(manager =>
+                    var previous = o.CompilationCallback;
+                    o.CompilationCallback = context =>
+                    {
+                        previous?.Invoke(context);
+                        context.Compilation =
+                            context.Compilation.AddReferences(MetadataReference.CreateFromFile(currentAssembly.Location));
+                    };
+                    o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
+                })
+                .AddControllersAsServices()
+                .ConfigureApplicationPartManager(manager =>
                 {
                     manager.FeatureProviders.Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
-                });
+                })
+                .Services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
 
 #elif NETCOREAPP3_1
-            // var defaultEndpointSelector = services.BuildServiceProvider().GetService<EndpointSelector>();
-            // services.AddSingleton<EndpointSelector>(provider => new CrudEndpointSelector(defaultEndpointSelector));
-
             services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
             {
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));
@@ -148,19 +146,8 @@ namespace JCTools.GenericCrud
 
             services.AddMvcCore(o =>
             {
-                o.ModelBinderProviders.Insert(0, new Settings.DependencyInjection.CrudModelBinderProvider());
+                o.ModelBinderProviders.Insert(0, new CrudModelBinderProvider());
             });
-
-            // services
-            //     .AddControllers()
-            //     .AddControllersAsServices()
-            //     .ConfigureApplicationPartManager(manager =>
-            //     {
-            //         manager.FeatureProviders
-            //             .Add(new GenericControllerFeatureProvider(services.BuildServiceProvider()));
-            //     });
-
-            // services.Replace(ServiceDescriptor.Transient<IControllerActivator, CustomServiceBasedControllerActivator>());
 #endif
 
             return services;
@@ -187,129 +174,7 @@ namespace JCTools.GenericCrud
             }
         }
 
-        // public static IApplicationBuilder UseHttpRequestLogger(this IApplicationBuilder app, ILogger logger)
-        // {
-        //     app.Use(async (context, next) =>
-        //     {
-        //         logger.LogInformation($"Header: {JsonConvert.SerializeObject(context.Request.Headers, Formatting.Indented)}");
-
-        //         context.Request.EnableBuffering();
-        //         var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
-        //         logger.LogInformation($"Body: {body}");
-        //         context.Request.Body.Position = 0;
-
-        //         logger.LogInformation($"Host: {context.Request.Host.Host}");
-        //         logger.LogInformation($"Client IP: {context.Connection.RemoteIpAddress}");
-        //         await next?.Invoke();
-        //     });
-
-        //     return app;
-        // }
-
-        // public static IApplicationBuilder UseCrud(this IApplicationBuilder app)
-        // {
-        //     Options.Models.AsEnumerable()
-        //        .ToList()
-        //        .ForEach(ct =>
-        //        {
-        //            app.Map(
-        //                new PathString($"/{ct.ModelType.Name}"),
-        //                builder => builder.Use(async (context, next) =>
-        //                {
-        //                    context.Request.RouteValues.TryAdd("controller", ct.ControllerType.Name);
-        //                    context.Request.RouteValues.TryAdd(Configurator.ModelTypeTokenName, ct.ModelType.Name);
-        //                    context.Request.RouteValues.TryAdd(Configurator.KeyTokenName, ct.KeyPropertyName);
-        //                    context.Request.RouteValues.TryAdd(Configurator.ICrudTypeTokenName, ct);
-        //                    await next();
-        //                })
-        //            );
-        //        });
-
-        //     return app;
-        // }
-
-#if NETCOREAPP3_1   
-        /// <summary>
-        /// Add the routes of all models related at the cruds
-        /// </summary>
-        /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the routes to.</param>
-        public static void MapCrudRoutes(this IEndpointRouteBuilder endpoints)
-        {
-            MapCrudRoutes((route, crudType) =>
-            {
-                endpoints.MapControllerRoute(
-                    name: route.Name,
-                    pattern: route.Pattern,
-                    defaults: route.DefaultValues,
-                    constraints: new
-                    {
-                        modelType = new CrudRouteConstraint(route.DefaultValues)
-                    }
-                ).WithMetadata(new object[]{
-                    // new DataAnnotations.CrudConstraintAttibute(),
-                    new ControllerAttribute(),
-                   // CreateActionDescriptor(route.ActionName, crudType.ControllerType),
-                    new DataTokensMetadata(new Dictionary<string, object>())
-                });
-
-                // endpoints.MapControllerRoute(
-                //     name: "customCrudsDefaultRoute",
-                //     pattern: "{controller}/{id}/{action}");
-            });
-        }
-
-        private static ControllerActionDescriptor CreateActionDescriptor(string methodName, Type controllerType)
-        {
-            if (string.IsNullOrEmpty(methodName))
-                throw new ArgumentException($"'{nameof(methodName)}' cannot be null or empty.", nameof(methodName));
-
-            var action = new ControllerActionDescriptor();
-            action.SetProperty(new ApiDescriptionActionData());
-
-            if (controllerType == null)
-                throw new ArgumentNullException(nameof(controllerType));
-
-
-            action.MethodInfo = controllerType.GetMethod(methodName)
-                ?? controllerType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? controllerType.GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic)
-                ?? controllerType.GetMethod($"{methodName}Async", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                ?? controllerType.GetMethod($"{methodName}Async", BindingFlags.Public | BindingFlags.NonPublic)
-                ?? throw new InvalidOperationException($"The method {methodName} was not found.");
-
-            action.ControllerTypeInfo = controllerType.GetTypeInfo();
-            action.BoundProperties = new List<ParameterDescriptor>();
-
-            foreach (var property in controllerType.GetProperties())
-            {
-                var bindingInfo = BindingInfo.GetBindingInfo(property.GetCustomAttributes().OfType<object>());
-                if (bindingInfo != null)
-                {
-                    action.BoundProperties.Add(new ParameterDescriptor()
-                    {
-                        BindingInfo = bindingInfo,
-                        Name = property.Name,
-                        ParameterType = property.PropertyType,
-                    });
-                }
-            }
-
-
-            action.Parameters = new List<ParameterDescriptor>();
-            foreach (var parameter in action.MethodInfo.GetParameters())
-            {
-                action.Parameters.Add(new ControllerParameterDescriptor()
-                {
-                    Name = parameter.Name,
-                    ParameterType = parameter.ParameterType,
-                    BindingInfo = BindingInfo.GetBindingInfo(parameter.GetCustomAttributes().OfType<object>()),
-                    ParameterInfo = parameter
-                });
-            }
-
-            return action;
-        }
-#elif NETCOREAPP2_1
+#if NETCOREAPP2_1
         /// <summary>
         /// Add the routes of all models related at the cruds
         /// </summary>
