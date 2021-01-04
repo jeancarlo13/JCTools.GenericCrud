@@ -98,7 +98,7 @@ namespace JCTools.GenericCrud.Helpers
 
             var url = urlHelper.RouteUrl(route?.Name ?? actionName, values);
 
-            if (string.IsNullOrWhiteSpace(url) && crudType.UseGenericController)
+            if (string.IsNullOrWhiteSpace(url))
             {
                 url = route.Pattern;
                 if (id != null)

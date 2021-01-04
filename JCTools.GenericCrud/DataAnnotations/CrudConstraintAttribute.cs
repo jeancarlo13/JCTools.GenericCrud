@@ -1,11 +1,10 @@
 #if NETCOREAPP3_1
 using System;
-using System.Linq;
 using System.Reflection;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Http.Extensions;
+using JCTools.GenericCrud.Controllers;
 
 namespace JCTools.GenericCrud.DataAnnotations
 {
@@ -13,8 +12,8 @@ namespace JCTools.GenericCrud.DataAnnotations
     /// Allows discriminating between multiple CRUD endpoints 
     /// </summary>
     /// <remarks>See remarks on <see cref="IActionConstraint"/>.</remarks>
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = true)]
-    public class CrudActionConstraintAttribute : Attribute, IActionConstraint
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+    public class CrudConstraintAttribute : Attribute, IActionConstraint
     {
         /// <summary>
         /// The constraint order.
@@ -24,34 +23,57 @@ namespace JCTools.GenericCrud.DataAnnotations
         public int Order { get; set; }
 
         /// <summary>
+        /// The type of the CRUD to the related controller
+        /// </summary>
+        internal ICrudType CrudType { get; private set; }
+
+        /// <summary>
+        /// Initializes the attribute
+        /// </summary>
+        /// <param name="isCustomController">False if the related controller is equals 
+        /// to <see cref="GenericController" />; True if is a derived controller</param>
+        internal CrudConstraintAttribute() { }
+
+        /// <summary>
+        /// Initializes the attribute for a custom controller
+        /// </summary>
+        public CrudConstraintAttribute(Type modelType, string keyProperty = "Id")
+        {
+            if (string.IsNullOrWhiteSpace(keyProperty))
+                throw new ArgumentException(
+                    $"'{nameof(keyProperty)}' cannot be null or whitespace.", nameof(keyProperty));
+
+            CrudType = Configurator.Options.Models[modelType, keyProperty];
+
+            if (CrudType == null)
+                throw new ArgumentException(
+                    $"Not exists a configured Crud for the model \"{modelType}\" and the key property \"{keyProperty}\"");
+
+        }
+
+        /// <summary>
         /// Determines whether an action is a valid candidate for selection 
         /// considering the configure model type por the controller
         /// </summary>
         /// <param name="context">The <see cref="ActionConstraintContext"/> with the request data.</param>
         /// <returns>True if the action is valid for selection, otherwise false.</returns>
         public bool Accept(ActionConstraintContext context)
-        {    
-            var actionDescriptor = context.CurrentCandidate.Action as ControllerActionDescriptor;
-            if (actionDescriptor == null)
-                return false;
-
-            var crudType = context.RouteContext.RouteData.Values[Configurator.ICrudTypeTokenName] as ICrudType;
-            var modelType = context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName]?.ToString();
-            var isFoundController = TryFindGenericController(actionDescriptor.ControllerTypeInfo, out Type controllerType);
-
-            if (crudType == null && isFoundController)
-            {
-                var args = controllerType.GenericTypeArguments.Skip(1);
-                crudType = Configurator.Options.Models[args.First(), args.Last()];
-            }
-
+        {
             var accept = false;
-            if (crudType != null)
-                accept = actionDescriptor.ControllerTypeInfo.Equals(crudType.ControllerType.GetTypeInfo());
-            else if (!string.IsNullOrWhiteSpace(modelType) && isFoundController)
+            var actionDescriptor = context.CurrentCandidate.Action as ControllerActionDescriptor;
+            if (actionDescriptor != null)
             {
-                accept = actionDescriptor.ControllerTypeInfo.GenericTypeArguments
-                   .Any(gt => gt.Name.ToLowerInvariant().Equals(modelType.ToLowerInvariant()));
+                var modelType = context.RouteContext.RouteData.Values[Constants.EntitySettingsRouteKey]?.ToString()
+                    ?? context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName]?.ToString();
+
+                var _crud = Configurator.Options.Models[modelType];
+
+                if (CrudType == null)
+                    accept = _crud?.UseGenericController ?? false;
+                else
+                    accept = CrudType.ModelType.Equals(_crud.ModelType)
+                        && actionDescriptor.ControllerTypeInfo.Equals(CrudType.ControllerType);
+
             }
 
             return accept;
@@ -66,7 +88,7 @@ namespace JCTools.GenericCrud.DataAnnotations
         /// <returns>True if the <see cref="Controllers.GenericController{TContext, TModel, TKey}"/> definition is found, else false</returns>
         private bool TryFindGenericController(Type controllerType, out Type resultType)
         {
-            if (controllerType.Name.Equals(Configurator.GenericControllerType.Name))
+            if (controllerType.Equals(typeof(GenericController)))
                 resultType = controllerType;
             else if (controllerType.BaseType == null)
                 resultType = null;

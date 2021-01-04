@@ -1,21 +1,36 @@
 using System;
 using System.Linq;
 using JCTools.GenericCrud.Controllers;
+using JCTools.GenericCrud.Services;
+using JCTools.GenericCrud.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using Test3._1.Data;
+using Test3._1.Models;
 
 namespace Test3._1.Controllers
 {
-    public class MovieController : GenericController<Data.Context, Models.Movie, int>
+    [CrudConstraint(typeof(Movie))]
+    public class MovieController : GenericController
     {
-        public MovieController(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        public MovieController(
+            IServiceProvider serviceProvider,
+            IViewRenderService renderingService,
+            IStringLocalizerFactory localizerFactory,
+            ILoggerFactory loggerFactory
+        )
+            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, "Id")
+        { }
+
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             Settings.UseModals = false;
             Settings.Subtitle = "All entities";
-            ViewBag.Countries = DbContext.Countries.ToList();
+            ViewBag.Countries = (DbContext as Context).Countries.ToList();
             base.OnActionExecuting(filterContext);
         }
 
-
+        
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Services;
@@ -22,6 +23,7 @@ namespace JCTools.GenericCrud.Controllers
     /// <summary>
     /// Used for create the controllers that are the entry points for the custom cruds
     /// </summary>
+    [CrudConstraint]
     public class GenericController : Controller, IGenericController
     {
         /// <summary>
@@ -85,9 +87,11 @@ namespace JCTools.GenericCrud.Controllers
         )
         {
             if (string.IsNullOrWhiteSpace(keyPropertyName))
-                throw new ArgumentException($"'{nameof(keyPropertyName)}' cannot be null or whitespace.", nameof(keyPropertyName));
+                throw new ArgumentException(
+                    $"'{nameof(keyPropertyName)}' cannot be null or whitespace.",
+                    nameof(keyPropertyName)
+                );
             _keyPropertyName = keyPropertyName;
-
 
             DbContext = serviceProvider.GetRequiredService(Configurator.DatabaseContextType) as DbContext;
             if (DbContext == null)

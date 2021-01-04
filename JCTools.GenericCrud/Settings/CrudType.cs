@@ -20,7 +20,11 @@ namespace JCTools.GenericCrud.Settings
     internal class CrudType<TModel, TKey, TCustomController, TContext> : CrudType<TModel>
         where TModel : class, new()
         where TContext : DbContext
-        where TCustomController : GenericController<TContext, TModel, TKey>
+#if NETCOREAPP2_1
+            where TCustomController : GenericController<TContext, TModel, TKey>
+#elif NETCOREAPP3_1
+            where TCustomController : GenericController
+#endif
 
     {
         /// <summary>

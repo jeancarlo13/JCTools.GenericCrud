@@ -27,10 +27,11 @@
 @if (!Model.UseModals)
 {
     <div class="row">
-        <div class="col-md-12">
-            <partial name="_action" model="Model.IndexAction" />
-            @if (Model.CurrentProcess == CrudProcesses.Delete)
+    <div class="col-md-12">
+        <partial name="_action" model="Model.IndexAction" />
+        @if (Model.CurrentProcess == CrudProcesses.Delete)
             {
+                Model.DeleteAction.UseText = true;
                 <partial name="_action" model="Model.DeleteAction" />
             }
         </div>

@@ -246,7 +246,7 @@ namespace JCTools.GenericCrud
                         modelType = new CrudRouteConstraint(route.DefaultValues)
                     }
                 ).WithMetadata(new object[]{
-                    new DataAnnotations.CrudActionConstraintAttribute(),
+                    // new DataAnnotations.CrudConstraintAttibute(),
                     new ControllerAttribute(),
                    // CreateActionDescriptor(route.ActionName, crudType.ControllerType),
                     new DataTokensMetadata(new Dictionary<string, object>())
