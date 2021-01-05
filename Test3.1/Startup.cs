@@ -52,10 +52,7 @@ namespace Test3._1
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IWebHostEnvironment env,
-            ILoggerFactory loggerFactory,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider,
-            EndpointSelector selector
+            IWebHostEnvironment env
             )
         {
             if (env.IsDevelopment())
@@ -81,13 +78,9 @@ namespace Test3._1
             app.UseRouting();
 
             app.UseAuthorization();
-
-            // app.UseHttpRequestLogger(loggerFactory.CreateLogger<Startup>());
-            // app.UseCrud();
-
+            
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapCrudRoutes();
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

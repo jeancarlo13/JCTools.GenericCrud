@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using JCTools.GenericCrud;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace Test5._0
 {
@@ -23,7 +26,23 @@ namespace Test5._0
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddDbContext<Data.Context>(builder =>
+                builder.UseSqlite("Data Source=../Data/MoviesGallery.db")
+            );
+
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+            services.AddGenericCrud<Data.Context>(o =>
+            {
+                o.UseModals = true;
+                o.Models.Add<Models.Country>();
+                o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+                o.Models.Add<Models.Movie, int, Controllers.MovieController, Data.Context>();
+            });
+
+            services.AddControllersWithViews()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,8 +59,15 @@ namespace Test5._0
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
+            var supportedCultures = new[] { "en-US", "es-MX" };
+            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
+
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();

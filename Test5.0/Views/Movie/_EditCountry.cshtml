@@ -1,0 +1,13 @@
+@model Test5._0.Models.Movie
+
+
+<label class="col-md-2 text-right" asp-for="Country">@Localizer["Country"]</label>          
+<div class="col-md-10"> 
+    <select asp-for="Country">
+        @foreach(var country in ViewBag.Countries)
+        {
+            <option value="@country.Id">@country.Name</option>
+        }
+    </select>                   
+    <span asp-validation-for="Country" class="text-danger"></span>
+</div>
