@@ -54,4 +54,22 @@
     <EmbeddedResource Include="Views\Generic\Edit.cshtml" />
     <EmbeddedResource Include="js\genericCrud.js" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\I18N.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>I18N.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\I18N.es.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\I18N.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>I18N.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
