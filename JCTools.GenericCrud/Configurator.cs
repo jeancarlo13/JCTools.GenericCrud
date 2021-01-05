@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1 || NET5_0
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 #endif
@@ -103,7 +103,7 @@ namespace JCTools.GenericCrud
                 })
                 .AddControllersAsServices();
 
-#elif NETCOREAPP3_1
+#elif NETCOREAPP3_1 || NET5_0
             services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
             {
                 o.FileProviders.Add(new EmbeddedFileProvider(currentAssembly));

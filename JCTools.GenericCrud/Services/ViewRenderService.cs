@@ -83,7 +83,7 @@ namespace JCTools.GenericCrud.Services
             IActionContextAccessor actionContextAccessor,
 #if NETCOREAPP2_1
             IHostingEnvironment environmet
-#elif NETCOREAPP3_1
+#elif NETCOREAPP3_1 || NET5_0
             Microsoft.AspNetCore.Hosting.IWebHostEnvironment environmet
 #endif
         )
