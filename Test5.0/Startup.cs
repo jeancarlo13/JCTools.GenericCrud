@@ -38,6 +38,7 @@ namespace Test5._0
                 o.Models.Add<Models.Country>();
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
                 o.Models.Add<Models.Movie, int, Controllers.MovieController, Data.Context>();
+                o.ReplaceLocalization(Resources.I18NTest.ResourceManager);
             });
 
             services.AddControllersWithViews()
@@ -60,17 +61,19 @@ namespace Test5._0
             }
             app.UseHttpsRedirection();
 
-            var supportedCultures = new[] { "en-US", "es-MX" };
-            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+            var supportedCultures = new[] { "es", "en" };
+            var localizationOptions = new RequestLocalizationOptions() { ApplyCurrentCultureToResponseHeaders = true }
+                .SetDefaultCulture(supportedCultures[0])
                 .AddSupportedCultures(supportedCultures)
                 .AddSupportedUICultures(supportedCultures);
 
             app.UseRequestLocalization(localizationOptions);
 
-            app.UseStaticFiles();
             app.UseRouting();
+            app.UseStaticFiles();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints =>
             {

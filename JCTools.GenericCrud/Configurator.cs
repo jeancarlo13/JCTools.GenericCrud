@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Logging;
 #if NETCOREAPP3_1 || NET5_0
 using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
@@ -79,6 +81,13 @@ namespace JCTools.GenericCrud
             services.AddTransient<IViewRenderService, ViewRenderService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
+            services.AddLocalization();
+            services.AddTransient<ICrudLocalizer>(services =>
+            {
+                var logger = services.GetRequiredService<ILoggerFactory>();
+                return new CrudLocalizer(Options.ResourceManager, logger);
+            });
+
 #if NETCOREAPP2_1
             services.Configure<RazorViewEngineOptions>(o =>
             {
@@ -101,7 +110,9 @@ namespace JCTools.GenericCrud
                     };
                     o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
                 })
-                .AddControllersAsServices();
+                .AddControllersAsServices()
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
 
 #elif NETCOREAPP3_1 || NET5_0
             services.Configure<MvcRazorRuntimeCompilationOptions>(o =>
@@ -110,19 +121,17 @@ namespace JCTools.GenericCrud
             });
 
             services.AddRazorPages()
-                .AddRazorOptions(o =>
-                {
-                    o.ViewLocationExpanders.Add(new Services.ViewLocationExpander());
-                })
+                .AddRazorOptions(o => o.ViewLocationExpanders.Add(new ViewLocationExpander()))
                 .AddRazorRuntimeCompilation();
 
-            services.AddMvcCore(o =>
-            {
-                o.ModelBinderProviders.Insert(0, new CrudModelBinderProvider());
-            });
+            services
+                .AddMvcCore(o => o.ModelBinderProviders.Insert(0, new CrudModelBinderProvider()))
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
 #endif
 
             return services;
         }
+
     }
 }

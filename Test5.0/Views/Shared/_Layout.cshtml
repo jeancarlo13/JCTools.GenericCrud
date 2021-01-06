@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Test5._0.Resources.Views.Shared
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,19 +21,19 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@_Layout.Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">@_Layout.Privacy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Movie" asp-action="Index">@Localizer["Movie"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Movie" asp-action="Index">@_Layout.Movie</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Country" asp-action="Index">@Localizer["Country"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Country" asp-action="Index">@_Layout.Country</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Genre" asp-action="Index">@Localizer["Genre"]</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Genre" asp-action="Index">@_Layout.Genre</a>
                         </li>
                     </ul>
                 </div>

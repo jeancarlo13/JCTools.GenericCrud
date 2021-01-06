@@ -34,8 +34,6 @@ namespace Test3._1
                 builder.UseSqlite("Data Source=../Data/MoviesGallery.db")
             );
 
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
-
             services.AddGenericCrud<Data.Context>(o =>
            {
                o.UseModals = true;
@@ -44,9 +42,7 @@ namespace Test3._1
                o.Models.Add<Models.Movie, int, Controllers.MovieController, Data.Context>();
            });
 
-            services.AddControllersWithViews()
-                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-                .AddDataAnnotationsLocalization();
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,14 +62,7 @@ namespace Test3._1
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-
-            var supportedCultures = new[] { "en-US", "es-MX" };
-            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
-                .AddSupportedCultures(supportedCultures)
-                .AddSupportedUICultures(supportedCultures);
-
-            app.UseRequestLocalization(localizationOptions);
-
+           
             app.UseStaticFiles();
             app.UseRouting();
 

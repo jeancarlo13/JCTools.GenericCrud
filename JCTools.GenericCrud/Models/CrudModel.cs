@@ -171,7 +171,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                             "GenericCrud.List.Index.Caption",
                             "Go back",
-                            GetModelType().Name.ToLower()
+                            GetModelName().ToLower()
                         ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Index.Text", "Go back"),
                         IconClass = Configurator.Options?.Actions?.Index?.IconClass
@@ -209,7 +209,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                                 "GenericCrud.List.Create.Caption",
                                     "Create new {0}",
-                                    GetModelType().Name.ToLower()
+                                    GetModelName().ToLower()
                             ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Create.Text", "Create"),
                         IconClass = Configurator.Options?.Actions?.New?.IconClass
@@ -248,7 +248,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                             "GenericCrud.List.Save.Caption",
                             "Save changes",
-                            GetModelType().Name.ToLower()
+                            GetModelName().ToLower()
                         ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Save.Text", "Save"),
                         IconClass = Configurator.Options?.Actions?.Save?.IconClass
@@ -292,7 +292,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                             "GenericCrud.List.Details.Caption",
                             "Details of the {0}",
-                            GetModelType().Name.ToLower()
+                            GetModelName().ToLower()
                         ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Details.Text", "Details"),
                         IconClass = Configurator.Options?.Actions?.Details?.IconClass ?? ActionOptions.DefaultDetails.IconClass,
@@ -329,7 +329,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                             "GenericCrud.List.Edit.Caption",
                             "Edit of the {0}",
-                            GetModelType().Name.ToLower()
+                            GetModelName().ToLower()
                         ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Edit.Text", "Edit"),
                         IconClass = Configurator.Options?.Actions?.Edit?.IconClass
@@ -368,7 +368,7 @@ namespace JCTools.GenericCrud.Models
                         Caption = _localizer.GetLocalizedString(
                            "GenericCrud.List.Delete.Caption",
                            "Delete of the {0}",
-                           GetModelType().Name.ToLower()
+                           GetModelName().ToLower()
                        ),
                         Text = _localizer.GetLocalizedString("GenericCrud.List.Delete.Text", "Delete"),
                         IconClass = Configurator.Options?.Actions?.Delete?.IconClass
@@ -459,7 +459,7 @@ namespace JCTools.GenericCrud.Models
         public virtual string GetModelName()
         {
             var name = _crudType.ModelType.Name;
-            return _localizer.GetLocalizedString(name, name);
+            return _localizer.GetLocalizedString<TModel>();
         }
 
         /// <summary>
@@ -605,5 +605,7 @@ namespace JCTools.GenericCrud.Models
 
             return default(TKey);
         }
+
+
     }
 }

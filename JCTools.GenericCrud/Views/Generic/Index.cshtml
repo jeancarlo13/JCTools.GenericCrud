@@ -1,6 +1,8 @@
-@using Microsoft.AspNetCore.Mvc.Localization
+@using JCTools.GenericCrud.Services
+
 @model JCTools.GenericCrud.Models.IIndexModel
-@inject IViewLocalizer Localizer
+
+@inject ICrudLocalizer Localizer
 @inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
 @{

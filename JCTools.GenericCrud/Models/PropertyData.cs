@@ -65,8 +65,8 @@ namespace JCTools.GenericCrud.Models
             IsVisible = crudAttribute?.Visible ?? true;
             UseCustomView = crudAttribute?.UseCustomView ?? false;
 
-            var displayAttribute = _info.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>();
-            Order = displayAttribute?.Order ?? 0;
+            var displayAttribute = _info.GetCustomAttribute<DisplayAttribute>();
+            Order = displayAttribute?.GetOrder() ?? 0;
 
             _displayName = localizer.GetString(displayAttribute?.GetName() ?? Name);
         }

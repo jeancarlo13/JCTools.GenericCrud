@@ -174,7 +174,7 @@ namespace JCTools.GenericCrud.Services
             foreach (var key in viewData.Keys)
                 viewDictionary.Add(key, viewData[key]);
 
-            var file = $"~/Views/{model.GetModelType().Name}/{viewPrefix}{propertyName}.cshtml";
+            var file = $"~/Views/{model.GetModelName()}/{viewPrefix}{propertyName}.cshtml";
             var result = htmlHelper.Raw(await RenderToStringAsync(file, data, viewDictionary));
             return result;
         }

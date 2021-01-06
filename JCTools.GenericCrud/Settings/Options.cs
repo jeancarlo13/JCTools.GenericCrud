@@ -1,4 +1,5 @@
 using System;
+using System.Resources;
 using JCTools.GenericCrud.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,5 +58,17 @@ namespace JCTools.GenericCrud.Settings
         /// Default <see cref="Bootstrap.Version4"/>
         /// </summary>
         public Bootstrap BootstrapVersion { get; set; } = Bootstrap.Version4;
+
+        /// <summary>
+        /// The cached <see cref="ResourceManager"/> instance to be used
+        /// </summary>
+        public ResourceManager ResourceManager { get; private set; } = Resources.I18N.ResourceManager;
+
+        /// <summary>
+        /// Allows replace the default localization strings for the CRUDs
+        /// </summary>
+        /// <param name="resourceManager">The cached <see cref="ResourceManager"/> instance to be used</param>
+        public void ReplaceLocalization(ResourceManager resourceManager)
+            => ResourceManager = resourceManager ?? throw new ArgumentNullException(nameof(resourceManager));
     }
 }

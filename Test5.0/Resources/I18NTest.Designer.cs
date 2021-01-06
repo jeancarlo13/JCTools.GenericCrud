@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace JCTools.GenericCrud.Resources {
+namespace Test5._0.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace JCTools.GenericCrud.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class I18N {
+    public class I18NTest {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal I18N() {
+        internal I18NTest() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace JCTools.GenericCrud.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JCTools.GenericCrud.Resources.I18N", typeof(I18N).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Test5._0.Resources.I18NTest", typeof(I18NTest).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -255,6 +255,42 @@ namespace JCTools.GenericCrud.Resources {
         public static string RequiredField {
             get {
                 return ResourceManager.GetString("RequiredField", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Name
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Country
+        /// </summary>
+        public static string Country {
+            get {
+                return ResourceManager.GetString("Country", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Genre
+        /// </summary>
+        public static string Genre {
+            get {
+                return ResourceManager.GetString("Genre", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Description
+        /// </summary>
+        public static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
             }
         }
     }

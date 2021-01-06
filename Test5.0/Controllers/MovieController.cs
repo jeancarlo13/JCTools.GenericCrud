@@ -20,7 +20,7 @@ namespace Test5._0.Controllers
             IStringLocalizerFactory localizerFactory,
             ILoggerFactory loggerFactory
         )
-            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, nameof(Models.Movie.Id))
+            : base(serviceProvider, renderingService, loggerFactory, nameof(Models.Movie.Id))
         {
             // add your custom logic here
         }

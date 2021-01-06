@@ -117,78 +117,19 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="GenericCrud.Index.Subtitle" xml:space="preserve">
-        <value>Todos los datos</value>
+    <data name="Movie" xml:space="preserve">
+        <value>Movie</value>
     </data>
-    <data name="GenericCrud.List.Create.Caption" xml:space="preserve">
-        <value>Crear {0}</value>
-        <comment>{0} is the entity name</comment>
+    <data name="Country" xml:space="preserve">
+        <value>Country</value>
     </data>
-    <data name="GenericCrud.List.Create.Text" xml:space="preserve">
-        <value>Nuevo</value>
+    <data name="Genre" xml:space="preserve">
+        <value>Genre</value>
     </data>
-    <data name="GenericCrud.List.Details.Caption" xml:space="preserve">
-        <value>Ver detalles</value>
-        <comment>{0} is the entity name</comment>
+    <data name="Home" xml:space="preserve">
+        <value>Home</value>
     </data>
-    <data name="GenericCrud.List.Details.Text" xml:space="preserve">
-        <value>Detalles</value>
-    </data>
-    <data name="GenericCrud.List.Edit.Caption" xml:space="preserve">
-        <value>Editar {0}</value>
-        <comment>{0} is the entity name</comment>
-    </data>
-    <data name="GenericCrud.List.Edit.Text" xml:space="preserve">
-        <value>Editar</value>
-    </data>
-    <data name="GenericCrud.List.Delete.Caption" xml:space="preserve">
-        <value>Borrar {0}</value>
-        <comment>{0} is the entity name</comment>
-    </data>
-    <data name="GenericCrud.List.Index.Text" xml:space="preserve">
-        <value>Regresar</value>
-    </data>
-    <data name="GenericCrud.List.Save.Caption" xml:space="preserve">
-        <value>Guardar cambios</value>
-    </data>
-    <data name="GenericCrud.List.Save.Text" xml:space="preserve">
-        <value>Guardar</value>
-    </data>
-    <data name="GenericCrud.List.GoBack.Caption" xml:space="preserve">
-        <value>Regresar</value>
-    </data>
-    <data name="GenericCrud.List.Delete.Text" xml:space="preserve">
-        <value>Borrar</value>
-    </data>
-    <data name="GenericCrud.Details.Subtitle" xml:space="preserve">
-        <value>Detalles</value>
-    </data>
-    <data name="GenericCrud.Edit.Subtitle" xml:space="preserve">
-        <value>Edición</value>
-    </data>
-    <data name="GenericCrud.Delete.Subtitle" xml:space="preserve">
-        <value>¿Estas seguro de desear borrar esto?</value>
-    </data>
-    <data name="GenericCrud.Index.CreateSuccessMessage" xml:space="preserve">
-        <value>Información almacenada correctamente.</value>
-    </data>
-    <data name="GenericCrud.Index.DeleteSuccessMessage" xml:space="preserve">
-        <value>Información borrada correctamente.</value>
-    </data>
-    <data name="GenericCrud.UnableSaveChangesMessage" xml:space="preserve">
-        <value>No es posible almacenar los cambios. Inténtelo de nuevo, y si el problema persiste, consulte a su administrador del sistema.</value>
-    </data>
-    <data name="GenericCrud.UnableDeleteMessage" xml:space="preserve">
-        <value>No es posible borrar los datos. Inténtelo de nuevo, y si el problema persiste, consulte a su administrador del sistema.</value>
-    </data>
-    <data name="GenericCrud.ClosePopup" xml:space="preserve">
-        <value>Cerrar</value>
-    </data>
-    <data name="RequiredField" xml:space="preserve">
-        <value>El campo {0} es requerido.</value>
-        <comment>{0} is the field name</comment>
-    </data>
-    <data name="GenericCrud.Index.EditSuccessMessage" xml:space="preserve">
-        <value>Cambios almacenado correctamente.</value>
+    <data name="Privacy" xml:space="preserve">
+        <value>Privacy</value>
     </data>
 </root>

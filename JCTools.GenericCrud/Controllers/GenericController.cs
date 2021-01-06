@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
+using JCTools.GenericCrud.Resources;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ namespace JCTools.GenericCrud.Controllers
         /// The instance of <see cref="IStringLocalizer" /> used of the internationalization 
         /// and localization of the string
         /// </summary>
-        private readonly IStringLocalizer _localizer;
+        private readonly ICrudLocalizer _localizer;
 
         /// <summary>
         /// The instance of <see cref="ILogger"/> used for send to log the message of the controller
@@ -73,14 +74,11 @@ namespace JCTools.GenericCrud.Controllers
         /// of access to the configured services into the startup class</param>
         /// <param name="renderingService">The instance of <see cref="IViewRenderService"/> used 
         /// for render the embedded views</param>
-        /// <param name="localizerFactory">The instance of <se cref="IStringLocalizerFactory"/> used
-        /// for generate the <see cref="IStringLocalizer"/> translators</param>
         /// <param name="loggerFactory">The instance of <see cref="ILoggerFactory"/> used for create new logs</param>
         /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
         public GenericController(
             IServiceProvider serviceProvider,
             IViewRenderService renderingService,
-            IStringLocalizerFactory localizerFactory,
             ILoggerFactory loggerFactory,
             string keyPropertyName = "Id"
         )
@@ -96,10 +94,11 @@ namespace JCTools.GenericCrud.Controllers
             if (DbContext == null)
                 throw new ArgumentException("Failure generating the database context.");
 
-            _renderingService = renderingService;
-            _localizer = localizerFactory.Create(this.GetType());
+            _localizer = serviceProvider.GetRequiredService<ICrudLocalizer>()
+                ?? throw new InvalidOperationException($"Failure getting the {nameof(ICrudLocalizer)} service.");
 
-            _loggerFactory = loggerFactory;
+            _renderingService = renderingService ?? throw new ArgumentNullException(nameof(renderingService));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = loggerFactory.CreateLogger(this.GetType());
         }
 

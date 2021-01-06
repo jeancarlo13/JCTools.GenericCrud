@@ -1,10 +1,10 @@
-@using Microsoft.AspNetCore.Mvc.Localization
 @using JCTools.GenericCrud;
 @using JCTools.GenericCrud.Settings;
+@using JCTools.GenericCrud.Services;
 
 @model JCTools.GenericCrud.Models.Popup
 
-@inject IViewLocalizer Localizer
+@inject ICrudLocalizer Localizer
 
 @{
     var useBootstrap3 = Configurator.BootstrapVersion == Bootstrap.Version3;
@@ -42,7 +42,7 @@
                 </div>
             }
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary @(useBootstrap3 ? "btn-sm" : string.Empty)"
+                <button type="button" class="btn btn-secondary btn-sm"
                     data-dismiss="modal">@Localizer["GenericCrud.ClosePopup"]</button>
                 @if (Model.CommitAction != null)
                 {

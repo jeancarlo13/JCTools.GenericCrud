@@ -17,10 +17,9 @@ namespace Test.Controllers
         public MovieController(
             IServiceProvider serviceProvider,
             IViewRenderService renderingService,
-            IStringLocalizerFactory localizerFactory,
             ILoggerFactory loggerFactory
         )
-            : base(serviceProvider, renderingService, localizerFactory, loggerFactory, nameof(Models.Movie.Id))
+            : base(serviceProvider, renderingService, loggerFactory, nameof(Models.Movie.Id))
         {
             // add your custom logic here
         }
