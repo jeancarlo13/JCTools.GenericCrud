@@ -370,8 +370,8 @@ namespace JCTools.GenericCrud.Controllers
             var model = Settings as IEditModel;
             model.SetData(entityModel);
 
-            // TODO: review when is editable the key/id field
-            if (!model.GetId().Equals(key))
+            var modelId = model.GetId();
+            if (!entitySettings.KeyPropertyIsEditable && !modelId.Equals(key))
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -382,7 +382,13 @@ namespace JCTools.GenericCrud.Controllers
                 if (entity == null)
                     return NotFound();
 
-                DbContext.Entry(entity).CurrentValues.SetValues(entityModel);
+                if (!entitySettings.KeyPropertyIsEditable || modelId.Equals(key))
+                    DbContext.Entry(entity).CurrentValues.SetValues(entityModel);
+                else
+                {
+                    DbContext.Remove(entity);
+                    await DbContext.AddAsync(entityModel);
+                }
 
                 try
                 {
@@ -394,7 +400,7 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(id, IndexMessages.EditSuccess);
+                return SendSuccessResponse(modelId.ToString(), IndexMessages.EditSuccess);
             }
 
             return await Edit(id, Settings.GetData());

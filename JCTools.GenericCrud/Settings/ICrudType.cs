@@ -27,6 +27,12 @@ namespace JCTools.GenericCrud.Settings
         Type KeyPropertyType { get; }
 
         /// <summary>
+        /// True indicates that the user can edit the value of the Id / Key property 
+        /// and can overwrite its value; False (default) other case
+        /// </summary>
+        bool KeyPropertyIsEditable { get; }
+
+        /// <summary>
         /// The controller to be used for entry to the CRUD actions
         /// </summary>
         /// <remarks>The default controller is <see cref="GenericController"/></remarks>
@@ -36,7 +42,7 @@ namespace JCTools.GenericCrud.Settings
         /// True if the controller to be used into the current represented CRUD 
         /// is <see cref="GenericController"/>; Another, false
         /// </summary>
-        bool UseGenericController { get; }        
+        bool UseGenericController { get; }
 
         /// <summary>
         /// Actives a new controller instance for attend the HTTP request

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JCTools.GenericCrud.Controllers;
+using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -85,6 +86,12 @@ namespace JCTools.GenericCrud.Settings
         public Type KeyPropertyType { get; }
 
         /// <summary>
+        /// True indicates that the user can edit the value of the Id / Key property 
+        /// and can overwrite its value; False (default) other case
+        /// </summary>
+        public bool KeyPropertyIsEditable { get; }
+
+        /// <summary>
         /// The controller to be used for entry to the CRUD actions
         /// </summary>
         /// <remarks>The default controller is <see cref="GenericController"/></remarks>
@@ -113,8 +120,12 @@ namespace JCTools.GenericCrud.Settings
         public CrudType(string keyPropertyName = "Id")
         {
             KeyPropertyName = keyPropertyName;
-            KeyPropertyType = ModelType.GetProperty(KeyPropertyName)?.PropertyType
+            var keyProperty = ModelType.GetProperty(KeyPropertyName);
+
+            KeyPropertyType = keyProperty?.PropertyType
                 ?? throw new InvalidOperationException($"The \"{KeyPropertyName}\" is not found in the model \"{ModelType.FullName}\"");
+
+            KeyPropertyIsEditable = keyProperty.GetCustomAttribute<CrudAttribute>()?.IsEditableKey ?? false;
 
             ControllerType = typeof(GenericController);
             UseGenericController = true;

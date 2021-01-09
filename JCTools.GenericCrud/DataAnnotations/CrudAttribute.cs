@@ -6,7 +6,7 @@ namespace JCTools.GenericCrud.DataAnnotations
     /// Allows configured the property to be use into the CRUDs
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class CrudAttribute: Attribute
+    public class CrudAttribute : Attribute
     {
         /// <summary>
         /// True if the property is visible in the crud list; False another case
@@ -23,5 +23,13 @@ namespace JCTools.GenericCrud.DataAnnotations
         /// <para>* _EditCountry.cshtml</para>
         /// </remarks>
         public bool UseCustomView { get; set; }
+
+        /// <summary>
+        /// True indicates that the related property is a property Id/Key 
+        /// and the user can overwrite its value; False (default) another case
+        /// </summary>
+        /// <remarks>If the Id / Key property is editable, actually editing the entity 
+        /// is a deletion of the old entity followed by an insertion of a new identity.</remarks>
+        public bool IsEditableKey { get; set; }
     }
 }
