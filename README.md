@@ -11,7 +11,7 @@ This package allows reduce this task at minimum of actions.
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
 
 ## Status
-![v2.0.0-beta4](https://img.shields.io/badge/nuget-v2.0.0%20beta4-blue)
+![v2.0.0](https://img.shields.io/badge/nuget-v2.0.0-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
@@ -27,11 +27,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
     ```bash
-    Install-Package JCTools.GenericCrud -Version 2.0.0-beta4
+    Install-Package JCTools.GenericCrud -Version 2.0.0
     ```
     Or
     ```bash
-    dotnet add package JCTools.GenericCrud --version 2.0.0-beta4
+    dotnet add package JCTools.GenericCrud --version 2.0.0
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs
@@ -134,6 +134,24 @@ If your desired personalize your controllers, add additional actions or override
 
 4. Run to app and access at the url **http://localhost:5000/Movie**.
 
+## Entity model property settings
+Version 2.0.0 includes the ability to customize property settings in an entity model.
+For this propose using the data annotation **CrudAttribute** in the namespace *JCTools.GenericCrud.DataAnnotations*.
+
+This data annotation have third properties:
+
+ * Visible: Boolean indicating that the property is or not visible in CRUD views.
+ * UseCustomView: Boolean indicating that the property has custom views for rendering in details, create, delete, and edit actions.
+    > Two custom views are required per property, one for read-only views (Details and Delete actions) and one for editable views (Create and Edit actions).
+    > * Readonly views are named _Details<Property name>.cshtml.
+    > * Editable views are named _Edit<Property name>.cshtml.    
+    > eg; if the property is named *Status*, the CRUD expects to find two views named _DetailsStatus.cshtml and _EditStatus.cshtml.
+
+ * IsEditableKey: Boolean that indicates whether the entity property is an Id/Key and whether or not it is editable by the user.
+    > When an Id / Key property is editable, editing the entity is actually a deletion of the stored entity followed by the creation of a new entity using the new values.
+
+For samples, review the basic demo applications included in this repository, [.net Core 2.1 demo app](Test), [.net core 3.1 demo app](Test3.1) and [.net 5.0 demo app](Test5.0).
+
 ## Links and HTML anchors
 To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anchor Tag Helper.
 
@@ -146,8 +164,6 @@ Notice that it was used in the entity model name instead of the controller name.
     ```
         <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
     ```
-
-
 
 ## Globalization and localization
 By default, generic CRUDs support ASP.NET globalization and localization, as described in the official [documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0).
