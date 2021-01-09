@@ -1,27 +1,53 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netcoreapp2.1;</TargetFrameworks>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LangVersion>9.0</LangVersion>
+    <NeutralLanguage>en-US</NeutralLanguage>
+
     <AssemblyName>JCTools.GenericCrud</AssemblyName>
     <PackageId>JCTools.GenericCrud</PackageId>
+    <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
+    <PackageDescription>Simplification of the Create, Read, Update and Delete web pages of the application models.</PackageDescription>
+    <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.0.0-beta4: The globalization and internationalization process is improved
+    - v2.0.0-beta3: Adds .net core 5.0 support
+    - v2.0.0-beta2: Adds .net core 3.1 support
+    - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
+    </Description>
+    <Version>2.0.0-beta5</Version>
+
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
-    <Description>Simplification of the Create, Read, Update and Delete pages of the application models.</Description>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Version>1.0.5</Version>
-    
+    <PackageProjectUrl>https://github.com/jeancarlo13/JCTools.GenericCrud</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jeancarlo13/JCTools.GenericCrud</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.0.2" />
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="2.0.1" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.8.2" />
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.1" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.10" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.1.0" />
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.14" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="2.1.1" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.7" />
+  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Views\Generic\Index.cshtml" />
     <EmbeddedResource Include="Views\Generic\_action.cshtml" />
@@ -30,4 +56,23 @@
     <EmbeddedResource Include="Views\Generic\Edit.cshtml" />
     <EmbeddedResource Include="js\genericCrud.js" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\I18N.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>I18N.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\I18N.es.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\I18N.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>I18N.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

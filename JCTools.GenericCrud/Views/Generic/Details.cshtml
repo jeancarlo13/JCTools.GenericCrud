@@ -1,45 +1,48 @@
-@using JCTools.GenericCrud.Helpers
-@using Microsoft.AspNetCore.Mvc.Localization
-@model JCTools.GenericCrud.Models.ICrudDetails
-@inject IViewLocalizer Localizer
+@using JCTools.GenericCrud.Models
+@using JCTools.GenericCrud.Services
+
+@model JCTools.GenericCrud.Models.IDetailsModel
+
+@inject ICrudLocalizer Localizer
+@inject JCTools.GenericCrud.Services.IViewRenderService RenderingServices
 
 @{
     Layout = Model.UseModals ? string.Empty : Model.LayoutPage;
     ViewData["Title"] = Model.Title;
-    var values = @Model.GetModelValues();
-    
-    Model.IndexAction.Url = Url.Action("Index");
-    Model.DeleteAction.Url = Url.Action("DeleteConfirm", new { id = Model.GetId() } );
+    var entity = @Model.GetData();
 }
 @if (!Model.UseModals)
 {
     <h2>@Model.Title</h2>
     <h3>@Model.Subtitle</h3>
 }
-<div class="row">
-    <dl class="dl-horizontal">
-        @foreach(var value in values)
-        {
-            if (value.Visible)
-            {
-                <dt>
-                    @value.Display
-                </dt>
-                <dd>
-                    @value.Value
-                </dd>
+<dl class="dl-horizontal row">
+    @foreach (var property in entity.VisibleProperties)
+    {
+        <dt class="col-2">
+            @property
+        </dt>
+        <dd class="col-10">
+            @if (property.UseCustomView)
+            {                
+                @await RenderingServices.RenderViewFor(Model, Html, ViewData, property.Name, entity.GetEntity())
             }
-        }
-    </dl>
-</div>
+            else
+            {
+                @entity.GetPropertyValue(property)
+            }
+        </dd>
+    }
+</dl>
 @if (!Model.UseModals)
 {
     <div class="row">
-        <div class="col-md-12">
-            @Html.Partial("_action", Model.IndexAction)
-            @if (ViewBag.IsDelete == true)
+    <div class="col-md-12">
+        <partial name="_action" model="Model.IndexAction" />
+        @if (Model.CurrentProcess == CrudProcesses.Delete)
             {
-                @Html.Partial("_action", Model.DeleteAction)
+                Model.DeleteAction.UseText = true;
+                <partial name="_action" model="Model.DeleteAction" />
             }
         </div>
     </div>
