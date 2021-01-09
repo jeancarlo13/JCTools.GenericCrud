@@ -97,7 +97,7 @@ namespace Test
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            // app.UseRequestLocalization();
+            app.UseRequestLocalization();
 
             app.UseMvc(routes =>
             {

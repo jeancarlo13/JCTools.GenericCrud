@@ -54,9 +54,9 @@ You only require create and configure your models, and this package create the n
         });
     ```
 
-**Note:** From the version 2.0.0 the next features was marked how to obsolete and will be removed in future versions:
-    - The method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")*.
-    - The *ContextCreator* option
+    > **Note:** From the version 2.0.0 the next features was marked how to obsolete and will be removed in future versions:
+    > - The method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")*.
+    > - The *ContextCreator* option
 
 3. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
  ![Sample index page](Mockups/sampleIndexPage.png)
@@ -94,7 +94,7 @@ If your desired personalize your controllers, add additional actions or override
     }
     ```
 
-**Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
+    > **Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
 
 2. Add the related model in the method **ConfigureServices** of your **Startup** class using specifying the custom controller, eg;
     ```cs
@@ -133,6 +133,21 @@ If your desired personalize your controllers, add additional actions or override
     ```
 
 4. Run to app and access at the url **http://localhost:5000/Movie**.
+
+## Links and HTML anchors
+To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anchor Tag Helper.
+
+```html
+    <a asp-area="" asp-controller="MyEntity" asp-action="Index">My Label</a>
+```
+Notice that it was used in the entity model name instead of the controller name.
+
+> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings with the entity model name, eg;
+    ```
+        <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
+    ```
+
+
 
 ## Globalization and localization
 By default, generic CRUDs support ASP.NET globalization and localization, as described in the official [documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0).

@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;netcoreapp2.1;</TargetFrameworks>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netcoreapp2.1;</TargetFrameworks>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>9.0</LangVersion>
@@ -16,7 +16,7 @@
     - v2.0.0-beta2: Adds .net core 3.1 support
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
-    <Version>2.0.0-beta4</Version>
+    <Version>2.0.0-beta5</Version>
 
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
