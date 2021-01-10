@@ -62,7 +62,7 @@ namespace JCTools.GenericCrud.Settings
         /// to grant access to the CRUD controllers
         /// </summary>
         /// <param name="policyFactory">The action builder of the policy to be used. 
-        /// If is null, only is required an authenticated user.</param>
+        /// If is null, only one authenticated user is required.</param>
         void UseAuthorization(Action<AuthorizationPolicyBuilder> policyFactory = null);
     }
 }
