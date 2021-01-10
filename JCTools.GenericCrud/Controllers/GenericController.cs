@@ -1,13 +1,11 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
-using JCTools.GenericCrud.Resources;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Mvc;

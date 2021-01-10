@@ -25,20 +25,6 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// Allows add a new CRUD type
         /// </summary>
-        /// <param name="modelType">The type of the model to add</param>
-        /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
-        /// <param name="controllerName">The custom controller name to be used for the CRUD; string empty for used a generic controller</param>
-        [Obsolete("Use other Add method", error: true)]
-        public void Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")
-        {
-            var instanceType = typeof(CrudType<>).MakeGenericType(modelType);
-            var instance = Activator.CreateInstance(instanceType, args: new { keyPropertyName, controllerName }) as ICrudType;
-            Add(instance);
-        }
-
-        /// <summary>
-        /// Allows add a new CRUD type
-        /// </summary>
         /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
         /// <typeparam name="TModel">The type of the model to add</typeparam>
         public void Add<TModel>(string keyPropertyName = "Id")
@@ -72,19 +58,6 @@ namespace JCTools.GenericCrud.Settings
         }
 
         /// <summary>
-        /// Returns an enumerator that iterates through the configured <see cref="ICrudType"/> items
-        /// </summary>
-        /// <returns>the generated enumerator</returns>
-        internal IEnumerator<ICrudType> GetEnumerator()
-            => _types.GetEnumerator();
-
-        /// <summary>
-        /// Returns an enumerable that iterates through the configured <see cref="ICrudType"/> items
-        /// </summary>
-        /// <returns>the generated enumerable</returns>
-        internal IEnumerable<ICrudType> AsEnumerable()
-            => _types;
-        /// <summary>
         /// Returns a <see cref="List{ICrudType}"/> that iterates through the configured <see cref="ICrudType"/> items
         /// </summary>
         /// <param name="predicate">The filter to be applied to the crud enumeration</param>
@@ -114,27 +87,6 @@ namespace JCTools.GenericCrud.Settings
         }
 
         /// <summary>
-        /// Allows get the CRUD with the specified model type
-        /// </summary>
-        /// <param name="model">The type of the related model to the searched CRUD</param>
-        /// <value>The found CRUD or null</value>
-        internal ICrudType this[Type model]
-        {
-            get => _types.FirstOrDefault(c => c.ModelType.Equals(model));
-        }
-
-        /// <summary>
-        /// Allows get the CRUD with the specified model type
-        /// </summary>
-        /// <param name="model">The type of the related model to the searched CRUD</param>
-        /// <param name="key">The type of the related Id/Key property to the searched CRUD</param>
-        /// <value>The found CRUD or null</value>
-        internal ICrudType this[Type model, Type key]
-        {
-            get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.KeyPropertyType.Equals(key));
-        }
-
-        /// <summary>
         /// Allows get the CRUD with the specified data
         /// </summary>
         /// <param name="model">The type of the related model to the searched CRUD</param>
@@ -146,22 +98,6 @@ namespace JCTools.GenericCrud.Settings
         }
 
         /// <summary>
-        /// Allows get the CRUD with the specified model type
-        /// </summary>
-        /// <param name="modelType">The type of the related model to the searched CRUD</param>
-        /// <param name="keyType">The type of the related Id/Key property to the searched CRUD</param>
-        /// <param name="keyName">The name of the Key/Id property of the related model to the searched CRUD</param>
-        /// <value>The found CRUD or null</value>
-        internal ICrudType this[Type modelType, Type keyType, string keyName]
-        {
-            get => _types
-                .FirstOrDefault(c => c.ModelType.Equals(modelType)
-                                && c.KeyPropertyType.Equals(keyType)
-                                && c.KeyPropertyName == keyName
-                );
-        }
-
-        /// <summary>
         /// Allows get the CRUD with the specified data
         /// </summary>
         /// <param name="routeData">The data of the current request that desire an CRUD controller</param>
@@ -170,13 +106,16 @@ namespace JCTools.GenericCrud.Settings
         {
             get
             {
-                if (routeData[Configurator.ModelTypeTokenName] is Type modelType && modelType != null)
+                if (routeData[Constants.ModelTypeTokenName] is Type modelType && modelType != null)
                 {
-                    var keyName = routeData[Configurator.KeyTokenName]?.ToString() ?? "Id";
+                    var keyName = routeData[Constants.KeyTokenName]?.ToString() ?? "Id";
                     return this[modelType, keyName];
                 }
-                else if (routeData[Constants.EntitySettingsRouteKey] is string entityName && !string.IsNullOrEmpty(entityName))
+                else if (routeData[Constants.EntitySettingsRouteKey] is string entityName
+                            && !string.IsNullOrEmpty(entityName))
+                {
                     return this[entityName];
+                }
 
                 return null;
             }

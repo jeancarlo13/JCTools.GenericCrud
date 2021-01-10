@@ -60,7 +60,7 @@ namespace JCTools.GenericCrud.DataAnnotations
             if (actionDescriptor != null)
             {
                 var modelType = context.RouteContext.RouteData.Values[Constants.EntitySettingsRouteKey]?.ToString()
-                    ?? context.RouteContext.RouteData.Values[Configurator.ModelTypeTokenName]?.ToString();
+                    ?? context.RouteContext.RouteData.Values[Constants.ModelTypeTokenName]?.ToString();
 
                 var _crud = Configurator.Options.Models[modelType];
                 if (_crud != null)

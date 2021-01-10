@@ -10,7 +10,6 @@ using Microsoft.Extensions.Localization;
 
 namespace JCTools.GenericCrud.Settings
 {
-
     /// <summary>
     /// Defines the properties required for generate a CRUD of any model
     /// </summary>
@@ -129,23 +128,6 @@ namespace JCTools.GenericCrud.Settings
 
             ControllerType = typeof(GenericController);
             UseGenericController = true;
-        }
-
-        /// <summary>
-        /// Actives a new controller instance for attend the HTTP request
-        /// </summary>
-        /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used 
-        /// of access to the configured services into the startup class</param>
-        /// <returns>The generated instance</returns>
-        public IGenericController GetControllerInstance(IServiceProvider serviceProvider)
-        {
-            var constructor = ControllerType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.NonPublic,
-                null,
-                new Type[] { typeof(IServiceProvider), typeof(ICrudType) },
-                null
-            );
-            return constructor.Invoke(new object[] { serviceProvider, this }) as IGenericController;
         }
 
         /// <summary>

@@ -63,11 +63,11 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// The pattern that include an entity id/key that will be used to make the path pattern
         /// </summary>
-        private static readonly string _defaultIdPattern = $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{id}}}}/{{0}}";
+        private static readonly string _defaultIdPattern = $"{{{{{Constants.ModelTypeTokenName}}}}}/{{{{id}}}}/{{0}}";
         /// <summary>
         /// The pattern that not include an entity id/key that will be used to make the path pattern
         /// </summary>
-        private static readonly string _defaultPattern = $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{0}}";
+        private static readonly string _defaultPattern = $"{{{{{Constants.ModelTypeTokenName}}}}}/{{0}}";
 
         /// <summary>
         /// Contains the settings of the related CRUD with the route
@@ -112,8 +112,7 @@ namespace JCTools.GenericCrud.Settings
             {
                 Controller = type?.ControllerType.Name,
                 Action = ActionName,
-                ModelType = type?.ModelType.Name,
-                ICrudType = type
+                ModelType = type?.ModelType.Name
             };
         }
 

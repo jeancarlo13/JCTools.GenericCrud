@@ -12,10 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Logging;
 #if NETCOREAPP3_1 || NET5_0
-using Microsoft.AspNetCore.Routing.Matching;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 #endif
 
@@ -30,21 +28,6 @@ namespace JCTools.GenericCrud
         /// The type of the database context to be use
         /// </summary>
         internal static Type DatabaseContextType;
-
-        /// <summary>
-        /// The name of the token with the model type of a CRUD
-        /// </summary>
-        internal const string ICrudTypeTokenName = "ICrudType";
-
-        /// <summary>
-        /// The name of the token with the model type of a CRUD
-        /// </summary>
-        internal const string ModelTypeTokenName = "ModelType";
-
-        /// <summary>
-        /// The name of the token with the Id/Key property name to be use into a CRUD 
-        /// </summary>
-        internal const string KeyTokenName = "ModelKey";
 
         /// <summary>
         /// The configured settings for all CRUDs
@@ -72,8 +55,6 @@ namespace JCTools.GenericCrud
         {
             DatabaseContextType = typeof(TDbContext);
 
-            var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
-
             Options = new Settings.Options();
             optionsFactory?.Invoke(Options);
 
@@ -87,6 +68,8 @@ namespace JCTools.GenericCrud
                 var logger = services.GetRequiredService<ILoggerFactory>();
                 return new CrudLocalizer(Options.ResourceManager, logger);
             });
+
+            var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
 
 #if NETCOREAPP2_1
             services.Configure<RazorViewEngineOptions>(o =>

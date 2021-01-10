@@ -45,14 +45,6 @@ namespace JCTools.GenericCrud.Settings
         bool UseGenericController { get; }
 
         /// <summary>
-        /// Actives a new controller instance for attend the HTTP request
-        /// </summary>
-        /// <param name="serviceProvider">Instance of <see cref="IServiceProvider" /> used 
-        /// of access to the configured services into the startup class</param>
-        /// <returns>The generated instance</returns>
-        IGenericController GetControllerInstance(IServiceProvider serviceProvider);
-
-        /// <summary>
         /// Allows get the properties that should appear into the CRUD views
         /// </summary>
         /// <param name="includeNoVisibleColumns">True for include the not visible columns; 
