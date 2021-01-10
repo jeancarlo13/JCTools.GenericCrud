@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using JCTools.GenericCrud.Controllers;
 using JCTools.GenericCrud.DataAnnotations;
+using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Services;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Localization;
@@ -29,9 +30,25 @@ namespace Test5._0.Controllers
         {
             // Call the initialization of the Settings property
             base.InitSettings(filterContext);
+
             // Add your custom settings here, eg;
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
+            Settings.UseModals = false; // disabled the modals
+            Settings.Subtitle = "All entities"; // change the default subtitle
+            
+            // Customizing the Icons and Buttons Classes of the Index Page
+            var index = Settings as IIndexModel;
+            index.NewAction.IconClass = "fa fa-plus-circle";
+            index.NewAction.ButtonClass = "btn btn-success btn-sm";
+
+            index.DetailsAction.IconClass = "fa fa-info";
+            index.DetailsAction.ButtonClass = "btn btn-info btn-sm";
+            
+            index.EditAction.IconClass = "fa fa-edit";
+            index.EditAction.ButtonClass = "btn btn-warning btn-sm";
+            
+            index.DeleteAction.IconClass = "fa fa-eraser";
+
+            // other things
             ViewBag.Countries = (DbContext as Context).Countries.ToList();
 
             base.OnActionExecuting(filterContext);
