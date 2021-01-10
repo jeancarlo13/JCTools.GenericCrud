@@ -33,12 +33,8 @@ namespace JCTools.GenericCrud.Settings
         /// Generate a new instance for any model
         /// </summary>
         /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
-        public CrudType(string keyPropertyName = "Id")
-            : base(keyPropertyName)
-        {
-            UseGenericController = false;
-        }
-
+        public CrudType(string keyPropertyName = "Id") : base(keyPropertyName) { }
+        
         /// <summary>
         /// Allows get the Key/Id property value of the specific instance
         /// </summary>
@@ -50,7 +46,7 @@ namespace JCTools.GenericCrud.Settings
             {
                 var value = (TKey)ModelType
                    .GetTypeInfo()
-                   .GetProperty(KeyPropertyName)?
+                   .GetProperty(Key.Name)?
                    .GetValue(obj);
 
                 if (value != null)
@@ -80,37 +76,15 @@ namespace JCTools.GenericCrud.Settings
         public virtual Type ModelType { get => typeof(TModel); }
 
         /// <summary>
-        /// The name of the property used how to key/id of the model
+        /// The Id/Key property of the model used into the CRUD
         /// </summary>
-        public virtual string KeyPropertyName { get; }
-
-        /// <summary>
-        /// The type of the property used how to key/id of the model
-        /// </summary>
-        public Type KeyPropertyType { get; }
-
-        /// <summary>
-        /// True indicates that the user can edit the value of the Id / Key property 
-        /// and can overwrite its value; False (default) other case
-        /// </summary>
-        public bool KeyPropertyIsEditable { get; }
+        public IKeyProperty Key { get; set; }
 
         /// <summary>
         /// The controller to be used for entry to the CRUD actions
         /// </summary>
         /// <remarks>The default controller is <see cref="GenericController"/></remarks>
         public virtual Type ControllerType { get; }
-
-        /// <summary>
-        /// True if the controller to be used into the current represented CRUD 
-        /// is <see cref="GenericController"/>; Another, false
-        /// </summary>
-        public bool UseGenericController { get; protected set; }
-
-        /// <summary>
-        /// The name of the model type related to the CRUD
-        /// </summary>
-        public string ModelTypeName => ModelType.Name;
 
         /// <summary>
         /// Gets or sets the mvc routes
@@ -121,21 +95,22 @@ namespace JCTools.GenericCrud.Settings
             {
                 if (_routes == null || !_routes.Any())
                 {
+                    var model = ModelType.Name;
                     _routes = new List<Route>()
                     {
-                        new Route(this, Route.DetailsActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DetailsActionName}"),
-                        new Route(this, Route.DeleteActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DeleteActionName}"),
-                        new Route(this, Route.DeleteConfirmActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DeleteConfirmActionName}"),
-                        new Route(this, Route.CreateActionName, pattern: $"{ModelTypeName}/{Route.CreateActionName}"),
-                        new Route(this, Route.SaveActionName, pattern: $"{ModelTypeName}/{Route.SaveActionName}"),
-                        new Route(this, Route.EditActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.EditActionName}"),
-                        new Route(this, Route.SaveChangesActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.SaveChangesActionName}"),
-                        new Route(this, Route.GetScriptActionName, pattern: $"{ModelTypeName}/{{filename}}.js"),
+                        new Route(this, Route.DetailsActionName, pattern: $"{model}/{{id}}/{Route.DetailsActionName}"),
+                        new Route(this, Route.DeleteActionName, pattern: $"{model}/{{id}}/{Route.DeleteActionName}"),
+                        new Route(this, Route.DeleteConfirmActionName, pattern: $"{model}/{{id}}/{Route.DeleteConfirmActionName}"),
+                        new Route(this, Route.CreateActionName, pattern: $"{model}/{Route.CreateActionName}"),
+                        new Route(this, Route.SaveActionName, pattern: $"{model}/{Route.SaveActionName}"),
+                        new Route(this, Route.EditActionName, pattern: $"{model}/{{id}}/{Route.EditActionName}"),
+                        new Route(this, Route.SaveChangesActionName, pattern: $"{model}/{{id}}/{Route.SaveChangesActionName}"),
+                        new Route(this, Route.GetScriptActionName, pattern: $"{model}/{{filename}}.js"),
                         new Route(this, Route.IndexActionName,
-                            routeName: string.Format(Route.RedirectIndexActionNamePattern, ModelTypeName),
-                            pattern: $"{ModelTypeName}/{{id}}/{{message}}"
+                            routeName: string.Format(Route.RedirectIndexActionNamePattern, model),
+                            pattern: $"{model}/{{id}}/{{message}}"
                         ),
-                        new Route(this, Route.IndexActionName, pattern: ModelTypeName)
+                        new Route(this, Route.IndexActionName, pattern: model)
                     };
                 }
 
@@ -149,16 +124,16 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="keyPropertyName">The name of the property used how to key/id of the model</param>
         public CrudType(string keyPropertyName = "Id")
         {
-            KeyPropertyName = keyPropertyName;
-            var keyProperty = ModelType.GetProperty(KeyPropertyName);
-
-            KeyPropertyType = keyProperty?.PropertyType
-                ?? throw new InvalidOperationException($"The \"{KeyPropertyName}\" is not found in the model \"{ModelType.FullName}\"");
-
-            KeyPropertyIsEditable = keyProperty.GetCustomAttribute<CrudAttribute>()?.IsEditableKey ?? false;
+            var property = ModelType.GetProperty(keyPropertyName);
+            Key = new KeyProperty()
+            {
+                Name = keyPropertyName,
+                Type = property?.PropertyType
+                    ?? throw new InvalidOperationException($"The \"{keyPropertyName}\" is not found in the model \"{ModelType.FullName}\""),
+                IsEditable = property?.GetCustomAttribute<CrudAttribute>()?.IsEditableKey ?? false
+            };
 
             ControllerType = typeof(GenericController);
-            UseGenericController = true;
         }
 
         /// <summary>
@@ -187,7 +162,7 @@ namespace JCTools.GenericCrud.Settings
         {
             if (obj is TModel instance)
                 return ModelType.GetTypeInfo()
-                .GetProperty(KeyPropertyName)?
+                .GetProperty(Key.Name)?
                 .GetValue(obj) ?? null;
 
             return null;

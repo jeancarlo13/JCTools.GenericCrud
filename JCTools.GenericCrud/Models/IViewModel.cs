@@ -42,17 +42,6 @@ namespace JCTools.GenericCrud.Models
         IEnumerable<string> Columns { get; }
 
         /// <summary>
-        /// The name of the property used how to key/id of the model
-        /// </summary>
-        string KeyPropertyName { get; }
-
-        /// <summary>
-        /// True if the current CRUD use a custom controller; 
-        /// False if use the <see cref="Controllers.GenericController"/> class
-        /// </summary>
-        bool UseCustomController { get; }
-
-        /// <summary>
         /// Allows get the type of the model represented into the views
         /// </summary>
         /// <returns>The found type</returns>
@@ -65,12 +54,6 @@ namespace JCTools.GenericCrud.Models
         string GetModelName();
 
         /// <summary>
-        /// Allows get the type of the model id/key property
-        /// </summary>
-        /// <returns>The found type</returns>
-        Type GetKeyType();
-
-        /// <summary>
         /// Allows get the value of the Id/Key property of the entity
         /// </summary>
         /// <returns>The found value</returns>
@@ -81,13 +64,6 @@ namespace JCTools.GenericCrud.Models
         /// </summary>
         /// <param name="id">The Id/Key property value to be set</param>
         void SetId(object id);
-
-        /// <summary>
-        /// Allows get the Key/Id property value of the specific instance
-        /// </summary>
-        /// <param name="obj">The instance to be evaluated</param>
-        /// <returns>The found Key/Id property value or null</returns>
-        object GetKeyPropertyValue(object obj);
 
         /// <summary>
         /// Allows get the entire data of the entity to be displayed into the view

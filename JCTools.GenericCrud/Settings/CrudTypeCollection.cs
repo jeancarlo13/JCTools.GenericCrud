@@ -94,7 +94,7 @@ namespace JCTools.GenericCrud.Settings
         /// <value>The found CRUD or null</value>
         internal ICrudType this[Type model, string key]
         {
-            get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.KeyPropertyName == key);
+            get => _types.FirstOrDefault(c => c.ModelType.Equals(model) && c.Key.Name == key);
         }
 
         /// <summary>

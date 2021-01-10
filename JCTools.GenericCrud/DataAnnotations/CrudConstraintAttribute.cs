@@ -66,7 +66,7 @@ namespace JCTools.GenericCrud.DataAnnotations
                 if (_crud != null)
                 {
                     if (CrudType == null)
-                        accept = _crud?.UseGenericController ?? false;
+                        accept = _crud?.ControllerType.Equals(typeof(GenericController)) ?? false;
                     else
                         accept = CrudType.ModelType.Equals(_crud.ModelType)
                             && actionDescriptor.ControllerTypeInfo.Equals(CrudType.ControllerType);

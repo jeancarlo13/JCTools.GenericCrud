@@ -9,6 +9,11 @@ namespace JCTools.GenericCrud.Settings
     internal class Route
     {
         /// <summary>
+        /// The action name to map with the route
+        /// </summary>
+        private string _actionName;
+
+        /// <summary>
         /// The name of the CRUD see entity details action
         /// </summary>
         internal const string DetailsActionName = "Details";
@@ -61,18 +66,9 @@ namespace JCTools.GenericCrud.Settings
         internal const string RedirectIndexActionNamePattern = "{0}_RedirectedIndex";
 
         /// <summary>
-        /// Contains the settings of the related CRUD with the route
-        /// </summary>
-        public ICrudTypeRoutable CrudType { get; }
-        /// <summary>
         /// The URL pattern of the route.
         /// </summary>
         public string Pattern { get; }
-
-        /// <summary>
-        /// The action name to map with the route
-        /// </summary>
-        public string ActionName { get; }
 
         /// <summary>
         /// The name of the route.
@@ -91,7 +87,7 @@ namespace JCTools.GenericCrud.Settings
         /// <param name="actionName">The name of the related action to the new route.</param>
         /// <param name="pattern">The pattern to be used in the created urls from the new routes.
         /// <para>If is null is used the pattern: 
-        /// {<paramref name="crudType"/>.ModelTypeName}/{Id}/{<paramref name="actionName"/>}</para>
+        /// {<paramref name="crudType"/>.ModelType.Name}/{Id}/{<paramref name="actionName"/>}</para>
         /// </param>
         /// <param name="routeName">The name of the new route; null for use the 
         /// <paramref name="actionName"/> parameter</param>
@@ -102,21 +98,20 @@ namespace JCTools.GenericCrud.Settings
             string routeName = null
         )
         {
-            CrudType = crudType;
-            ActionName = actionName;
+            _actionName = actionName;
 
             Pattern = pattern
                 ?? string.Format($"{{{{{Constants.ModelTypeTokenName}}}}}/{{{{id}}}}/{{0}}", actionName.ToLowerInvariant());
 
             Name = string.IsNullOrWhiteSpace(routeName)
-                ? $"{CrudType.ModelTypeName}_{ActionName}"
+                ? $"{crudType.ModelType.Name}_{_actionName}"
                 : routeName;
 
             var type = crudType as ICrudType;
             DefaultValues = new RouteDefaultValues
             {
                 Controller = type?.ControllerType.Name,
-                Action = ActionName,
+                Action = _actionName,
                 ModelType = type?.ModelType.Name
             };
         }
@@ -125,7 +120,7 @@ namespace JCTools.GenericCrud.Settings
         /// Returns the string representation of the class
         /// </summary>
         public override string ToString()
-            => $"{Name}, {ActionName}, {Pattern}";
+            => $"{Name}, {_actionName}, {Pattern}";
 
     }
 }

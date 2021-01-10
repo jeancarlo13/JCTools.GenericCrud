@@ -136,8 +136,8 @@ namespace JCTools.GenericCrud.Helpers
                 throw new System.ArgumentNullException(nameof(crudType));
 
             var routeName = actionName == Settings.Route.RedirectIndexActionNamePattern
-                ? string.Format(actionName, crudType.ModelTypeName)
-                : $"{crudType.ModelTypeName}_{actionName}";
+                ? string.Format(actionName, crudType.ModelType.Name)
+                : $"{crudType.ModelType.Name}_{actionName}";
 
             var route = crudType.Routes.FirstOrDefault(r => r.Name == routeName);
 
