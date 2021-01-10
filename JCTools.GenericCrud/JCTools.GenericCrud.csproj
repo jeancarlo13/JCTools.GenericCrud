@@ -11,13 +11,14 @@
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <PackageDescription>Simplification of the Create, Read, Update and Delete web pages of the application models.</PackageDescription>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.1.0-beta1: Authorization policy support to manage access to CRUD controllers
     - v2.0.0: Add support for editable entity Id/Key properties, additionally to the features of the beta versions
     - v2.0.0-beta4: The globalization and internationalization process is improved
     - v2.0.0-beta3: Adds .net core 5.0 support
     - v2.0.0-beta2: Adds .net core 3.1 support
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
-    <Version>2.0.0</Version>
+    <Version>2.1.0-beta1</Version>
 
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
