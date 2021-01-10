@@ -1,94 +1,132 @@
 /*jshint esversion: 6 */
 
-var genericCrud =
-  genericCrud ||
-  (function () {
-    "use strict";
+var genericCrud = genericCrud || (function () {
+  "use strict";
 
-    var global = {
-      loadingClass: 'fa fa-spinner fa-spin'
-    };
+  var global = {
+    loadingClass: 'fa fa-spinner fa-spin'
+  };
 
-    function addResponse(response) {
-      $("#genericCrudModal").modal("hide");
-      $('.modal-backdrop.fade.show').remove();
+  function addResponse(response) {
+    $("#genericCrudModal").modal("hide");
+    $('.modal-backdrop.fade.show').remove();
 
-      var div = document.createElement("div");
-      div.innerHTML = response;
+    var div = document.createElement("div");
+    div.innerHTML = response;
 
-      let modal = div.querySelector(":first-child");
-      document.body.appendChild(modal);
+    let modal = div.querySelector(":first-child");
+    document.body.appendChild(modal);
 
-      let form = modal.querySelector("form");
-      if (form) {
-        form.onsubmit = evt => {
-          evt.preventDefault();
-          modal.querySelector(".modal-footer button:last-child").click();
-          return false;
-        };
+    let form = modal.querySelector("form");
+    if (form) {
+      form.onsubmit = evt => {
+        evt.preventDefault();
+        modal.querySelector(".modal-footer button:last-child").click();
+        return false;
+      };
+    }
+
+    $(modal).modal();
+  }
+
+  /**
+   * Find the children elements that are comment blocks
+   * @param {element} el The parent element where make the search
+   * @param {bool} recursive True for a recursive search; else, false 
+   */
+  function findComments(el, recursive = false) {
+    var arr = [];
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var node = el.childNodes[i];
+      if (node.nodeType === Node.COMMENT_NODE) {
+        arr.push(node);
+      } else if (recursive) {
+        arr.push.apply(arr, findComments(node));
       }
-
-      $(modal).modal();
     }
+    return arr;
+  };
 
-    function showModal() {
-      var i = this.querySelector('i'),
-        classes = i.className;
+  /**
+   * Allows find the i element replaced by a svg by font awesome 5.x
+   * @param {element} el The parent element where make the search
+   * @returns {element} the found i HTML element
+   */
+  function findFaInComments(el) {
+    let comments = findComments(el);
+    let i = comments[0].nodeValue;
+    i = i.substring(0, i.indexOf('</i>') + 4);
+    el.innerHTML = i;
+    i = el.querySelector('i');
+    return i;
+  }
 
-      i.className = global.loadingClass;
+  function showModal() {
+    let self = this;
+    let i = self.querySelector('i') || findFaInComments(self);
+    let classes = i.className;
 
-      $.ajax({
-        url: this.dataset.url,
-        method: "GET",
-        success: function (response) {
-          addResponse(response);
-          i.className = classes;
-        }
-      });
-    }
+    i.className = global.loadingClass;
 
-    function executeCommitAction() {
-      var modal = $("#genericCrudModal"),
-        form = modal[0].querySelector("form"),
-        data = form ? $(form).serialize() : undefined,
-        i = document.createElement('i');
+    $.ajax({
+      url: this.dataset.url,
+      method: "GET",
+      success: function (response) {
+        addResponse(response);
+        i = self.querySelector('i') || findFaInComments(self);
+        i.className = classes;
+      }
+    });
+  }
 
-      i.className = global.loadingClass;
-      this.insertBefore(i, this.childNodes[0]);
+  function executeCommitAction() {
+    let self = this,
+      modal = $("#genericCrudModal"),
+      form = modal[0].querySelector("form"),
+      data = form ? $(form).serialize() : undefined,
+      i = document.createElement('i');
 
-      $.ajax({
-        method: form && data ? "POST" : "GET",
-        data: data,
-        url: this.dataset.url,
-        success: (r, status, xhr) => {
-          var contentType = xhr.getResponseHeader("content-type"),
-            isJson = contentType.indexOf("json") > -1,
-            isHtml = contentType.indexOf("html") > -1;
+    i.className = global.loadingClass;
+    self.insertBefore(i, self.childNodes[0]);
 
-          modal.modal("hide");
-          document.body.removeChild(modal[0]);
+    $.ajax({
+      method: form && data ? "POST" : "GET",
+      data: data,
+      url: self.dataset.url,
+      success: (r, status, xhr) => {
+        var contentType = xhr.getResponseHeader("content-type"),
+          isJson = contentType.indexOf("json") > -1,
+          isHtml = contentType.indexOf("html") > -1;
 
-          i.parentElement.removeChild(i);
-          if (isJson && r.success === true) {
-            window.location.replace(r.redirectUrl);
-          } else if (isHtml) {
-            addResponse(r);
-            let parent = i.parentElement;
-            if (parent) {
-              parent.removeChild(i);
-            }
+        try {
+          self.removeChild(i);
+        } catch {
+          let toRemove = Array.prototype.slice.call(self.querySelectorAll('svg'));
+          if (toRemove.length > 1) {
+            toRemove.pop();
           }
+          toRemove.forEach(r => self.removeChild(r));
         }
-      });
-    }
 
-    return {
-      showModal: function () {
-        $("#genericCrudModal").remove();
-        showModal.call(this);
-      },
-      executeCommitAction: function () {
-        executeCommitAction.call(this);
+        document.body.removeChild(modal[0]);
+        modal.modal("hide");
+
+        if (isJson && r.success === true) {
+          window.location.replace(r.redirectUrl);
+        } else if (isHtml) {
+          addResponse(r);
+        }
       }
-    };
-  })();
+    });
+  }
+
+  return {
+    showModal: function () {
+      $("#genericCrudModal").remove();
+      showModal.call(this);
+    },
+    executeCommitAction: function () {
+      executeCommitAction.call(this);
+    }
+  };
+})();

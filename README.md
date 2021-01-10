@@ -160,7 +160,7 @@ To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anc
 ```
 Notice that it was used in the entity model name instead of the controller name.
 
-> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings with the entity model name, eg;
+> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings attribute with the entity model name, eg;
     ```
         <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
     ```
