@@ -13,7 +13,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-#if NETCOREAPP3_1 || NET5_0
+#if NETCOREAPP2_1
+using Microsoft.AspNetCore.Mvc;
+#elif NETCOREAPP3_1 || NET5_0
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 #endif
 
@@ -71,6 +73,7 @@ namespace JCTools.GenericCrud
 
             var currentAssembly = typeof(Configurator).GetTypeInfo().Assembly;
 
+
 #if NETCOREAPP2_1
             services.Configure<RazorViewEngineOptions>(o =>
             {
@@ -112,6 +115,9 @@ namespace JCTools.GenericCrud
                 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
 #endif
+
+            var policyBuilder = Options.AuthorizationPolicy ?? (b => b.RequireAssertion(c => true));
+            services.AddAuthorization(o => o.AddPolicy(Constants.PolicyName, policyBuilder));
 
             return services;
         }

@@ -21,10 +21,15 @@ namespace JCTools.GenericCrud.Settings
         /// The name of the token with the Id/Key property name to be use into a CRUD 
         /// </summary>
         internal const string KeyTokenName = "ModelKey";
-        
+
         /// <summary>
         /// The name of the token with the model type of a CRUD
         /// </summary>
         internal const string ModelTypeTokenName = "ModelType";
+
+        /// <summary>
+        /// The name of the policy that you use to manage access to CRUDs.
+        /// </summary>
+        public const string PolicyName = "JCTools.GenericCrud.CrudPolicy";
     }
 }

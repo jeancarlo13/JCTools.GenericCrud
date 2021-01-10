@@ -8,6 +8,7 @@ using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -22,6 +23,7 @@ namespace JCTools.GenericCrud.Controllers
     /// Used for create the controllers that are the entry points for the custom cruds
     /// </summary>
     [CrudConstraint]
+    [Authorize(Constants.PolicyName)]
     public class GenericController : Controller, IGenericController
     {
         /// <summary>

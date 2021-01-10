@@ -1,6 +1,7 @@
 using System;
 using System.Resources;
 using JCTools.GenericCrud.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace JCTools.GenericCrud.Settings
@@ -65,10 +66,26 @@ namespace JCTools.GenericCrud.Settings
         public ResourceManager ResourceManager { get; private set; } = Resources.I18N.ResourceManager;
 
         /// <summary>
+        /// The action to invoke to configure the authorization policy used to manage access to CRUD controllers
+        /// </summary>
+        /// <remarks>By default, only is required an authenticated user</remarks>
+        public Action<AuthorizationPolicyBuilder> AuthorizationPolicy { get; private set; } = null;
+
+        /// <summary>
         /// Allows replace the default localization strings for the CRUDs
         /// </summary>
         /// <param name="resourceManager">The cached <see cref="ResourceManager"/> instance to be used</param>
         public void ReplaceLocalization(ResourceManager resourceManager)
             => ResourceManager = resourceManager ?? throw new ArgumentNullException(nameof(resourceManager));
+
+        /// <summary>
+        /// It allows to indicate if it is required to enable the authorization policy 
+        /// to grant access to the CRUD controllers
+        /// </summary>
+        /// <param name="policyFactory">The action builder of the policy to be used. 
+        /// If is null, only is required an authenticated user.</param>
+        public void UseAuthorization(Action<AuthorizationPolicyBuilder> policyFactory = null)
+            => AuthorizationPolicy = policyFactory ?? ((b) => b.RequireAuthenticatedUser());
+
     }
 }
