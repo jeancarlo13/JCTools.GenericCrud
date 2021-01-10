@@ -70,6 +70,11 @@ namespace JCTools.GenericCrud.Settings
 
     {
         /// <summary>
+        /// Contains the mvc routes
+        /// </summary>
+        private IReadOnlyList<Route> _routes;
+
+        /// <summary>
         /// The type of the model to be used into the CRUD
         /// </summary>
         public virtual Type ModelType { get => typeof(TModel); }
@@ -110,7 +115,33 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// Gets or sets the mvc routes
         /// </summary>
-        public IReadOnlyList<Route> Routes { get; set; }
+        public IReadOnlyList<Route> Routes
+        {
+            get
+            {
+                if (_routes == null || !_routes.Any())
+                {
+                    _routes = new List<Route>()
+                    {
+                        new Route(this, Route.DetailsActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DetailsActionName}"),
+                        new Route(this, Route.DeleteActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DeleteActionName}"),
+                        new Route(this, Route.DeleteConfirmActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.DeleteConfirmActionName}"),
+                        new Route(this, Route.CreateActionName, pattern: $"{ModelTypeName}/{Route.CreateActionName}"),
+                        new Route(this, Route.SaveActionName, pattern: $"{ModelTypeName}/{Route.SaveActionName}"),
+                        new Route(this, Route.EditActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.EditActionName}"),
+                        new Route(this, Route.SaveChangesActionName, pattern: $"{ModelTypeName}/{{id}}/{Route.SaveChangesActionName}"),
+                        new Route(this, Route.GetScriptActionName, pattern: $"{ModelTypeName}/{{filename}}.js"),
+                        new Route(this, Route.IndexActionName,
+                            routeName: string.Format(Route.RedirectIndexActionNamePattern, ModelTypeName),
+                            pattern: $"{ModelTypeName}/{{id}}/{{message}}"
+                        ),
+                        new Route(this, Route.IndexActionName, pattern: ModelTypeName)
+                    };
+                }
+
+                return _routes;
+            }
+        }
 
         /// <summary>
         /// Generate a new instance for any model

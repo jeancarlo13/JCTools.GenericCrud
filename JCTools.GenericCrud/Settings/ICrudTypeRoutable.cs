@@ -23,6 +23,6 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// Gets or sets the mvc routes
         /// </summary>
-        IReadOnlyList<Route> Routes { get; set; }
+        IReadOnlyList<Route> Routes { get; }
     }
 }
