@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JCTools.GenericCrud.Controllers;
 
@@ -12,17 +13,11 @@ namespace JCTools.GenericCrud.Settings
         /// <summary>
         /// The name of the model type related to the CRUD
         /// </summary>
-        string ModelTypeName { get; }
-
-        /// <summary>
-        /// True if the controller to be used into the current represented CRUD 
-        /// is <see cref="GenericController"/>; Another, false
-        /// </summary>
-        bool UseGenericController { get; }
+        Type ModelType { get; }
 
         /// <summary>
         /// Gets or sets the mvc routes
         /// </summary>
-        IReadOnlyList<Route> Routes { get; set; }
+        IReadOnlyList<Route> Routes { get; }
     }
 }

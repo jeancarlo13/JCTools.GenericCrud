@@ -11,7 +11,7 @@ This package allows reduce this task at minimum of actions.
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
 
 ## Status
-![v2.0.0](https://img.shields.io/badge/nuget-v2.0.0-blue)
+![v2.1.0](https://img.shields.io/badge/nuget-v2.1.0-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
@@ -27,11 +27,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
     ```bash
-    Install-Package JCTools.GenericCrud -Version 2.0.0
+    Install-Package JCTools.GenericCrud -Version 2.1.0
     ```
     Or
     ```bash
-    dotnet add package JCTools.GenericCrud --version 2.0.0
+    dotnet add package JCTools.GenericCrud --version 2.1.0
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs
@@ -104,20 +104,37 @@ If your desired personalize your controllers, add additional actions or override
 3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
 
     ```cs
-        //...
+        // ...
         
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             // Call the initialization of the Settings property
             base.InitSettings(context);
+            
             // Add your custom settings here, eg;
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
-            ViewBag.OtherEntities = (DbContext as Data.Context).OtherEntities.ToList();
+            Settings.UseModals = false; // disabled the modals
+            Settings.Subtitle = "All entities"; // change the default subtitle
+            
+            // Customizing the Icons and Buttons Classes of the Index Page
+            var index = Settings as IIndexModel;
+            index.NewAction.IconClass = "fa fa-plus-circle";
+            index.NewAction.ButtonClass = "btn btn-success btn-sm";
+
+            index.DetailsAction.IconClass = "fa fa-info";
+            index.DetailsAction.ButtonClass = "btn btn-info btn-sm";
+            
+            index.EditAction.IconClass = "fa fa-edit";
+            index.EditAction.ButtonClass = "btn btn-warning btn-sm";
+            
+            index.DeleteAction.IconClass = "fa fa-eraser";
+
+            // other things
+            ViewBag.Countries = (DbContext as Context).Countries.ToList();
 
             base.OnActionExecuting(context);
         }
         
+        // Or
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             // Call the initialization of the Settings property
@@ -152,6 +169,21 @@ This data annotation have third properties:
 
 For samples, review the basic demo applications included in this repository, [.net Core 2.1 demo app](Test), [.net core 3.1 demo app](Test3.1) and [.net 5.0 demo app](Test5.0).
 
+## Authorization
+JCTool.GenericCrud includes since version 2.1.0 the possibility of managing access to CRUD controllers using an authorization policy.
+
+The name of the default policy is JCTools.GenericCrud.CrudPolicy, and by default authorization is not activated and anonymous access is allowed.
+
+To turn on authorization validation, just add a call to **UseAuthorization** in your *Startup.ConfigureServices* method. e.g;
+
+```cs
+    services.ConfigureGenericCrud<MyContext>(options =>
+    {
+        // ...
+        o.UseAuthorization(f => f.RequireAuthenticatedUser()); // add this line
+    });
+```
+> **Note:** If no action is specified for policy validation, by default only one authenticated user is required.
 ## Links and HTML anchors
 To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anchor Tag Helper.
 
@@ -160,7 +192,7 @@ To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anc
 ```
 Notice that it was used in the entity model name instead of the controller name.
 
-> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings with the entity model name, eg;
+> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings attribute with the entity model name, eg;
     ```
         <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
     ```
@@ -186,34 +218,9 @@ You can extend or replace the included localized strings with your own translati
     ```
     The *Resources.MyResourcesClass.ResourceManager* corresponds to the property *ResourceManager* of the autogenerated file in the step 1
 
-## Changes of the version 2.0.0
-* Add .net 5.0 support
-* Add .net core 2.1 y 3.1 support
-* Add support to Bootstrap 4.0
-* Replaces the GenericController<TContext, TModel, TKey> class for the GenericController class
-  * This new class is easier to use
-* The follows interfaces was replaced for a best definition and structure:
-  * IBase -> IViewModel
-  * IBaseDetails, ICrudDetails -> IDetailsModel
-  * ICrudEdit -> IEditModel
-  * ICrudList -> IIndexModel
-* The follows models was replaced by the **CrudModel** class
-  * Base
-  * CrudDetails
-  * CrudEdit
-  * CrudList
-* The **IControllerOptions** interface and **ControllerOptions** class was removed for being unnecessary in the new structure
-* The extensors methods **GetLocalizedString(...)** for the **IStringLocalizer** interfaces was moved to the **StringLocalizerExtensors** class
-* The globalization and internationalization process is improved
-* Now no need to use endpoint mapping, if you use older version remove the next code from the method **Configure** your **startup** class:
-```cs
-    app.UseMvc(routes =>
-    {
-        routes.MapCrudRoutes(); // remove this line
+## Changes of the version 2.1.0
+* Authorization policy support to manage access to CRUD controllers
+* Fixed bug with the font awesome and its generated svg files
 
-        // ...
-    });   
-
-```
 ## License
 [MIT License](LICENSE)

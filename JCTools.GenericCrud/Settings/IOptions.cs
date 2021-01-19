@@ -1,5 +1,7 @@
+using System;
 using System.Resources;
 using JCTools.GenericCrud.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JCTools.GenericCrud.Settings
 {
@@ -48,11 +50,19 @@ namespace JCTools.GenericCrud.Settings
         /// Default <see cref="Bootstrap.Version4"/>
         /// </summary>
         Bootstrap BootstrapVersion { get; set; }
-        
+
         /// <summary>
         /// Allows replace the default localization strings for the CRUDs
         /// </summary>
         /// <param name="resourceManager">The cached <see cref="ResourceManager"/> instance to be used</param>
         void ReplaceLocalization(ResourceManager resourceManager);
+
+        /// <summary>
+        /// It allows to indicate if it is required to enable the authorization policy 
+        /// to grant access to the CRUD controllers
+        /// </summary>
+        /// <param name="policyFactory">The action builder of the policy to be used. 
+        /// If is null, only one authenticated user is required.</param>
+        void UseAuthorization(Action<AuthorizationPolicyBuilder> policyFactory = null);
     }
 }
