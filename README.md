@@ -11,7 +11,7 @@ This package allows reduce this task at minimum of actions.
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
 
 ## Status
-![v2.1.0-beta1](https://img.shields.io/badge/nuget-v2.1.0--beta1-blue)
+![v2.1.0](https://img.shields.io/badge/nuget-v2.1.0-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
@@ -27,11 +27,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
     ```bash
-    Install-Package JCTools.GenericCrud -Version 2.1.0-beta1
+    Install-Package JCTools.GenericCrud -Version 2.1.0
     ```
     Or
     ```bash
-    dotnet add package JCTools.GenericCrud --version 2.1.0-beta1
+    dotnet add package JCTools.GenericCrud --version 2.1.0
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs
