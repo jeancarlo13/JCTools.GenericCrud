@@ -3,8 +3,13 @@
 ## Content
 - [JCTools.GenericCrud Release notes](#jctoolsgenericcrud-release-notes)
   - [Content](#content)
+  - [Version 2.2.0-beta1](#version-220-beta1)
   - [Version 2.1.0](#version-210)
   - [Version 2.0.0](#version-200)
+
+## Version 2.2.0-beta1
+* Support to get all data by API Rest added.  
+* Support by JSON and XML responses added.
 
 ## Version 2.1.0
 * Authorization policy support to manage access to CRUD controllers

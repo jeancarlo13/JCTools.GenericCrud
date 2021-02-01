@@ -31,5 +31,17 @@ namespace JCTools.GenericCrud.Settings
         /// The name of the policy that you use to manage access to CRUDs.
         /// </summary>
         public const string PolicyName = "JCTools.GenericCrud.CrudPolicy";
+
+        /// <summary>
+        /// The supported JSON mime type
+        /// see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        /// </summary>
+        internal const string JsonMimeType = "application/json";
+
+        /// <summary>
+        /// The supported XML mime type
+        /// see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+        /// </summary>
+        internal const string XmlMimeType = "application/xml";
     }
 }

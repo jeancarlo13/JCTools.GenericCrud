@@ -1,11 +1,13 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
+using JCTools.GenericCrud.Models.Rest;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace JCTools.GenericCrud.Controllers
 {
@@ -66,6 +69,16 @@ namespace JCTools.GenericCrud.Controllers
         /// The name of the property used how to key/id of the model
         /// </summary>
         private readonly string _keyPropertyName;
+
+        /// <summary>
+        /// True if the client required a JSON response; else, false.
+        /// </summary>
+        private bool _requiredJson => Request.Headers[HeaderNames.Accept].Contains(Constants.JsonMimeType);
+
+        /// <summary>
+        /// True if the client required a XML response; else, false.
+        /// </summary>
+        private bool _requiredXml => Request.Headers[HeaderNames.Accept].Contains(Constants.XmlMimeType);
 
         /// <summary>
         /// Initialize an instace of the controller with the required services
@@ -196,10 +209,16 @@ namespace JCTools.GenericCrud.Controllers
                 model.SetId(id);
 
             model.CurrentProcess = CrudProcesses.Index;
-            return Content(
-                await _renderingService.RenderToStringAsync(nameof(Index), model, ViewData),
-                "text/html"
-            );
+
+            if (_requiredJson)
+                return new IndexModel(model).ToJson();
+            else if (_requiredXml)
+                return new IndexModel(model).ToXml();
+            else
+                return Content(
+                    await _renderingService.RenderToStringAsync(nameof(Index), model, ViewData),
+                    "text/html"
+                );
         }
 
         /// <summary>
@@ -507,5 +526,6 @@ namespace JCTools.GenericCrud.Controllers
 
             return Content(await contentTask, "text/html");
         }
+
     }
 }
