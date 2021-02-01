@@ -25,6 +25,9 @@ Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages 
     - [Get entity details](#get-entity-details)
       - [Request](#request-1)
       - [Response](#response-1)
+    - [Delete entities](#delete-entities)
+      - [Request](#request-2)
+      - [Response](#response-2)
   - [Release notes](#release-notes)
   - [License](#license)
 
@@ -38,7 +41,7 @@ You only require create and configure your models, and this package create the n
 
 
 ## Status
-![v2.2.0-beta2](https://img.shields.io/badge/nuget-v2.2.0--beta2-blue)
+![v2.2.0-beta3](https://img.shields.io/badge/nuget-v2.2.0--beta3-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
@@ -330,13 +333,13 @@ Allows get all related data of the specified entity. It's equivalent to the **In
 
 > GET http://host:post/{entity}/{id}/details
 
-Allows get all data of a specific entity, It's equivalent to the CRUD Details action.
+Allows get all related data to an specific entity, It's equivalent to the CRUD Details action.
 
 #### Request
 
 **Path parameters**
 
-- **entity** parameter (required): Is the name of the model related of the desired entities. It should be corresponds with any of the configured models into the startup class.
+- **entity** parameter (required): Is the name of the model related of the desired entity. It should be corresponds with any of the configured models into the startup class.
 
 - **id** parameter (required): Is the Id or Key value of a specific entity. 
 
@@ -364,6 +367,24 @@ Allows get all data of a specific entity, It's equivalent to the CRUD Details ac
             <Description>Action movies</Description>
         </Genre>
         ```
+
+### Delete entities
+
+> DELETE http://host:post/{entity}/{id}
+
+Allows delete all related data to an specific entity, It's equivalent to the CRUD Delete Confirm action.
+
+#### Request
+
+**Path parameters**
+
+- **entity** parameter (required): Is the name of the model related of the desired entity. It should be corresponds with any of the configured models into the startup class.
+
+- **id** parameter (required): Is the Id or Key value of a specific entity. 
+
+#### Response
+- HTTP OK (status code 200): The delete action was successful.
+- HTTP Internal server error (status code 500): The delete actions cannot executed. Review the app logs for more details.
 
 ## Release notes
 In this [link](ReleaseNotes.md) you can be the release notes of the package.

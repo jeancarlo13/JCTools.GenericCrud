@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -79,6 +80,11 @@ namespace JCTools.GenericCrud.Controllers
         /// True if the client required a XML response; else, false.
         /// </summary>
         private bool _requiredXml => Request.Headers[HeaderNames.Accept].Contains(Constants.XmlMimeType);
+
+        /// <summary>
+        /// True if the HTTP request is a DELETE request; else, false.
+        /// </summary>
+        private bool _isDeleteRequest => Request.Method.ToUpperInvariant() == "DELETE";
 
         /// <summary>
         /// Initialize an instace of the controller with the required services
@@ -275,6 +281,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
         [Route("{entitySettings}/{id}/[action]")]
+        [HttpDelete("{entitySettings}/{id}")]
         public virtual async Task<IActionResult> DeleteConfirm(ICrudType entitySettings, string id)
         {
             await Settings.SetDataAsync(DbContext, id);
@@ -298,9 +305,15 @@ namespace JCTools.GenericCrud.Controllers
                     "Unable to delete the data. Try again, and if the problem persists, see your system administrator." :
                     message
                 );
+
+                if (_isDeleteRequest)
+                    return StatusCode(500, "Failure deleting entity.");
             }
 
-            return SendSuccessResponse(id, IndexMessages.DeleteSuccess);
+            if (_isDeleteRequest)
+                return Ok();
+            else
+                return SendSuccessResponse(id, IndexMessages.DeleteSuccess);
         }
 
         /// <summary>

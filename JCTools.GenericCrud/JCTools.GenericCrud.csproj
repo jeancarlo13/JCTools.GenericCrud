@@ -11,6 +11,7 @@
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <PackageDescription>Simplification of the Create, Read, Update and Delete web pages of the application models.</PackageDescription>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.2.0-beta3: Support to delete of entities by API Rest added.  
     - v2.2.0-beta2: Support to get the entities details by API Rest added.  
     - v2.2.0-beta1: 
       - Support to get all data by API Rest added.  
@@ -22,7 +23,7 @@
     - v2.0.0-beta2: Adds .net core 3.1 support
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
-    <Version>2.2.0-beta2</Version>
+    <Version>2.2.0-beta3</Version>
 
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>
