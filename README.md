@@ -2,6 +2,23 @@
 
 Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages of the application models.
 
+## Content
+- [JCTools.GenericCrud](#jctoolsgenericcrud)
+  - [Content](#content)
+  - [Overview](#overview)
+  - [Status](#status)
+  - [Requirements](#requirements)
+  - [Usage](#usage)
+    - [Basic usage](#basic-usage)
+    - [Demo apps](#demo-apps)
+  - [Other features](#other-features)
+    - [Custom controllers](#custom-controllers)
+    - [Entity model property settings](#entity-model-property-settings)
+    - [Authorization](#authorization)
+    - [Links and HTML anchors](#links-and-html-anchors)
+    - [Globalization and localization](#globalization-and-localization)
+  - [License](#license)
+
 ## Overview
 
 All application required multiple pages for edited the base models. This pages generally are equals to each other.
@@ -9,6 +26,7 @@ All application required multiple pages for edited the base models. This pages g
 This package allows reduce this task at minimum of actions.
 
 You only require create and configure your models, and this package create the necessary controllers, views and actions for the **C**reate, **R**ead, **U**pdate and **D**elete actions.
+
 
 ## Status
 ![v2.0.0-beta4](https://img.shields.io/badge/nuget-v2.0.0%20beta4-blue)
@@ -24,6 +42,7 @@ You only require create and configure your models, and this package create the n
 ![font awesome 5.0.6](https://img.shields.io/badge/font%20awesome-v5.0.6-blue)
 
 ## Usage
+### Basic usage
 
 1. Add the package to your application
     ```bash
@@ -37,6 +56,11 @@ You only require create and configure your models, and this package create the n
     ```cs
         services.ConfigureGenericCrud<MyContext>(options =>
         {
+            // add the models type to manage with the package
+            options.Models.Add<Models.Country>(); 
+            options.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
+            // ...
+            
             // options is an instance from JCTools.GenericCrud.Settings.IOptions
             // use this interface to custom the generated CRUDs globally
             // eg;
@@ -45,23 +69,24 @@ You only require create and configure your models, and this package create the n
             options.UseModals = true;
             // Set the bootstrap version to be used (default v4.3.1)
             options.BootstrapVersion = Settings.Bootstrap.Version3;
-            // add the models type to manage with the package
-            options.Models.Add<Models.Country>(); 
-            options.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
             
             // add a model with a custom controller
-            options.Models.Add<Models.Movie, int, MovieController, Data.Context>();
+            options.Models.Add<Models.Movie, int, MovieController, Data.Context>();            
         });
     ```
-
-    > **Note:** From the version 2.0.0 the next features was marked how to obsolete and will be removed in future versions:
-    > - The method *o.Models.Add(Type modelType, string keyPropertyName = "Id", string controllerName = "")*.
-    > - The *ContextCreator* option
-
 3. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
  ![Sample index page](Mockups/sampleIndexPage.png)
+ ![Sample index page](Mockups/sampleIndexPage2.png)
+    > Your app's layout page may make it look different from the images above.
 
-## Custom controllers
+### Demo apps
+The current repository include 3 demo apps for showing the described features of the package:
+- [.net Core 2.1 demo app](Test)
+- [.net core 3.1 demo app](Test3.1)
+- [.net 5.0 demo app](Test5.0)
+
+## Other features
+### Custom controllers
 If your desired personalize your controllers, add additional actions or override the default actions, then
 
 1. Create a new controller the inherits from **JCTools.GenericCrud.Controllers.GenericController**. e.g;
@@ -93,8 +118,6 @@ If your desired personalize your controllers, add additional actions or override
         }
     }
     ```
-
-    > **Note:** In the version 2.0.0 the **Settings** property of the controller has initialized in the *OnActionExecuting(ActionExecutingContext filterContext)* or *OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)* controller methods; **You should move their custom settings of the controller constructor to this methods.**
 
 2. Add the related model in the method **ConfigureServices** of your **Startup** class using specifying the custom controller, eg;
     ```cs
@@ -132,9 +155,45 @@ If your desired personalize your controllers, add additional actions or override
         //...
     ```
 
-4. Run to app and access at the url **http://localhost:5000/Movie**.
+4. Run to app and access at the url **http://localhost:5000/[model name]**, e.g. http://localhost:5000/movie
 
-## Links and HTML anchors
+> You can see a sample custom controller in the demo apps called MovieController:
+> * [.net Core 2.1 demo app](Test/Controllers/MovieController.cs)
+> * [.net core 3.1 demo app](Test3.1/Controllers/MovieController.cs) 
+> * [.net 5.0 demo app](Test5.0/Controllers/MovieController.cs)
+
+### Entity model property settings
+Version 2.0.0 includes the ability to customize property settings in an entity model.
+For this propose using the data annotation **CrudAttribute** in the namespace *JCTools.GenericCrud.DataAnnotations*.
+
+This data annotation have third properties:
+
+ * Visible: Boolean indicating that the property is or not visible in CRUD views.
+ * UseCustomView: Boolean indicating that the property has custom views for rendering in details, create, delete, and edit actions.
+    > Two custom views are required per property, one for read-only views (Details and Delete actions) and one for editable views (Create and Edit actions).
+    > * Readonly views are named _Details<Property name>.cshtml.
+    > * Editable views are named _Edit<Property name>.cshtml.    
+    > eg; if the property is named *Status*, the CRUD expects to find two views named _DetailsStatus.cshtml and _EditStatus.cshtml.
+
+ * IsEditableKey: Boolean that indicates whether the entity property is an Id/Key and whether or not it is editable by the user.
+    > When an Id / Key property is editable, editing the entity is actually a deletion of the stored entity followed by the creation of a new entity using the new values.
+
+### Authorization
+JCTool.GenericCrud includes since version 2.1.0 the possibility of managing access to CRUD controllers using an authorization policy.
+
+The name of the default policy is JCTools.GenericCrud.CrudPolicy, and by default authorization is not activated and anonymous access is allowed.
+
+To turn on authorization validation, just add a call to **UseAuthorization** in your *Startup.ConfigureServices* method. e.g;
+
+```cs
+    services.ConfigureGenericCrud<MyContext>(options =>
+    {
+        // ...
+        o.UseAuthorization(f => f.RequireAuthenticatedUser()); // add this line
+    });
+```
+> **Note:** If no action is specified for policy validation, by default only one authenticated user is required.
+### Links and HTML anchors
 To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anchor Tag Helper.
 
 ```html
@@ -147,9 +206,7 @@ Notice that it was used in the entity model name instead of the controller name.
         <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
     ```
 
-
-
-## Globalization and localization
+### Globalization and localization
 By default, generic CRUDs support ASP.NET globalization and localization, as described in the official [documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/localization?view=aspnetcore-5.0).
 
 But only the english and spanish languages are included into the package.
@@ -170,33 +227,9 @@ You can extend or replace the included localized strings with your own translati
     ```
     The *Resources.MyResourcesClass.ResourceManager* corresponds to the property *ResourceManager* of the autogenerated file in the step 1
 
-## Changes of the version 2.0.0
-* Add .net 5.0 support
-* Add .net core 2.1 y 3.1 support
-* Add support to Bootstrap 4.0
-* Replaces the GenericController<TContext, TModel, TKey> class for the GenericController class
-  * This new class is easier to use
-* The follows interfaces was replaced for a best definition and structure:
-  * IBase -> IViewModel
-  * IBaseDetails, ICrudDetails -> IDetailsModel
-  * ICrudEdit -> IEditModel
-  * ICrudList -> IIndexModel
-* The follows models was replaced by the **CrudModel** class
-  * Base
-  * CrudDetails
-  * CrudEdit
-  * CrudList
-* The **IControllerOptions** interface and **ControllerOptions** class was removed for being unnecessary in the new structure
-* The extensors methods **GetLocalizedString(...)** for the **IStringLocalizer** interfaces was moved to the **StringLocalizerExtensors** class
-* The globalization and internationalization process is improved
-* Now no need to use endpoint mapping, if you use older version remove the next code from the method **Configure** your **startup** class:
-```cs
-    app.UseMvc(routes =>
-    {
-        routes.MapCrudRoutes(); // remove this line
 
-        // ...
-    });   
+## Release notes
+In this [link](ReleaseNotes.md) you can be the release notes of the package.
 
 ```
 ## License
