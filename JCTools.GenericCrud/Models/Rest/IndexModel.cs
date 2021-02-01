@@ -30,7 +30,7 @@ namespace JCTools.GenericCrud.Models.Rest
         /// <summary>
         /// Init an empty instance
         /// </summary>
-        public IndexModel(){}
+        public IndexModel() { }
 
         /// <summary>
         /// Inits the current instance
@@ -57,23 +57,11 @@ namespace JCTools.GenericCrud.Models.Rest
         /// to JSON format for a HTTP response.</returns>
         public JsonResult ToJson() => new JsonResult(this);
 
-        /// <summary>
+            /// <summary>
         /// Creates a <see cref="JsonResult"/> object that serializes the current instance to JSON.
         /// </summary>
         /// <returns>The created <see cref="JsonResult"/> that serializes the current instance 
         /// to JSON format for a HTTP response.</returns>
-        public ContentResult ToXml()
-        {
-            var serializedData = JsonConvert.DeserializeXNode(
-                JsonConvert.SerializeObject(this),
-                "Index"
-            );
-
-            return new ContentResult(){
-                Content = serializedData.ToString(),
-                ContentType = Constants.XmlMimeType,
-                StatusCode = (int)HttpStatusCode.OK
-            };
-        }
+        public ContentResult ToXml() => Helpers.XmlResult.Xml(null, this, "All");
     }
 }

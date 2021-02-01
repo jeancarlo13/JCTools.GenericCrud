@@ -22,6 +22,9 @@ Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages 
     - [Get all data](#get-all-data)
       - [Request](#request)
       - [Response](#response)
+    - [Get entity details](#get-entity-details)
+      - [Request](#request-1)
+      - [Response](#response-1)
   - [Release notes](#release-notes)
   - [License](#license)
 
@@ -323,6 +326,44 @@ Allows get all related data of the specified entity. It's equivalent to the **In
         </Index>
         ```
 
+### Get entity details
+
+> GET http://host:post/{entity}/{id}/details
+
+Allows get all data of a specific entity, It's equivalent to the CRUD Details action.
+
+#### Request
+
+**Path parameters**
+
+- **entity** parameter (required): Is the name of the model related of the desired entities. It should be corresponds with any of the configured models into the startup class.
+
+- **id** parameter (required): Is the Id or Key value of a specific entity. 
+
+**Headers**
+
+- **Accept** header (optional): Allows specified the desired mime type to receive into the response. See [Supported response mime types section](#supported-response-mime-types).
+
+#### Response
+- By default, the sent response is a html view with the found data using the configured styles by the application. 
+    The following image correspond to a response for the details request of the model [genre](Test5.0/Models/Genre.cs) of a [demo app](Test5.0).
+    ![Details sample](Mockups/sampleDetailsPopup.png)
+- If the **Accept** header is established a response object with the found entity is send.
+    - The followings are examples of equivalent responses to the image above:
+        - Accept:application/json: 
+        ```json
+        {
+            "name": "Action",
+            "description": "Action movies"
+        }
+        ```
+        - Accept:application/xml
+        ```xml
+        <Genre>
+            <Name>Action</Name>
+            <Description>Action movies</Description>
+        </Genre>
+        ```
 
 ## Release notes
 In this [link](ReleaseNotes.md) you can be the release notes of the package.

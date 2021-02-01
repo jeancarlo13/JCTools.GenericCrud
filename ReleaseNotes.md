@@ -3,11 +3,16 @@
 ## Content
 - [JCTools.GenericCrud Release notes](#jctoolsgenericcrud-release-notes)
   - [Content](#content)
-  - [Version 2.2.0-beta1](#version-220-beta1)
+  - [Version 2.2.0](#version-220)
+    - [beta2](#beta2)
+    - [beta1](#beta1)
   - [Version 2.1.0](#version-210)
   - [Version 2.0.0](#version-200)
 
-## Version 2.2.0-beta1
+## Version 2.2.0
+### beta2
+* Support to get the entities details by API Rest added.
+### beta1
 * Support to get all data by API Rest added.  
 * Support by JSON and XML responses added.
 

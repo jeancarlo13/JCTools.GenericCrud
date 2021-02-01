@@ -256,7 +256,7 @@ namespace JCTools.GenericCrud.Controllers
         [HttpGet]
         [Route("{entitySettings}/{id}/[action]")]
         public virtual Task<IActionResult> Details(ICrudType entitySettings, string id)
-            => ShowDetailsAsync(id);
+            => ShowDetailsAsync(id, supportApiResponse: true);
 
         /// <summary>
         /// Allows render the delete view
@@ -431,8 +431,13 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to show into the view</param>
         /// <param name="isForDeletion">True if the view will used for delete the related entity;
         /// another, false</param>
+        /// <param name="supportApiResponse">True to respond to Api Rest requests; False for ignoring them</param>
         /// <returns>The task to be invoked</returns>
-        private async Task<IActionResult> ShowDetailsAsync(string id, bool isForDeletion = false)
+        private async Task<IActionResult> ShowDetailsAsync(
+            string id,
+            bool isForDeletion = false,
+            bool supportApiResponse = false
+        )
         {
             var model = Settings as IDetailsModel;
             await model.SetDataAsync(DbContext, id);
@@ -442,7 +447,12 @@ namespace JCTools.GenericCrud.Controllers
                 return NotFound();
 
             model.CurrentProcess = isForDeletion ? CrudProcesses.Delete : CrudProcesses.Details;
-            return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
+            if (supportApiResponse && _requiredJson)
+                return Json(entity);
+            else if (supportApiResponse && _requiredXml)
+                return this.Xml(entity);
+            else
+                return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
         }
 
         /// <summary>

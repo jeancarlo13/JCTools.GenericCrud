@@ -11,6 +11,7 @@
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <PackageDescription>Simplification of the Create, Read, Update and Delete web pages of the application models.</PackageDescription>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.2.0-beta2: Support to get the entities details by API Rest added.  
     - v2.2.0-beta1: 
       - Support to get all data by API Rest added.  
       - Support by JSON and XML responses added.
