@@ -38,7 +38,7 @@ You only require create and configure your models, and this package create the n
 
 
 ## Status
-![v2.1.0](https://img.shields.io/badge/nuget-v2.1.0-blue)
+![v2.2.0-beta2](https://img.shields.io/badge/nuget-v2.2.0--beta2-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
