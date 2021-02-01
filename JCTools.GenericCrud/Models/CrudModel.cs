@@ -131,24 +131,11 @@ namespace JCTools.GenericCrud.Models
                 .Select(p => p.ToString());
         }
 
-
-        /// <summary>
-        /// The name of the property used how to key/id of the model
-        /// </summary>
-        public string KeyPropertyName { get => _crudType.KeyPropertyName; }
-
         /// <summary>
         /// The message to be displayed into the view.
         /// Used for display the success or error messages into the CRUD operations
         /// </summary>
         public ViewMessage Message { get; set; }
-
-
-        /// <summary>
-        /// True if the current CRUD use a custom controller; 
-        /// False if use the a GenericController class
-        /// </summary>
-        public bool UseCustomController { get => !_crudType.UseGenericController; }
 
         /// <summary>
         /// The configuration to be used for represents the icon/button 
@@ -463,13 +450,6 @@ namespace JCTools.GenericCrud.Models
         }
 
         /// <summary>
-        /// Allows get the type of the model id/key property
-        /// </summary>
-        /// <returns>The found type</returns>
-        public virtual Type GetKeyType()
-            => _crudType.KeyPropertyType;
-
-        /// <summary>
         /// Allows get the entire data of the entity to be displayed into the view
         /// </summary>
         /// <returns>The stored data</returns>
@@ -564,14 +544,6 @@ namespace JCTools.GenericCrud.Models
             else
                 _modelId = (TKey)id;
         }
-
-        /// <summary>
-        /// Allows get the Key/Id property value of the specific instance
-        /// </summary>
-        /// <param name="obj">The instance to be evaluated</param>
-        /// <returns>The found Key/Id property value or null</returns>
-        public object GetKeyPropertyValue(object obj)
-            => _crudType.GetKeyPropertyValue(obj);
 
         /// <summary>
         /// Convert the string value to an valid <typeparamref name="TKey"/> value

@@ -17,6 +17,7 @@ Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages 
     - [Authorization](#authorization)
     - [Links and HTML anchors](#links-and-html-anchors)
     - [Globalization and localization](#globalization-and-localization)
+  - [Release notes](#release-notes)
   - [License](#license)
 
 ## Overview
@@ -29,7 +30,7 @@ You only require create and configure your models, and this package create the n
 
 
 ## Status
-![v2.0.0-beta4](https://img.shields.io/badge/nuget-v2.0.0%20beta4-blue)
+![v2.1.0](https://img.shields.io/badge/nuget-v2.1.0-blue)
 
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
@@ -46,11 +47,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
     ```bash
-    Install-Package JCTools.GenericCrud -Version 2.0.0-beta4
+    Install-Package JCTools.GenericCrud -Version 2.1.0
     ```
     Or
     ```bash
-    dotnet add package JCTools.GenericCrud --version 2.0.0-beta4
+    dotnet add package JCTools.GenericCrud --version 2.1.0
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs
@@ -127,20 +128,37 @@ If your desired personalize your controllers, add additional actions or override
 3. **(optional)** If you override the **OnActionExecuting(ActionExecutingContext filterContext)** or **OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)** controller methods, make sure to invoke the base methods for the correct initializations of the controller settings
 
     ```cs
-        //...
+        // ...
         
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             // Call the initialization of the Settings property
             base.InitSettings(context);
+            
             // Add your custom settings here, eg;
-            Settings.UseModals = false;
-            Settings.Subtitle = "All entities";
-            ViewBag.OtherEntities = (DbContext as Data.Context).OtherEntities.ToList();
+            Settings.UseModals = false; // disabled the modals
+            Settings.Subtitle = "All entities"; // change the default subtitle
+            
+            // Customizing the Icons and Buttons Classes of the Index Page
+            var index = Settings as IIndexModel;
+            index.NewAction.IconClass = "fa fa-plus-circle";
+            index.NewAction.ButtonClass = "btn btn-success btn-sm";
+
+            index.DetailsAction.IconClass = "fa fa-info";
+            index.DetailsAction.ButtonClass = "btn btn-info btn-sm";
+            
+            index.EditAction.IconClass = "fa fa-edit";
+            index.EditAction.ButtonClass = "btn btn-warning btn-sm";
+            
+            index.DeleteAction.IconClass = "fa fa-eraser";
+
+            // other things
+            ViewBag.Countries = (DbContext as Context).Countries.ToList();
 
             base.OnActionExecuting(context);
         }
         
+        // Or
         public override Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             // Call the initialization of the Settings property
@@ -201,7 +219,7 @@ To insert a link to a custom CRUD or CRUD, you only need to use ASP.NET Core Anc
 ```
 Notice that it was used in the entity model name instead of the controller name.
 
-> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings with the entity model name, eg;
+> **Note:** In .Net Core 2.1 the controller is named **Generic** and is required add the asp-route-entitySettings attribute with the entity model name, eg;
     ```
         <a asp-area="" asp-controller="Generic" asp-action="Index" asp-route-entitySettings="MyEntity">My Label</a>
     ```
@@ -231,6 +249,5 @@ You can extend or replace the included localized strings with your own translati
 ## Release notes
 In this [link](ReleaseNotes.md) you can be the release notes of the package.
 
-```
 ## License
 [MIT License](LICENSE)

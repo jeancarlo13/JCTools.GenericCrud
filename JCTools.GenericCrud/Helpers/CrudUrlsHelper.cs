@@ -126,19 +126,21 @@ namespace JCTools.GenericCrud.Helpers
         /// <param name="crudType">The <see cref="ICrudTypeRoutable"/> with the CRUD argument to be used</param>
         /// <param name="throwIfNoFoundRoute">True for generate a exception if not found a route; Another, false.</param>
         /// <returns>The found route</returns>
-        private static Settings.Route GetRoute(string actionName, ICrudTypeRoutable crudType, bool throwIfNoFoundRoute = true)
+        private static Settings.Route GetRoute(
+            string actionName,
+            ICrudTypeRoutable crudType,
+            bool throwIfNoFoundRoute = true
+        )
         {
             if (crudType is null)
                 throw new System.ArgumentNullException(nameof(crudType));
 
-            if (!crudType.Routes?.Any() ?? true)
-                Settings.Route.CreateRoutes(crudType);
-
             var routeName = actionName == Settings.Route.RedirectIndexActionNamePattern
-                ? string.Format(actionName, crudType.ModelTypeName)
-                : $"{crudType.ModelTypeName}_{actionName}";
+                ? string.Format(actionName, crudType.ModelType.Name)
+                : $"{crudType.ModelType.Name}_{actionName}";
 
             var route = crudType.Routes.FirstOrDefault(r => r.Name == routeName);
+
             if (route == null && throwIfNoFoundRoute)
                 throw new InvalidOperationException($"No found route for the action \"{actionName}\"");
 

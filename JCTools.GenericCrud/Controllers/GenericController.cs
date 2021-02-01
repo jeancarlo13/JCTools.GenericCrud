@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
-using JCTools.GenericCrud.Resources;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -24,6 +23,7 @@ namespace JCTools.GenericCrud.Controllers
     /// Used for create the controllers that are the entry points for the custom cruds
     /// </summary>
     [CrudConstraint]
+    [Authorize(Constants.PolicyName)]
     public class GenericController : Controller, IGenericController
     {
         /// <summary>
@@ -148,7 +148,7 @@ namespace JCTools.GenericCrud.Controllers
                 if (CrudType == null)
                     throw new InvalidOperationException($"Configured model not found for {entityName}");
 
-                var type = typeof(CrudModel<,>).MakeGenericType(CrudType.ModelType, CrudType.KeyPropertyType);
+                var type = typeof(CrudModel<,>).MakeGenericType(CrudType.ModelType, CrudType.Key.Type);
                 var constructor = type.GetConstructor(
                     bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic,
                     binder: null,
@@ -324,7 +324,7 @@ namespace JCTools.GenericCrud.Controllers
             [FromForm] object entityModel
         )
         {
-            ModelState.Remove(Settings.KeyPropertyName);
+            ModelState.Remove(entitySettings.Key.Name);
             if (ModelState.IsValid)
             {
                 await DbContext.AddAsync(entityModel);
@@ -341,7 +341,7 @@ namespace JCTools.GenericCrud.Controllers
                 }
 
                 return SendSuccessResponse(
-                    Settings.GetKeyPropertyValue(entityModel).ToString(),
+                    entitySettings.GetKeyPropertyValue(entityModel).ToString(),
                     IndexMessages.CreateSuccess
                 );
             }
@@ -371,7 +371,7 @@ namespace JCTools.GenericCrud.Controllers
             model.SetData(entityModel);
 
             var modelId = model.GetId();
-            if (!entitySettings.KeyPropertyIsEditable && !modelId.Equals(key))
+            if (!entitySettings.Key.IsEditable && !modelId.Equals(key))
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -382,7 +382,7 @@ namespace JCTools.GenericCrud.Controllers
                 if (entity == null)
                     return NotFound();
 
-                if (!entitySettings.KeyPropertyIsEditable || modelId.Equals(key))
+                if (!entitySettings.Key.IsEditable || modelId.Equals(key))
                     DbContext.Entry(entity).CurrentValues.SetValues(entityModel);
                 else
                 {

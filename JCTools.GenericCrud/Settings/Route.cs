@@ -9,6 +9,11 @@ namespace JCTools.GenericCrud.Settings
     internal class Route
     {
         /// <summary>
+        /// The action name to map with the route
+        /// </summary>
+        private string _actionName;
+
+        /// <summary>
         /// The name of the CRUD see entity details action
         /// </summary>
         internal const string DetailsActionName = "Details";
@@ -61,27 +66,9 @@ namespace JCTools.GenericCrud.Settings
         internal const string RedirectIndexActionNamePattern = "{0}_RedirectedIndex";
 
         /// <summary>
-        /// The pattern that include an entity id/key that will be used to make the path pattern
-        /// </summary>
-        private static readonly string _defaultIdPattern = $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{{{id}}}}/{{0}}";
-        /// <summary>
-        /// The pattern that not include an entity id/key that will be used to make the path pattern
-        /// </summary>
-        private static readonly string _defaultPattern = $"{{{{{Configurator.ModelTypeTokenName}}}}}/{{0}}";
-
-        /// <summary>
-        /// Contains the settings of the related CRUD with the route
-        /// </summary>
-        public ICrudTypeRoutable CrudType { get; }
-        /// <summary>
         /// The URL pattern of the route.
         /// </summary>
         public string Pattern { get; }
-
-        /// <summary>
-        /// The action name to map with the route
-        /// </summary>
-        public string ActionName { get; }
 
         /// <summary>
         /// The name of the route.
@@ -93,6 +80,17 @@ namespace JCTools.GenericCrud.Settings
         /// </summary>
         public RouteDefaultValues DefaultValues { get; }
 
+        /// <summary>
+        /// Init an instance with the specified settings
+        /// </summary>
+        /// <param name="crudType">The related <see cref="ICrudTypeRoutable"/> to the new route.</param>
+        /// <param name="actionName">The name of the related action to the new route.</param>
+        /// <param name="pattern">The pattern to be used in the created urls from the new routes.
+        /// <para>If is null is used the pattern: 
+        /// {<paramref name="crudType"/>.ModelType.Name}/{Id}/{<paramref name="actionName"/>}</para>
+        /// </param>
+        /// <param name="routeName">The name of the new route; null for use the 
+        /// <paramref name="actionName"/> parameter</param>
         internal Route(
             ICrudTypeRoutable crudType,
             string actionName,
@@ -100,20 +98,21 @@ namespace JCTools.GenericCrud.Settings
             string routeName = null
         )
         {
-            CrudType = crudType;
-            ActionName = actionName;
-            Pattern = pattern ?? string.Format(_defaultIdPattern, actionName.ToLowerInvariant());
+            _actionName = actionName;
+
+            Pattern = pattern
+                ?? string.Format($"{{{{{Constants.ModelTypeTokenName}}}}}/{{{{id}}}}/{{0}}", actionName.ToLowerInvariant());
+
             Name = string.IsNullOrWhiteSpace(routeName)
-                ? $"{CrudType.ModelTypeName}_{ActionName}"
+                ? $"{crudType.ModelType.Name}_{_actionName}"
                 : routeName;
 
             var type = crudType as ICrudType;
             DefaultValues = new RouteDefaultValues
             {
                 Controller = type?.ControllerType.Name,
-                Action = ActionName,
-                ModelType = type?.ModelType.Name,
-                ICrudType = type
+                Action = _actionName,
+                ModelType = type?.ModelType.Name
             };
         }
 
@@ -121,39 +120,7 @@ namespace JCTools.GenericCrud.Settings
         /// Returns the string representation of the class
         /// </summary>
         public override string ToString()
-            => $"{Name}, {ActionName}, {Pattern}";
+            => $"{Name}, {_actionName}, {Pattern}";
 
-        /// <summary>
-        /// Generate the mvc routes collection for the specified CRUD type 
-        /// </summary>
-        /// <param name="crudType">The related crud type to the routes to be generated</param>
-        /// <returns>The generated routes collection</returns>
-        internal static IReadOnlyList<Route> CreateRoutes(ICrudTypeRoutable crudType)
-        {
-            if (crudType is null)
-                throw new System.ArgumentNullException(nameof(crudType));
-
-            if (!crudType.Routes?.Any() ?? true)
-            {
-                crudType.Routes = new List<Route>()
-                {
-                    new Route(crudType, DetailsActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DetailsActionName}"),
-                    new Route(crudType, DeleteActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DeleteActionName}"),
-                    new Route(crudType, DeleteConfirmActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{DeleteConfirmActionName}"),
-                    new Route(crudType, CreateActionName, pattern: $"{crudType.ModelTypeName}/{CreateActionName}"),
-                    new Route(crudType, SaveActionName, pattern: $"{crudType.ModelTypeName}/{SaveActionName}"),
-                    new Route(crudType, EditActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{EditActionName}"),
-                    new Route(crudType, SaveChangesActionName, pattern: $"{crudType.ModelTypeName}/{{id}}/{SaveChangesActionName}"),
-                    new Route(crudType, GetScriptActionName, pattern: $"{crudType.ModelTypeName}/{{filename}}.js"),
-                    new Route(crudType, IndexActionName,
-                        routeName: string.Format(RedirectIndexActionNamePattern, crudType.ModelTypeName),
-                        pattern: $"{crudType.ModelTypeName}/{{id}}/{{message}}"
-                    ),
-                    new Route(crudType, IndexActionName, pattern: crudType.ModelTypeName)
-                };
-            }
-
-            return crudType.Routes;
-        }
     }
 }
