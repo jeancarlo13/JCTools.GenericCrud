@@ -28,9 +28,12 @@ Simplification of the **C**reate, **R**ead, **U**pdate and **D**elete web pages 
     - [Create a new entity](#create-a-new-entity)
       - [Request](#request-2)
       - [Response](#response-2)
-    - [Delete entities](#delete-entities)
+    - [Edit entities](#edit-entities)
       - [Request](#request-3)
       - [Response](#response-3)
+    - [Delete entities](#delete-entities)
+      - [Request](#request-4)
+      - [Response](#response-4)
   - [Release notes](#release-notes)
   - [License](#license)
 
@@ -437,7 +440,7 @@ The following js code is used for create a new entity of the model [Country](Tes
 If the creation is successful, the API return a object serialized in XML or JSON depending of the **Content-Type** header value, with the following properties:
 
 - **Success**: True if the operation was successful; else, false. 
-- **Data**: A serialized object with all related data of the new created entity.
+- **Data**: A serialized object with all related data of the new created entity if the **Success** property is true; else, a string collection with the error messages
   
 **Example**
 
@@ -464,6 +467,109 @@ Continuing with the previous example seen for the request; the responses in XML 
         </Data>
     </Country>
     ```
+
+### Edit entities
+
+> PUT http://host:post/{entity}
+
+Allows update previously created entities specifying the new data for the entity, It's equivalent to the CRUD Edit/Update action.
+
+#### Request
+
+**Path parameters**
+
+- **entity** parameter (required): Is the name of the model related of the new entity. It should be corresponds with any of the configured models into the startup class.
+
+- **id** parameter (required): Is the Id or Key value of a specific entity. 
+
+**Headers**
+
+- **Content-Type** header (required): Used for specifying the content type of the data sent to the api. See [Supported response mime types section](#supported-response-mime-types) for the possible values.
+
+**Body**
+
+A serialized object with the new data for the entity to update.
+> Is required that this object contains the id/key property of the entity for the correct validation.
+>
+> In the xml requests is required that the root element was named **data**
+
+**Example**
+
+The following js code is used for create a new entity of the model [Country](Test5.0/Models/Country.cs) in the Demo app:
+
+- For JSON content:
+    ```js
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = ;
+
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        body: JSON.stringify({
+            "Id":5,
+            "Name":"Country edited from JSON data"
+        }),
+        redirect: 'follow'
+    };
+
+    fetch("http://host:port/Country/5", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+    ```
+- For XML content:
+    ```js
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/xml");
+
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        body: "<data><id>5</id><Name>Country edited from xml request</Name></data>",
+        redirect: 'follow'
+    };
+
+    fetch("http://host:post/Country/5", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error)); 
+    ```
+
+#### Response
+
+If the update process is successful, the API return a object serialized in XML or JSON depending of the **Content-Type** header value, with the following properties:
+
+- **Success**: True if the operation was successful; else, false. 
+- **Data**: A serialized object with all related data of the new created entity if the **Success** property is true; else, a string collection with the error messages
+  
+**Example**
+
+Continuing with the previous example seen for the request; the responses in XML and JSON would be:
+
+- Content-Type:application/json: 
+    ```json
+    {
+        "success": true,
+        "data": {
+            "id": 5,
+            "name": "Country edited from JSON data"
+        }
+    }
+    ```
+
+- Content-Type:application/xml
+    ```xml
+    <Country>
+        <Success>true</Success>
+        <Data>
+            <Id>5</Id>
+            <Name>Country edited from xml request</Name>
+        </Data>
+    </Country>
+    ```
+
 
 ### Delete entities
 

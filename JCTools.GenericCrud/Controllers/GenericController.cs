@@ -428,7 +428,20 @@ namespace JCTools.GenericCrud.Controllers
         }
 
         /// <summary>
-        /// Allows valid and save the changes into the specified entity
+        /// Allows valid and save the changes into the specified entity from the API rest
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">Instance with the changes of the entity to save</param>
+        /// <param name="id">The id of the entity to change</param>
+        [HttpPut("{entitySettings}/{id}")]
+        public virtual Task<IActionResult> Edit(
+            ICrudType entitySettings,
+            string id,
+            [FromBody] object entityModel
+        ) => SaveEntityChangesAsync(entitySettings, id, entityModel, supportApiResponse: true);
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity from the CRUD screens
         /// </summary>
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="entityModel">Instance with the changes of the entity to save</param>
@@ -436,10 +449,25 @@ namespace JCTools.GenericCrud.Controllers
         [HttpPost]
         [ActionName(GenericCrud.Settings.Route.SaveChangesActionName)]
         [Route("{entitySettings}/{id}/[action]")]
-        public virtual async Task<IActionResult> SaveChangesAsync(
+        public virtual Task<IActionResult> SaveChangesAsync(
             ICrudType entitySettings,
             string id,
             [FromForm] object entityModel
+        ) => SaveEntityChangesAsync(entitySettings, id, entityModel, supportApiResponse: false);
+
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity 
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="id">The id of the entity to change</param>
+        /// <param name="entityModel">Instance with the changes of the entity to save</param>
+        /// <param name="supportApiResponse">True to respond to Api Rest requests; False for ignoring them</param>
+        private async Task<IActionResult> SaveEntityChangesAsync(
+            ICrudType entitySettings,
+            string id,
+            object entityModel,
+            bool supportApiResponse = false
         )
         {
             Settings.SetId(id);
@@ -478,10 +506,39 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(modelId.ToString(), IndexMessages.EditSuccess);
+                if (supportApiResponse)
+                {
+                    var response = new JsonResponse()
+                    {
+                        Success = true,
+                        Data = Settings.GetData().GetEntity()
+                    };
+
+                    if (_requiredXml)
+                        return this.Xml(response, entitySettings.ModelType.Name);
+                    else
+                        return Json(response);
+                }
+                else
+                    return SendSuccessResponse(modelId.ToString(), IndexMessages.EditSuccess);
             }
 
-            return await Edit(id, Settings.GetData());
+            if (supportApiResponse)
+            {
+                var response = new JsonResponse()
+                {
+                    Success = false,
+                    Data = ModelState.Values
+                                    .Select(v => v.Errors.Select(e => e.ErrorMessage))
+                };
+
+                if (_requiredXml)
+                    return this.Xml(response, entitySettings.ModelType.Name);
+                else
+                    return Json(response);
+            }
+            else
+                return await Edit(id, Settings.GetData());
         }
 
         /// <summary>
