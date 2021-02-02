@@ -1,11 +1,14 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using JCTools.GenericCrud.DataAnnotations;
 using JCTools.GenericCrud.Helpers;
 using JCTools.GenericCrud.Models;
+using JCTools.GenericCrud.Models.Rest;
 using JCTools.GenericCrud.Services;
 using JCTools.GenericCrud.Settings;
 using Microsoft.AspNetCore.Authorization;
@@ -16,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace JCTools.GenericCrud.Controllers
 {
@@ -66,6 +70,25 @@ namespace JCTools.GenericCrud.Controllers
         /// The name of the property used how to key/id of the model
         /// </summary>
         private readonly string _keyPropertyName;
+
+        /// <summary>
+        /// True if the client required a JSON response; else, false.
+        /// </summary>
+        private bool _requiredJson
+            => Request.Headers[HeaderNames.Accept].Contains(Constants.JsonMimeType)
+                || Request.Headers[HeaderNames.ContentType].Contains(Constants.JsonMimeType);
+
+        /// <summary>
+        /// True if the client required a XML response; else, false.
+        /// </summary>
+        private bool _requiredXml
+            => Request.Headers[HeaderNames.Accept].Contains(Constants.XmlMimeType)
+                || Request.Headers[HeaderNames.ContentType].Contains(Constants.XmlMimeType);
+
+        /// <summary>
+        /// True if the HTTP request is a DELETE request; else, false.
+        /// </summary>
+        private bool _isDeleteRequest => Request.Method.ToUpperInvariant() == "DELETE";
 
         /// <summary>
         /// Initialize an instace of the controller with the required services
@@ -173,6 +196,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
         [Route("{entitySettings}/{id?}/{message?}")]
+        [HttpGet]
         public virtual async Task<IActionResult> Index(
             ICrudType entitySettings,
             string id,
@@ -196,10 +220,16 @@ namespace JCTools.GenericCrud.Controllers
                 model.SetId(id);
 
             model.CurrentProcess = CrudProcesses.Index;
-            return Content(
-                await _renderingService.RenderToStringAsync(nameof(Index), model, ViewData),
-                "text/html"
-            );
+
+            if (_requiredJson)
+                return new IndexModel(model).ToJson();
+            else if (_requiredXml)
+                return new IndexModel(model).ToXml();
+            else
+                return Content(
+                    await _renderingService.RenderToStringAsync(nameof(Index), model, ViewData),
+                    "text/html"
+                );
         }
 
         /// <summary>
@@ -237,7 +267,7 @@ namespace JCTools.GenericCrud.Controllers
         [HttpGet]
         [Route("{entitySettings}/{id}/[action]")]
         public virtual Task<IActionResult> Details(ICrudType entitySettings, string id)
-            => ShowDetailsAsync(id);
+            => ShowDetailsAsync(id, supportApiResponse: true);
 
         /// <summary>
         /// Allows render the delete view
@@ -256,6 +286,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to show into the view</param>
         [HttpGet]
         [Route("{entitySettings}/{id}/[action]")]
+        [HttpDelete("{entitySettings}/{id}")]
         public virtual async Task<IActionResult> DeleteConfirm(ICrudType entitySettings, string id)
         {
             await Settings.SetDataAsync(DbContext, id);
@@ -279,9 +310,15 @@ namespace JCTools.GenericCrud.Controllers
                     "Unable to delete the data. Try again, and if the problem persists, see your system administrator." :
                     message
                 );
+
+                if (_isDeleteRequest)
+                    return StatusCode(500, "Failure deleting entity.");
             }
 
-            return SendSuccessResponse(id, IndexMessages.DeleteSuccess);
+            if (_isDeleteRequest)
+                return Ok();
+            else
+                return SendSuccessResponse(id, IndexMessages.DeleteSuccess);
         }
 
         /// <summary>
@@ -313,7 +350,32 @@ namespace JCTools.GenericCrud.Controllers
         }
 
         /// <summary>
-        /// Allows save new entities
+        /// Allows save new entities from the API rest
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">The entity to save</param>
+        [HttpPost("{entitySettings}")]
+        public virtual async Task<IActionResult> Create(
+            ICrudType entitySettings,
+            [FromBody] object entityModel
+        )
+        {
+            var response = new JsonResponse();
+            response.Success = await SaveNewEntity(entitySettings, entityModel);
+            if (response.Success)
+                response.Data = entityModel;
+            else
+                response.Data = ModelState.Values
+                    .Select(v => v.Errors.Select(e => e.ErrorMessage));
+
+            if (_requiredXml)
+                return this.Xml(response, entitySettings.ModelType.Name);
+            else
+                return Json(response);
+        }
+
+        /// <summary>
+        /// Allows save new entities from the CRUD screens
         /// </summary>
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="entityModel">The entity to save</param>
@@ -324,33 +386,62 @@ namespace JCTools.GenericCrud.Controllers
             [FromForm] object entityModel
         )
         {
-            ModelState.Remove(entitySettings.Key.Name);
-            if (ModelState.IsValid)
+            if (await SaveNewEntity(entitySettings, entityModel))
             {
-                await DbContext.AddAsync(entityModel);
-
-                try
-                {
-                    await DbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateException ex)
-                {
-                    _logger.LogWarning(ex, "Failure saving changes.");
-                    AddSaveChangesErrorMessage();
-                    return await Create(entitySettings);
-                }
-
                 return SendSuccessResponse(
                     entitySettings.GetKeyPropertyValue(entityModel).ToString(),
                     IndexMessages.CreateSuccess
                 );
             }
-
-            return await Create(entitySettings);
+            else
+                return await Create(entitySettings);
         }
 
         /// <summary>
-        /// Allows valid and save the changes into the specified entity
+        /// Allows store the new entities
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">The entity to save</param>
+        /// <returns>True if the store process is successful; else, false</returns>
+        private async Task<bool> SaveNewEntity(
+            ICrudType entitySettings,
+            object entityModel
+        )
+        {
+            ModelState.Remove(entitySettings.Key.Name);
+            if (!ModelState.IsValid)
+                return false;
+            await DbContext.AddAsync(entityModel);
+
+            try
+            {
+                await DbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogWarning(ex, "Failure saving changes.");
+                AddSaveChangesErrorMessage();
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity from the API rest
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">Instance with the changes of the entity to save</param>
+        /// <param name="id">The id of the entity to change</param>
+        [HttpPut("{entitySettings}/{id}")]
+        public virtual Task<IActionResult> Edit(
+            ICrudType entitySettings,
+            string id,
+            [FromBody] object entityModel
+        ) => SaveEntityChangesAsync(entitySettings, id, entityModel, supportApiResponse: true);
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity from the CRUD screens
         /// </summary>
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="entityModel">Instance with the changes of the entity to save</param>
@@ -358,10 +449,25 @@ namespace JCTools.GenericCrud.Controllers
         [HttpPost]
         [ActionName(GenericCrud.Settings.Route.SaveChangesActionName)]
         [Route("{entitySettings}/{id}/[action]")]
-        public virtual async Task<IActionResult> SaveChangesAsync(
+        public virtual Task<IActionResult> SaveChangesAsync(
             ICrudType entitySettings,
             string id,
             [FromForm] object entityModel
+        ) => SaveEntityChangesAsync(entitySettings, id, entityModel, supportApiResponse: false);
+
+
+        /// <summary>
+        /// Allows valid and save the changes into the specified entity 
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="id">The id of the entity to change</param>
+        /// <param name="entityModel">Instance with the changes of the entity to save</param>
+        /// <param name="supportApiResponse">True to respond to Api Rest requests; False for ignoring them</param>
+        private async Task<IActionResult> SaveEntityChangesAsync(
+            ICrudType entitySettings,
+            string id,
+            object entityModel,
+            bool supportApiResponse = false
         )
         {
             Settings.SetId(id);
@@ -400,10 +506,39 @@ namespace JCTools.GenericCrud.Controllers
                     AddSaveChangesErrorMessage();
                 }
 
-                return SendSuccessResponse(modelId.ToString(), IndexMessages.EditSuccess);
+                if (supportApiResponse)
+                {
+                    var response = new JsonResponse()
+                    {
+                        Success = true,
+                        Data = Settings.GetData().GetEntity()
+                    };
+
+                    if (_requiredXml)
+                        return this.Xml(response, entitySettings.ModelType.Name);
+                    else
+                        return Json(response);
+                }
+                else
+                    return SendSuccessResponse(modelId.ToString(), IndexMessages.EditSuccess);
             }
 
-            return await Edit(id, Settings.GetData());
+            if (supportApiResponse)
+            {
+                var response = new JsonResponse()
+                {
+                    Success = false,
+                    Data = ModelState.Values
+                                    .Select(v => v.Errors.Select(e => e.ErrorMessage))
+                };
+
+                if (_requiredXml)
+                    return this.Xml(response, entitySettings.ModelType.Name);
+                else
+                    return Json(response);
+            }
+            else
+                return await Edit(id, Settings.GetData());
         }
 
         /// <summary>
@@ -412,8 +547,13 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The id of the entity to show into the view</param>
         /// <param name="isForDeletion">True if the view will used for delete the related entity;
         /// another, false</param>
+        /// <param name="supportApiResponse">True to respond to Api Rest requests; False for ignoring them</param>
         /// <returns>The task to be invoked</returns>
-        private async Task<IActionResult> ShowDetailsAsync(string id, bool isForDeletion = false)
+        private async Task<IActionResult> ShowDetailsAsync(
+            string id,
+            bool isForDeletion = false,
+            bool supportApiResponse = false
+        )
         {
             var model = Settings as IDetailsModel;
             await model.SetDataAsync(DbContext, id);
@@ -423,7 +563,12 @@ namespace JCTools.GenericCrud.Controllers
                 return NotFound();
 
             model.CurrentProcess = isForDeletion ? CrudProcesses.Delete : CrudProcesses.Details;
-            return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
+            if (supportApiResponse && _requiredJson)
+                return Json(entity);
+            else if (supportApiResponse && _requiredXml)
+                return this.Xml(entity);
+            else
+                return await RenderView(nameof(Details), model, isForDeletion ? model.DeleteAction : null);
         }
 
         /// <summary>
@@ -507,5 +652,6 @@ namespace JCTools.GenericCrud.Controllers
 
             return Content(await contentTask, "text/html");
         }
+
     }
 }

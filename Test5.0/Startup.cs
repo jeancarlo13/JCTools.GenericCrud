@@ -48,7 +48,7 @@ namespace Test5._0
                 o.Models.Add<Models.Genre>(nameof(Models.Genre.Name));
                 o.Models.Add<Models.Movie, int, Controllers.MovieController, Context>();
                 o.ReplaceLocalization(Resources.I18NTest.ResourceManager);
-                o.UseAuthorization(f => f.RequireAuthenticatedUser());
+                // o.UseAuthorization(f => f.RequireAuthenticatedUser());
             });
 
             services.AddControllersWithViews()

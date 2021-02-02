@@ -13,5 +13,10 @@ namespace JCTools.GenericCrud.Models
         /// The redirection url to be used for refresh the displayed user data
         /// </summary>
         public string RedirectUrl { get; set; }
+
+        /// <summary>
+        /// The data to send into the response
+        /// </summary>
+        public object Data { get; set; }
     }
 }
