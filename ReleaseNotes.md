@@ -4,6 +4,7 @@
 - [JCTools.GenericCrud Release notes](#jctoolsgenericcrud-release-notes)
   - [Content](#content)
   - [Version 2.2.0](#version-220)
+    - [beta4](#beta4)
     - [beta3](#beta3)
     - [beta2](#beta2)
     - [beta1](#beta1)
@@ -11,6 +12,9 @@
   - [Version 2.0.0](#version-200)
 
 ## Version 2.2.0
+
+### beta4
+* Support to create new entities by API Rest added.  
 ### beta3 
 * Support to delete of entities by API Rest added.  
 ### beta2

@@ -74,12 +74,16 @@ namespace JCTools.GenericCrud.Controllers
         /// <summary>
         /// True if the client required a JSON response; else, false.
         /// </summary>
-        private bool _requiredJson => Request.Headers[HeaderNames.Accept].Contains(Constants.JsonMimeType);
+        private bool _requiredJson
+            => Request.Headers[HeaderNames.Accept].Contains(Constants.JsonMimeType)
+                || Request.Headers[HeaderNames.ContentType].Contains(Constants.JsonMimeType);
 
         /// <summary>
         /// True if the client required a XML response; else, false.
         /// </summary>
-        private bool _requiredXml => Request.Headers[HeaderNames.Accept].Contains(Constants.XmlMimeType);
+        private bool _requiredXml
+            => Request.Headers[HeaderNames.Accept].Contains(Constants.XmlMimeType)
+                || Request.Headers[HeaderNames.ContentType].Contains(Constants.XmlMimeType);
 
         /// <summary>
         /// True if the HTTP request is a DELETE request; else, false.
@@ -192,6 +196,7 @@ namespace JCTools.GenericCrud.Controllers
         /// <param name="id">The last id affect for the crud</param>
         /// <param name="message">The identifier of the message to show at the user</param>
         [Route("{entitySettings}/{id?}/{message?}")]
+        [HttpGet]
         public virtual async Task<IActionResult> Index(
             ICrudType entitySettings,
             string id,
@@ -345,7 +350,32 @@ namespace JCTools.GenericCrud.Controllers
         }
 
         /// <summary>
-        /// Allows save new entities
+        /// Allows save new entities from the API rest
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">The entity to save</param>
+        [HttpPost("{entitySettings}")]
+        public virtual async Task<IActionResult> Create(
+            ICrudType entitySettings,
+            [FromBody] object entityModel
+        )
+        {
+            var response = new JsonResponse();
+            response.Success = await SaveNewEntity(entitySettings, entityModel);
+            if (response.Success)
+                response.Data = entityModel;
+            else
+                response.Data = ModelState.Values
+                    .Select(v => v.Errors.Select(e => e.ErrorMessage));
+
+            if (_requiredXml)
+                return this.Xml(response, entitySettings.ModelType.Name);
+            else
+                return Json(response);
+        }
+
+        /// <summary>
+        /// Allows save new entities from the CRUD screens
         /// </summary>
         /// <param name="entitySettings">The settings of the desired CRUD</param>
         /// <param name="entityModel">The entity to save</param>
@@ -356,29 +386,45 @@ namespace JCTools.GenericCrud.Controllers
             [FromForm] object entityModel
         )
         {
-            ModelState.Remove(entitySettings.Key.Name);
-            if (ModelState.IsValid)
+            if (await SaveNewEntity(entitySettings, entityModel))
             {
-                await DbContext.AddAsync(entityModel);
-
-                try
-                {
-                    await DbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateException ex)
-                {
-                    _logger.LogWarning(ex, "Failure saving changes.");
-                    AddSaveChangesErrorMessage();
-                    return await Create(entitySettings);
-                }
-
                 return SendSuccessResponse(
                     entitySettings.GetKeyPropertyValue(entityModel).ToString(),
                     IndexMessages.CreateSuccess
                 );
             }
+            else
+                return await Create(entitySettings);
+        }
 
-            return await Create(entitySettings);
+        /// <summary>
+        /// Allows store the new entities
+        /// </summary>
+        /// <param name="entitySettings">The settings of the desired CRUD</param>
+        /// <param name="entityModel">The entity to save</param>
+        /// <returns>True if the store process is successful; else, false</returns>
+        private async Task<bool> SaveNewEntity(
+            ICrudType entitySettings,
+            object entityModel
+        )
+        {
+            ModelState.Remove(entitySettings.Key.Name);
+            if (!ModelState.IsValid)
+                return false;
+            await DbContext.AddAsync(entityModel);
+
+            try
+            {
+                await DbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogWarning(ex, "Failure saving changes.");
+                AddSaveChangesErrorMessage();
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
