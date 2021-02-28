@@ -72,7 +72,7 @@ You only require create and configure your models, and this package create the n
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs
-        services.ConfigureGenericCrud<MyContext>(options =>
+        services.AddGenericCrud<MyContext>(options =>
         {
             // add the models type to manage with the package
             options.Models.Add<Models.Country>(); 
@@ -92,6 +92,7 @@ You only require create and configure your models, and this package create the n
             options.Models.Add<Models.Movie, int, MovieController, Data.Context>();            
         });
     ```
+    > In the version 2.0.0 the method ConfigureGenericCrud was renamed to AddGenericCrud.
 3. Run to app and access at the url **http://localhost:5000/[ModelName]**, sample: **http://localhost:5000/Country**. In the browser you should see a similar page to :
  ![Sample index page](Mockups/sampleIndexPage.png)
  ![Sample index page](Mockups/sampleIndexPage2.png)
@@ -221,7 +222,7 @@ The name of the default policy is JCTools.GenericCrud.CrudPolicy, and by default
 To turn on authorization validation, just add a call to **UseAuthorization** in your *Startup.ConfigureServices* method. e.g;
 
 ```cs
-    services.ConfigureGenericCrud<MyContext>(options =>
+    services.AddGenericCrud<MyContext>(options =>
     {
         // ...
         o.UseAuthorization(f => f.RequireAuthenticatedUser()); // add this line
@@ -254,7 +255,7 @@ You can extend or replace the included localized strings with your own translati
 4. Modify the initialization of the GenericCrud in the method **ConfigureServices** of your **Startup** class for include the next line:
    
    ```cs
-    services.ConfigureGenericCrud<MyContext>(options =>
+    services.AddGenericCrud<MyContext>(options =>
     {
         // ...
         o.ReplaceLocalization(Resources.MyResourcesClass.ResourceManager); // add this line
