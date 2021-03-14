@@ -4,7 +4,8 @@ var genericCrud = genericCrud || (function () {
   "use strict";
 
   var global = {
-    loadingClass: 'fa fa-spinner fa-spin'
+    loadingClass: 'fa fa-spinner fa-spin',
+    fontAwesomeIsLoaded: true
   };
 
   function addResponse(response) {
@@ -63,18 +64,23 @@ var genericCrud = genericCrud || (function () {
 
   function showModal() {
     let self = this;
-    let i = self.querySelector('i') || findFaInComments(self);
-    let classes = i.className;
+    let classes;
+    if (global.fontAwesomeIsLoaded == true) {
+      let i = self.querySelector('i') || findFaInComments(self);
 
-    i.className = global.loadingClass;
+      classes = i.className;
+      i.className = global.loadingClass;
+    }
 
     $.ajax({
       url: this.dataset.url,
       method: "GET",
       success: function (response) {
         addResponse(response);
-        i = self.querySelector('i') || findFaInComments(self);
-        i.className = classes;
+        if (global.fontAwesomeIsLoaded == true) {
+          i = self.querySelector('i') || findFaInComments(self);
+          i.className = classes;
+        }
       }
     });
   }
@@ -119,6 +125,46 @@ var genericCrud = genericCrud || (function () {
       }
     });
   }
+
+  /**
+   * Check if the font awesome is loaded in the page; if it's not loaded the button icons is replaced. 
+   */
+  function isLoadedFontAwesome() {
+    /**
+     * Gets the value of a css property from the browser computed style.
+     * @param {Element} element The element with the style to check.
+     * @param {string} property the name of the desired css property.
+     * @returns {object} The found value of the property css applied to the specified element.
+     */
+    function css(element, property) {
+      return window.getComputedStyle(element, null).getPropertyValue(property);
+    }
+
+    let span = document.createElement('span');
+
+    span.classList.add('fa');
+    span.style.display = 'none';
+    document.body.insertBefore(span, document.body.firstChild);
+
+    if ((css(span, 'font-family')).indexOf('Awesome') === -1) {
+      document.body.removeChild(span);
+      console.warn('The font awesome is not found. The button with font icons are replaced with text labels.');
+      console.warn('Add the font awesome css from yourself location or use <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />');
+      console.warn('Add the font awesome js from yourself location or use <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/js/all.min.js" integrity="sha512-UwcC/iaz5ziHX7V6LjSKaXgCuRRqbTp1QHpbOJ4l1nw2/boCfZ2KlFIqBUA/uRVF0onbREnY9do8rM/uT/ilqw==" crossorigin="anonymous"></script>');
+      document.querySelectorAll('.fa').forEach(i => {
+        let text = i.dataset.text;
+        i.parentElement.innerHTML = text;
+      });
+
+      global.fontAwesomeIsLoaded = false;
+    } else {
+      document.body.removeChild(span);
+      console.log('Font awesome was found.');
+      global.fontAwesomeIsLoaded = true;
+    }
+  };
+
+  window.onload = isLoadedFontAwesome;
 
   return {
     showModal: function () {

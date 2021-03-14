@@ -47,8 +47,7 @@ You only require create and configure your models, and this package create the n
 
 
 ## Status
-![v2.2.0-beta3](https://img.shields.io/badge/nuget-v2.2.0--beta3-blue)
-
+![v2.2.1](https://img.shields.io/badge/nuget-v2.2.1-green)
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
 ![.net core 3.1](https://img.shields.io/badge/.net%20core-v3.1-green) or 
@@ -58,6 +57,7 @@ You only require create and configure your models, and this package create the n
 ![bootstrap 4.3.1](https://img.shields.io/badge/bootstrap-v4.3.1-blue)
 
 ![font awesome 5.0.6](https://img.shields.io/badge/font%20awesome-v5.0.6-blue)
+> Since version 2.2.1, the icons in the font awesome are replaced by the configured text labels if the font is not loaded. 
 
 ## Usage
 ### Basic usage

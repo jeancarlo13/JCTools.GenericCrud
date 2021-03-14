@@ -11,6 +11,7 @@
     <AssemblyTitle>Generic Crud by JCTools.mx</AssemblyTitle>
     <PackageDescription>Simplification of the Create, Read, Update and Delete web pages of the application models.</PackageDescription>
     <Description>Simplification of the Create, Read, Update and Delete web pages of the application models.
+    - v2.2.1: Added feature to check if awesome font 5 is loaded.
     - v2.2.0: 
       - API rest added for the CRUD actions.
       - Support by JSON and XML responses added.
@@ -21,7 +22,7 @@
     - v2.0.0-beta2: Adds .net core 3.1 support
     - v2.0.0-beta1: Refactorization and restructure of the package and migration to .net core app 2.1
     </Description>
-    <Version>2.2.0</Version>
+    <Version>2.2.1</Version>
 
     <Authors>JeanCarlo13</Authors>
     <Company>http://jctools.mx/</Company>

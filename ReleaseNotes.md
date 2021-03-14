@@ -3,10 +3,14 @@
 ## Content
 - [JCTools.GenericCrud Release notes](#jctoolsgenericcrud-release-notes)
   - [Content](#content)
+  - [Version 2.2.1](#version-221)
   - [Version 2.2.0](#version-220)
   - [Version 2.1.0](#version-210)
   - [Version 2.0.0](#version-200)
 
+## Version 2.2.1
+* Added feature to check if awesome font 5 is loaded.
+    * If the font is not loaded, all buttons with font icons are replaced by the configured text labels
 ## Version 2.2.0
 * API rest added for the CRUD actions.  
 * Support by JSON and XML responses added.
