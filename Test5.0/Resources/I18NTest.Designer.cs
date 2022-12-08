@@ -104,6 +104,15 @@ namespace Test5._0.Resources {
                 return ResourceManager.GetString("GenericCrud.Index.CreateSuccessMessage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Information stored successful..
+        /// </summary>
+        public static string GenericCrud_Index_EditSuccessMessage {
+            get {
+                return ResourceManager.GetString("GenericCrud.Index.EditSuccessMessage", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Information deleted successful..
