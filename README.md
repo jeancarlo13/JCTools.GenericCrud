@@ -47,7 +47,7 @@ You only require create and configure your models, and this package create the n
 
 
 ## Status
-![v2.2.1](https://img.shields.io/badge/nuget-v2.2.1-green)
+![v2.2.2](https://img.shields.io/badge/nuget-v2.2.2-green)
 ## Requirements
 ![.net core 2.1](https://img.shields.io/badge/.net%20core-v2.1-green),
 ![.net core 3.1](https://img.shields.io/badge/.net%20core-v3.1-green) or 
@@ -64,11 +64,11 @@ You only require create and configure your models, and this package create the n
 
 1. Add the package to your application
     ```bash
-    Install-Package JCTools.GenericCrud -Version 2.1.0
+    Install-Package JCTools.GenericCrud -Version 2.2.2
     ```
     Or
     ```bash
-    dotnet add package JCTools.GenericCrud --version 2.1.0
+    dotnet add package JCTools.GenericCrud --version 2.2.2
     ```
 2. Add the next lines in the method **ConfigureServices** of your **Startup** class
     ```cs

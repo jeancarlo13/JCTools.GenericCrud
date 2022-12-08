@@ -3,10 +3,16 @@
 ## Content
 - [JCTools.GenericCrud Release notes](#jctoolsgenericcrud-release-notes)
   - [Content](#content)
+  - [Version 2.2.2](#version-222)
   - [Version 2.2.1](#version-221)
   - [Version 2.2.0](#version-220)
   - [Version 2.1.0](#version-210)
   - [Version 2.0.0](#version-200)
+
+## Version 2.2.2
+* Upgrade NewtonSoft to v13.0.2
+* Fixed js bug with undeclared variable
+* Added missing I18N label
 
 ## Version 2.2.1
 * Added feature to check if awesome font 5 is loaded.
