@@ -172,6 +172,9 @@
     <data name="GenericCrud.Index.CreateSuccessMessage" xml:space="preserve">
         <value>Information stored successful.</value>
     </data>
+    <data name="GenericCrud.Index.EditSuccessMessage" xml:space="preserve">
+        <value>Information stored successful.</value>
+    </data>
     <data name="GenericCrud.Index.DeleteSuccessMessage" xml:space="preserve">
         <value>Information deleted successful.</value>
     </data>

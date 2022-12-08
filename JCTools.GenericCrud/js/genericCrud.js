@@ -78,7 +78,7 @@ var genericCrud = genericCrud || (function () {
       success: function (response) {
         addResponse(response);
         if (global.fontAwesomeIsLoaded == true) {
-          i = self.querySelector('i') || findFaInComments(self);
+          let i = self.querySelector('i') || findFaInComments(self);
           i.className = classes;
         }
       }

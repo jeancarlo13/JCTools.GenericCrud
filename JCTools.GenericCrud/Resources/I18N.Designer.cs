@@ -113,6 +113,15 @@ namespace JCTools.GenericCrud.Resources {
                 return ResourceManager.GetString("GenericCrud.Index.DeleteSuccessMessage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Information stored successful..
+        /// </summary>
+        public static string GenericCrud_Index_EditSuccessMessage {
+            get {
+                return ResourceManager.GetString("GenericCrud.Index.EditSuccessMessage", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to All data.
